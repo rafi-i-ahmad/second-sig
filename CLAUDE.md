@@ -7,7 +7,7 @@ Hackathon build: two people, about 2.5 days, Encode London. The full spec is the
 ## Who owns what
 
 - `judge/` (except `judge/evidence/fork.py`, `trace.py`, `decode.py`, `slots.py`), `cli/view.py`, `eval/`: Rafi (AI side).
-- `contracts/`, `judge/evidence/fork.py`, `trace.py`, `decode.py`, `slots.py`, `sepolia/`: the chain lead.
+- `contracts/`, `judge/evidence/fork.py`, `trace.py`, `decode.py`, `slots.py`, `sepolia/`: the chain lead. Daniel (Crypto side).
 - The two halves meet only at `judge/schemas.py` (`EvidenceBundle`, `Stamp`). Do not change either schema without both people agreeing. If a change seems necessary, stop and say so.
 
 ## Layout
