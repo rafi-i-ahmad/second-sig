@@ -1,0 +1,38 @@
+# Secrets: never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+keystore/
+secrets/
+
+# Node / Hardhat
+node_modules/
+artifacts/
+typechain-types/
+coverage/
+coverage.json
+
+# Foundry
+out/
+cache/
+broadcast/*/31337/
+broadcast/**/dry-run/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
