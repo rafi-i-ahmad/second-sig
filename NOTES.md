@@ -2,6 +2,12 @@
 
 Operational facts for the fork and the test Safe. Updated 23 October 2026.
 
+## Schema changes (for Daniel)
+
+- 23 October, Rafi: `judge/schemas.py` `Verdict` now has `reasoning: str` as its first field
+  (required), and `Decision.APPROVE` is renamed `Decision.MATCH`, to match the build spec and the
+  UI. `EvidenceBundle` and `Stamp` are unchanged.
+
 ## Fork
 
 | Thing | Value |
@@ -73,14 +79,32 @@ Prints the receipt, `ExecutionSuccess` or `ExecutionFailure`, ETH balance change
 address-book entry, and the `callTracer` call tree. Each run advances the Safe's nonce and leaves
 the fork as is; restart anvil for a clean state.
 
+## Traces
+
+`uv run python -m judge.run_fixture <case.json> --save-trace` writes `fixtures/traces/<id>.json`:
+callTracer tree with logs, prestateTracer diff (storage, balances, nonces, minus the coinbase), and
+ERC-20 balances before and after for every holder in a Transfer log. Before each run it tops the
+Safe up to 10,000 USDC by writing USDC's balance slot (mapping slot 9).
+
+Captured on 23 October: `01_send_eth_ops`, `demo_auditor`, `demo_bybit`. Bybit replaces the Safe's
+singleton (slot 0 becomes `0xbDd0…9516`), after which `nonce()` reverts. Reset afterwards:
+
+```sh
+curl -s -X POST -H 'Content-Type: application/json' http://127.0.0.1:8545   --data '{"jsonrpc":"2.0","id":1,"method":"anvil_reset","params":[{"forking":{"jsonRpcUrl":"https://eth.drpc.org","blockNumber":21895238}}]}'
+uv run python contracts/setup.py
+```
+
+Verified sources from Etherscan are cached in `fixtures/sources/<address>.json`
+(`judge/stages/sources.py`). Model outputs go in `fixtures/outputs/`; `fixtures/cases/` holds cases only.
+
 ## Runs so far
 
 Forward pass (description and address book only, no trace):
 
 | Cases | Model | Result | Output |
 | --- | --- | --- | --- |
-| cases 01 to 10 | `gemini-3.8-flash`, thinking low | all 10 pass against `intent` | `fixtures/cases/<id>.forward.json` |
-| case 09 | `gemini-4-argon`, thinking high | same form as flash, one question, no retry | `fixtures/cases/09_routine_transfer_vague.forward.argon-high.json` (untracked) |
+| cases 01 to 10 | `gemini-3.8-flash`, thinking low | all 10 pass against `intent` | `fixtures/outputs/<id>.forward.json` |
+| case 09 | `gemini-4-argon`, thinking high | same form as flash, one question, no retry | `fixtures/outputs/09_routine_transfer_vague.forward.argon-high.json` |
 
 Run: `uv run pytest tests/test_forward_cases.py --live -s`
 
@@ -92,3 +116,7 @@ On the fork, through the real Safe with two owner signatures:
 
 Not yet run on the fork: cases 02 to 10, the three demo scenarios. Nothing has been run through the
 guard, which is not deployed.
+
+Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
+01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss
+in `eval/naive_baseline.md`; outputs in `fixtures/outputs/<id>.naive.json`.

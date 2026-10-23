@@ -3,7 +3,8 @@
 For every case, run judge/jobs/forward.py on the description and address book alone,
 then compare the form with the case's ``intent``: same multiset of movements, same
 permission and config changes, ``nothing_else`` agreeing, and a question where the
-intent expects one. Each model output is saved next to its case as ``<id>.forward.json``.
+intent expects one. Each model output is saved as ``fixtures/outputs/<id>.forward.json``;
+fixtures/cases/ holds cases only.
 
 Run:  uv run pytest tests/test_forward_cases.py --live -s
 """
@@ -20,8 +21,10 @@ import pytest
 from judge.jobs import forward
 from judge.schemas import ExpectedEffects
 
-CASES_DIR = Path(__file__).resolve().parent.parent / "fixtures" / "cases"
-CASE_FILES = sorted(p for p in CASES_DIR.glob("*.json") if not p.name.endswith(".forward.json"))
+FIXTURES = Path(__file__).resolve().parent.parent / "fixtures"
+CASES_DIR = FIXTURES / "cases"
+OUTPUTS_DIR = FIXTURES / "outputs"
+CASE_FILES = sorted(CASES_DIR.glob("*.json"))
 MODEL = "gemini-3.8-flash"
 THINKING = "low"
 
@@ -136,7 +139,8 @@ def test_forward_case(case_path: Path) -> None:
         case["description"], case["address_book"], case["safe"], model=MODEL, thinking=THINKING
     )
 
-    out_path = case_path.with_name(f"{case_path.stem}.forward.json")
+    OUTPUTS_DIR.mkdir(exist_ok=True)
+    out_path = OUTPUTS_DIR / f"{case_path.stem}.forward.json"
     out_path.write_text(
         json.dumps(
             {"model": MODEL, "thinking": THINKING, "interaction_id": interaction_id,

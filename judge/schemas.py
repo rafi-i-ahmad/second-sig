@@ -110,7 +110,7 @@ class HumanQuestion(BaseModel):
 
 
 class Decision(str, Enum):
-    APPROVE = "APPROVE"
+    MATCH = "MATCH"
     ASK = "ASK"
     REJECT = "REJECT"
 
@@ -118,6 +118,7 @@ class Decision(str, Enum):
 class Verdict(BaseModel):
     """Layer 5 output: a pure function of the evidence bundle plus checked model forms."""
 
+    reasoning: str = Field(description="Why the decision follows; written before the decision.")
     decision: Decision
     reasons: list[str] = Field(default_factory=list)
 

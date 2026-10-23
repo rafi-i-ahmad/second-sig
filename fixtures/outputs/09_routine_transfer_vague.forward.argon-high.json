@@ -1,0 +1,18 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_ChdwYTdiYXU2OUF1RFN4TjhQbzZYNTJBVRIXcGE3YmF1NjlBdURTeE44UG82WDUyQVU",
+  "latency_ms": 13147,
+  "expected_effects": {
+    "reasoning": "The description simply states 'Routine transfer' without specifying the asset, the amount, or the recipient. Because it is too vague to determine any concrete transaction details, all effect lists must be left empty, nothing_else set to false, and questions raised for the human signer.",
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": false,
+    "assumptions": [],
+    "questions_for_human": [
+      "What asset and amount is this transaction meant to transfer, and who is the intended recipient?"
+    ],
+    "confidence": "low"
+  }
+}

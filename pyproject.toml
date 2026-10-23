@@ -1,7 +1,7 @@
 [project]
 name = "second-sig"
 version = "0.1.0"
-description = "An extra signer for Safe multisigs: rehearses a proposal on a fork, checks it against its description, signs a stamp on a match."
+description = "An extra signer for Safe multisigs: simulates a proposal on a fork, checks it against its description, signs a stamp on a match."
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.7",

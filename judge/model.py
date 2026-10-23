@@ -245,12 +245,25 @@ def _output_text(interaction: Any) -> str:
 # --------------------------------------------------------------------------- public API
 
 
+def count_tokens(model: str, system: str, user: str) -> int:
+    """Input tokens for system + user, counted by the API. Not a model call; not logged."""
+    client = get_client()
+    try:
+        resp = client.models.count_tokens(model=model, contents=system + "\n\n" + user)
+    except Exception as exc:
+        if not _is_api_error(exc):
+            raise
+        raise ModelUnavailable(f"count_tokens: {type(exc).__name__}: {exc}") from exc
+    return int(resp.total_tokens)
+
+
 def complete(
     model: str,
     system: str,
     user: str,
     schema: type[T],
     thinking: ThinkingLevel = "low",
+    timeout_s: float = DEFAULT_TIMEOUT_S,
 ) -> tuple[T, str]:
     """One typed call. Returns the parsed model instance and the interaction id."""
     client = get_client()
@@ -261,7 +274,7 @@ def complete(
         kwargs = _request_kwargs(model, system, prompt, schema, thinking, stream=False)
         t0 = time.perf_counter()
         try:
-            interaction = client.interactions.create(timeout=DEFAULT_TIMEOUT_S, **kwargs)
+            interaction = client.interactions.create(timeout=timeout_s, **kwargs)
         except Exception as exc:
             if not _is_api_error(exc):
                 raise

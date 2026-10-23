@@ -7,4 +7,6 @@ def test_stamp_roundtrip() -> None:
 
 
 def test_verdict_decision_enum() -> None:
-    assert Verdict(decision=Decision.REJECT).decision == "REJECT"
+    v = Verdict(reasoning="delegatecall to an unverified contract", decision=Decision.REJECT)
+    assert v.decision == "REJECT"
+    assert list(Verdict.model_fields)[0] == "reasoning"
