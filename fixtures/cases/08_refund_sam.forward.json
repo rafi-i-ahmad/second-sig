@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdqNnJiYXJQQUpjR0lrZFVQdU4yejJBbxIXajZyYmFyUEFKY0dJa2RVUHVOMnoyQW8",
+  "latency_ms": 6605,
+  "expected_effects": {
+    "reasoning": "The user wants to refund Sam 0.5 ETH from the Safe. Sam is present in the address book. This translates to a single asset transfer of 0.5 ETH from the Safe to Sam, with no approvals or safe configuration changes.",
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "0.5 ETH",
+        "from_name": "Safe",
+        "to_name": "Sam",
+        "cites": "Refund Sam the 0.5 ETH he overpaid"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

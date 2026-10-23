@@ -1,0 +1,88 @@
+{
+  "id": "07_pay_three_contractors",
+  "description": "Pay three contractors their October invoices: Alice 1,200 USDC, Bob 3,400 USDC, Chen 800 USDC",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "Alice": "0x0f7Fec2abfb38b2dbE7db5c42dDf737fE4d83793",
+    "Bob": "0x3016eed29f9F2352B2B67E570b2D1e25A2b6B79D",
+    "Chen": "0x0e3cF211A59882A219cF6a9E35A7023c92b9341D",
+    "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "MultiSendCallOnly v1.4.1": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2"
+  },
+  "safe_tx": {
+    "to": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+    "value": "0",
+    "data": "0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000001cb00a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000000f7fec2abfb38b2dbe7db5c42ddf737fe4d837930000000000000000000000000000000000000000000000000000000047868c0000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000003016eed29f9f2352b2b67e570b2d1e25a2b6b79d00000000000000000000000000000000000000000000000000000000caa7e20000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000000e3cf211a59882a219cf6a9e35a7023c92b9341d000000000000000000000000000000000000000000000000000000002faf0800000000000000000000000000000000000000000000",
+    "operation": 1
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0x0f7Fec2abfb38b2dbE7db5c42dDf737fE4d83793",
+        "1200000000"
+      ],
+      "data": "0xa9059cbb0000000000000000000000000f7fec2abfb38b2dbe7db5c42ddf737fe4d837930000000000000000000000000000000000000000000000000000000047868c00"
+    },
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0x3016eed29f9F2352B2B67E570b2D1e25A2b6B79D",
+        "3400000000"
+      ],
+      "data": "0xa9059cbb0000000000000000000000003016eed29f9f2352b2b67e570b2d1e25a2b6b79d00000000000000000000000000000000000000000000000000000000caa7e200"
+    },
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0x0e3cF211A59882A219cF6a9E35A7023c92b9341D",
+        "800000000"
+      ],
+      "data": "0xa9059cbb0000000000000000000000000e3cf211a59882a219cf6a9e35a7023c92b9341d000000000000000000000000000000000000000000000000000000002faf0800"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1,200 USDC",
+        "from_name": "Safe",
+        "to_name": "Alice"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "3,400 USDC",
+        "from_name": "Safe",
+        "to_name": "Bob"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "800 USDC",
+        "from_name": "Safe",
+        "to_name": "Chen"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false
+  }
+}

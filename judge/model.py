@@ -98,11 +98,16 @@ def _inline_refs(node: Any, defs: dict[str, Any]) -> Any:
             target = defs[ref[len("#/$defs/") :]]
             merged = {**target, **{k: v for k, v in node.items() if k != "$ref"}}
             return _inline_refs(merged, defs)
-        return {
+        out = {
             k: _inline_refs(v, defs)
             for k, v in node.items()
             if k not in ("$defs", "title")
         }
+        # Gemini omits properties that are not required, and pydantic then fills the
+        # default silently. Every field of a form must be filled, so require them all.
+        if isinstance(out.get("properties"), dict):
+            out["required"] = list(out["properties"])
+        return out
     if isinstance(node, list):
         return [_inline_refs(v, defs) for v in node]
     return node

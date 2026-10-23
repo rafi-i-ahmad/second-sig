@@ -1,0 +1,50 @@
+{
+  "id": "demo_bybit",
+  "description": "Transfer 500 ETH to the warm wallet",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "warm wallet": "0x5EdeB15618d4A94EBFC4DfEBBe49748982731B07"
+  },
+  "safe_tx": {
+    "to": "0x96221423681A6d52E184D440a8eFCEbB105C7242",
+    "value": "0",
+    "data": "0xa9059cbb000000000000000000000000bdd077f651ebe7f7b3ce16fe5f2b025be29695160000000000000000000000000000000000000000000000000000000000000000",
+    "operation": 1
+  },
+  "calls": [
+    {
+      "operation": 1,
+      "to": "0x96221423681A6d52E184D440a8eFCEbB105C7242",
+      "to_name": "Bybit attackers' contract (not in the address book)",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0xbDd077f651EBe7f7b3cE16fe5F2b025BE2969516",
+        "0"
+      ],
+      "data": "0xa9059cbb000000000000000000000000bdd077f651ebe7f7b3ce16fe5f2b025be29695160000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "500 ETH",
+        "from_name": "Safe",
+        "to_name": "warm wallet"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false
+  },
+  "expected_verdict": "REJECT",
+  "note": "The bytes do not do what the sentence says. The delegatecall trips hard-floor rules 1, 2 and 3 before any model runs. Real attack: mainnet block 21,895,238."
+}

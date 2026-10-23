@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdXYXJiYXFtQ0t1ejRuc0VQN2MyWWdRYxIXV2FyYmFxbUNLdXo0bnNFUDdjMllnUWM",
+  "latency_ms": 8051,
+  "expected_effects": {
+    "reasoning": "The proposal requests a direct transfer of 5 ETH from the Safe to the 'ops wallet'. Both asset, amount, and recipient are explicitly specified and match the address book.",
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "5 ETH",
+        "from_name": "Safe",
+        "to_name": "ops wallet",
+        "cites": "Send 5 ETH to the ops wallet"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

@@ -289,6 +289,14 @@ def test_json_schema_inlines_nested_models() -> None:
     assert list(schema["properties"]) == ["reasoning", "verdict", "findings"]
 
 
+def test_json_schema_requires_every_property() -> None:
+    """Fields with defaults are still required: Gemini drops optional properties."""
+    schema = m.json_schema_for(Judgement)
+    assert schema["required"] == ["reasoning", "verdict", "findings"]
+    item = schema["properties"]["findings"]["items"]
+    assert item["required"] == ["claim", "severity"]
+
+
 def test_get_client_without_key_raises(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(m, "_client", None)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)

@@ -1,0 +1,37 @@
+{
+  "id": "09_routine_transfer_vague",
+  "description": "Routine transfer",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {},
+  "safe_tx": {
+    "to": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+    "value": "1000000000000000000",
+    "data": "0x",
+    "operation": 0
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+      "to_name": "ops wallet",
+      "value_wei": "1000000000000000000",
+      "function": "(plain ETH transfer, empty calldata)",
+      "args": [],
+      "data": "0x"
+    }
+  ],
+  "intent": {
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": false,
+    "expect_question": true,
+    "note": "The description licenses nothing specific. The forward pass must ask rather than invent a movement."
+  }
+}

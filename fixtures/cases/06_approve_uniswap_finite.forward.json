@@ -1,0 +1,25 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdncXJiYXYzakpaX2Ruc0VQNzlhVXlBcxIXZ3FyYmF2M2pKWl9kbnNFUDc5YVV5QXM",
+  "latency_ms": 17120,
+  "expected_effects": {
+    "reasoning": "The proposal description specifies approving the Uniswap router to spend 1,000 USDC. No actual token transfers or Safe configuration changes are requested.",
+    "movements": [],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap router",
+        "amount_human": "1,000 USDC",
+        "cites": "Approve the Uniswap router to spend 1,000 USDC"
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

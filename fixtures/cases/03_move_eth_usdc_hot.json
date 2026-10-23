@@ -1,0 +1,65 @@
+{
+  "id": "03_move_eth_usdc_hot",
+  "description": "Move 20 ETH and 10,000 USDC to the hot wallet",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "hot wallet": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+    "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "MultiSendCallOnly v1.4.1": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2"
+  },
+  "safe_tx": {
+    "to": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+    "value": "0",
+    "data": "0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000ee005e65fc384fa4bef1cd524a77857b3693bc26e15b000000000000000000000000000000000000000000000001158e460913d00000000000000000000000000000000000000000000000000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000005e65fc384fa4bef1cd524a77857b3693bc26e15b00000000000000000000000000000000000000000000000000000002540be400000000000000000000000000000000000000",
+    "operation": 1
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+      "to_name": "hot wallet",
+      "value_wei": "20000000000000000000",
+      "function": "(plain ETH transfer, empty calldata)",
+      "args": [],
+      "data": "0x"
+    },
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+        "10000000000"
+      ],
+      "data": "0xa9059cbb0000000000000000000000005e65fc384fa4bef1cd524a77857b3693bc26e15b00000000000000000000000000000000000000000000000000000002540be400"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "20 ETH",
+        "from_name": "Safe",
+        "to_name": "hot wallet"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "10,000 USDC",
+        "from_name": "Safe",
+        "to_name": "hot wallet"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false
+  }
+}

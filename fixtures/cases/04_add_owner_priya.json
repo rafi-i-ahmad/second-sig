@@ -1,0 +1,48 @@
+{
+  "id": "04_add_owner_priya",
+  "description": "Add Priya as a signer",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "Priya": "0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8"
+  },
+  "safe_tx": {
+    "to": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "value": "0",
+    "data": "0x0d582f13000000000000000000000000b55c0e1de2af38cf741de4b2c8d6d5bb34e9afe80000000000000000000000000000000000000000000000000000000000000002",
+    "operation": 0
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+      "to_name": "Safe (itself)",
+      "value_wei": "0",
+      "function": "addOwnerWithThreshold(address,uint256)",
+      "args": [
+        "0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8",
+        "2"
+      ],
+      "data": "0x0d582f13000000000000000000000000b55c0e1de2af38cf741de4b2c8d6d5bb34e9afe80000000000000000000000000000000000000000000000000000000000000002"
+    }
+  ],
+  "intent": {
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [
+      {
+        "kind": "add_owner",
+        "owner_name": "Priya",
+        "threshold_after": 2
+      }
+    ],
+    "nothing_else": true,
+    "expect_question": false,
+    "note": "Threshold is unchanged at 2; a forward pass that flags the threshold as unstated is acceptable."
+  }
+}

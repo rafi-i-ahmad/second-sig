@@ -1,0 +1,80 @@
+{
+  "id": "demo_aave",
+  "description": "Deposit 10,000 USDC into Aave v3",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "Aave v3 Pool": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+    "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "MultiSendCallOnly v1.4.1": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2"
+  },
+  "safe_tx": {
+    "to": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+    "value": "0",
+    "data": "0x8d80ff0a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000017200a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000002540be4000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000002540be4000000000000000000000000005afe5afe5afe5afe5afe5afe5afe5afe5afe5afe00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "operation": 1
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "approve(address,uint256)",
+      "args": [
+        "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "10000000000"
+      ],
+      "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000002540be400"
+    },
+    {
+      "operation": 0,
+      "to": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+      "to_name": "Aave v3 Pool",
+      "value_wei": "0",
+      "function": "supply(address,uint256,address,uint16)",
+      "args": [
+        "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "10000000000",
+        "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+        "0"
+      ],
+      "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000002540be4000000000000000000000000005afe5afe5afe5afe5afe5afe5afe5afe5afe5afe0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "10,000 USDC",
+        "from_name": "Safe",
+        "to_name": "Aave v3 Pool"
+      },
+      {
+        "asset": "aUSDC",
+        "amount_human": "10,000 aUSDC",
+        "from_name": "Aave v3 Pool",
+        "to_name": "Safe"
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Aave v3 Pool",
+        "amount_human": "10,000 USDC"
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false,
+    "note": "The approval is implied by a deposit and is consumed by supply()."
+  },
+  "expected_verdict": "MATCH"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "08_refund_sam",
+  "description": "Refund Sam the 0.5 ETH he overpaid",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "Sam": "0x1C733c205548a061CED714A14925E952e2E64D6E"
+  },
+  "safe_tx": {
+    "to": "0x1C733c205548a061CED714A14925E952e2E64D6E",
+    "value": "500000000000000000",
+    "data": "0x",
+    "operation": 0
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0x1C733c205548a061CED714A14925E952e2E64D6E",
+      "to_name": "Sam",
+      "value_wei": "500000000000000000",
+      "function": "(plain ETH transfer, empty calldata)",
+      "args": [],
+      "data": "0x"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "0.5 ETH",
+        "from_name": "Safe",
+        "to_name": "Sam"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false
+  }
+}

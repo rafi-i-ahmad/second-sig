@@ -1,0 +1,43 @@
+{
+  "id": "05_raise_threshold",
+  "description": "Raise the signing threshold to 3 of 4",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 4,
+    "threshold": 2
+  },
+  "address_book": {},
+  "safe_tx": {
+    "to": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "value": "0",
+    "data": "0x694e80c30000000000000000000000000000000000000000000000000000000000000003",
+    "operation": 0
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+      "to_name": "Safe (itself)",
+      "value_wei": "0",
+      "function": "changeThreshold(uint256)",
+      "args": [
+        "3"
+      ],
+      "data": "0x694e80c30000000000000000000000000000000000000000000000000000000000000003"
+    }
+  ],
+  "intent": {
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [
+      {
+        "kind": "change_threshold",
+        "threshold_after": 3
+      }
+    ],
+    "nothing_else": true,
+    "expect_question": false
+  }
+}

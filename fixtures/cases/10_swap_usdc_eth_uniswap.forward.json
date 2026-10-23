@@ -1,0 +1,43 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdwcXJiYXVpUE1PSFU3TThQazYyM2lRbxIXcHFyYmF1aVBNT0hVN004UGs2MjNpUW8",
+  "latency_ms": 16034,
+  "expected_effects": {
+    "reasoning": "The user specifies swapping 5,000 USDC for ETH via Uniswap. This implies granting an ERC20 approval of 5,000 USDC (or unlimited, but typically at least the swap amount) to the Uniswap router, transferring 5,000 USDC from the Safe to Uniswap (or via the router), and receiving ETH back into the Safe. Since the exact return amount of ETH depends on market execution, the received amount is not fixed.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "5,000 USDC",
+        "from_name": "Safe",
+        "to_name": "Uniswap router",
+        "cites": "Swap 5,000 USDC for ETH on Uniswap"
+      },
+      {
+        "asset": "ETH",
+        "amount_human": null,
+        "from_name": "Uniswap router",
+        "to_name": "Safe",
+        "cites": "Swap 5,000 USDC for ETH on Uniswap"
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap router",
+        "amount_human": "5,000 USDC",
+        "cites": "Swap 5,000 USDC for ETH on Uniswap"
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [
+      "Approval granted to Uniswap router is for at least 5,000 USDC to execute the swap.",
+      "Swapped ETH will be returned directly to the Safe."
+    ],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

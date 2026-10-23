@@ -1,0 +1,38 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdpcXJiYXZXdUtlYTRuc0VQZ2Q2NHFBaxIXaXFyYmF2V3VLZWE0bnNFUGdkNjRxQWs",
+  "latency_ms": 4946,
+  "expected_effects": {
+    "reasoning": "The proposal specifies payments of USDC to three named contractors from the Safe: Alice receives 1,200 USDC, Bob receives 3,400 USDC, and Chen receives 800 USDC. All recipients and the asset are in the address book.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1,200 USDC",
+        "from_name": "Safe",
+        "to_name": "Alice",
+        "cites": "Alice 1,200 USDC"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "3,400 USDC",
+        "from_name": "Safe",
+        "to_name": "Bob",
+        "cites": "Bob 3,400 USDC"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "800 USDC",
+        "from_name": "Safe",
+        "to_name": "Chen",
+        "cites": "Chen 800 USDC"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}
