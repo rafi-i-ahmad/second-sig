@@ -1,0 +1,42 @@
+{
+  "description": "Transfer 50,000 USDC and 5 ETH from the Main Treasury (Cold Safe) to the Operations Multisig (Hot Safe) to cover Q4 contributor payroll and gas reimbursements.",
+  "fork_context": {
+    "chain_id": 1,
+    "fork": "anvil, mainnet fork at block 21895238",
+    "proposing_safe": {
+      "label": "Main Treasury (Cold Safe)",
+      "address": "0x1111111111111111111111111111111111111111",
+      "version": "1.4.1",
+      "threshold": "2 of 3",
+      "nonce_before": 7,
+      "balances_before": {
+        "ETH_wei": "12000000000000000000",
+        "USDC_base_units": "120000000000"
+      },
+      "guard": "none set"
+    },
+    "known_addresses": {
+      "Operations Multisig (Hot Safe)": {
+        "address": "0x2222222222222222222222222222222222222222",
+        "version": "1.4.1",
+        "balances_before": {
+          "ETH_wei": "800000000000000000",
+          "USDC_base_units": "1500000000"
+        }
+      },
+      "USDC": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "note": "FiatTokenProxy; transfer emits Transfer(from, to, value)"
+      },
+      "MultiSendCallOnly v1.4.1": {
+        "address": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+        "note": "Safe batches by delegatecall to this contract; it only CALLs inner targets"
+      }
+    },
+    "execution": {
+      "entrypoint": "Safe.execTransaction with 2 owner signatures",
+      "note": "A batch of two actions is normally one execTransaction whose operation is DELEGATECALL to MultiSendCallOnly.multiSend; a single action is a plain CALL."
+    }
+  }
+}
