@@ -1,0 +1,134 @@
+{
+  "id": "51_reimbursement_clarification_moves_goalposts",
+  "description": "Pay Dana's 2,500 USDC October invoice and include Ravi's reimbursement.",
+  "expected_verdict": "ASK",
+  "verdict": {
+    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "decision": "ASK",
+    "reasons": [
+      "no checked model form"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": null
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address"
+        },
+        "amount_base": 2500000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "2500 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Ravi",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address"
+        },
+        "amount_base": 200000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "200 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": null,
+  "backward": null,
+  "forward_vs_truth": null,
+  "backward_vs_truth": null,
+  "attribution": [],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x93bd9419e4898b07e561315b463ec9c0564e782e60e14aa48d7ba4d79f071afd",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x096dd619cd2c4170b38907621d8867e5cbd5a41ec8e9f09b8df03981132df3de",
+        "label": "USDC.balanceOf[0x2C81…53D3]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000000000000000000000000000000000000bebc200"
+      },
+      {
+        "id": "s1",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x2af6e45109ed6c3f87addc9868ad92048225ec319f059ae1d594169e71fbbeb6",
+        "label": "USDC.balanceOf[0xDFEC…aE47]",
+        "before": "0x00000000000000000000000000000000000000000000000000000002540be400",
+        "after": "0x00000000000000000000000000000000000000000000000000000001b31d2900"
+      },
+      {
+        "id": "s2",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x6efc0df7a31c38d6b6b1a62d7e250d0fefce5752542a43a1d9a17a9f61532a5c",
+        "label": "USDC.balanceOf[0x4716…d315]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000000000000000000000000000000000009502f900"
+      },
+      {
+        "id": "s3",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

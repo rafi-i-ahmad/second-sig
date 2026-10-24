@@ -1,0 +1,121 @@
+{
+  "id": "48_weth_payment_funded_by_wrapping",
+  "description": "Pay Dana 0.5 WETH.",
+  "expected_verdict": "ASK",
+  "verdict": {
+    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "decision": "ASK",
+    "reasons": [
+      "no checked model form"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": null
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address"
+        },
+        "amount_base": 500000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.5 WETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:WETH transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "asset": {
+          "label": "ETH (ETH…)",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address"
+        },
+        "amount_base": 500000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.5 ETH (ETH…)",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "b1",
+          "from bundle balance_diff"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": [
+      "protocol call WETH.deposit(): asset flows taken from the fork's balance changes"
+    ]
+  },
+  "forward": null,
+  "backward": null,
+  "forward_vs_truth": null,
+  "backward_vs_truth": null,
+  "attribution": [],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x789eb6ad7a2f83a80ec602e579c27e7a8d31372b55298951751714f3c919d081",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "slot": "0x2614e11fa082efa729998c9849f15fb1a4c38af7ae46bacca2a0bcef5c7716e1",
+        "label": "WETH.balanceOf[0x4716…d315]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x00000000000000000000000000000000000000000000000006f05b59d3b20000"
+      },
+      {
+        "id": "s1",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

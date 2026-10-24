@@ -1,0 +1,102 @@
+{
+  "id": "50_add_owner_threshold_side_effect",
+  "description": "Add Ravi as a backup owner.",
+  "expected_verdict": "ASK",
+  "verdict": {
+    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "decision": "ASK",
+    "reasons": [
+      "no checked model form"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": null
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "owners_add",
+        "old": null,
+        "new": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "severity": null,
+        "cites": [
+          "call:Safe (itself) addOwnerWithThreshold(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "1",
+        "severity": null,
+        "cites": [
+          "call:Safe (itself) addOwnerWithThreshold(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": null,
+  "backward": null,
+  "forward_vs_truth": null,
+  "backward_vs_truth": null,
+  "attribution": [],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0xf754879228ba64dc20595224b791e8c1e9b0c4321412d27cc72cc0e23dc1b146",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "label": "Safe.ownerCount",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000004"
+      },
+      {
+        "id": "s1",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "label": "Safe.threshold",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "id": "s2",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      },
+      {
+        "id": "s3",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0xe41cc979102d9bdb301e8352de1d78a08f0ef88d6cf1f44caa2af619e93a79b2",
+        "label": "Safe.owners[0x2C81…53D3]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+      },
+      {
+        "id": "s4",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0",
+        "label": "Safe.owners[0x0000…0001]",
+        "before": "0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "after": "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+      }
+    ]
+  }
+}
