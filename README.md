@@ -28,7 +28,7 @@ All three run against a real Safe v1.4.1 on an anvil fork pinned at the Bybit at
 | `secondsig demo aave` | Deposit 10,000 USDC into Aave v3 | approve and `Pool.supply`, eight storage writes no layout labels | MATCH once Argon's source reading is corroborated by code | stamp signed, attested, executed; the Safe holds aUSDC |
 | `secondsig demo auditor` | Pay our auditor 100 USDC | the transfer, plus an unlimited USDC approval to the auditor | ASK with one question | reverts; an owner's answer re-runs the judge and it executes |
 
-Beyond the demos there is a 33-case eval set under `fixtures/cases/`: honest proposals, vague ones, descriptions that contradict the bytes, and prompt injections in the description, an address-book label, a contract label and a forged rehearsal tag.
+Beyond the demos there are 30 more cases under `fixtures/cases/` (33 with the demos): honest proposals, vague ones, descriptions that contradict the bytes, and prompt injections in the description, an address-book label, a contract label and a forged rehearsal tag. With forms recorded live on 24 October, every one of the 33 replays to its expected verdict, and none that should be refused is a MATCH (`reports/compare/FINDINGS.md`).
 
 ## Setup
 
