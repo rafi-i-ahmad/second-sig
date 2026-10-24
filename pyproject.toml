@@ -19,6 +19,9 @@ secondsig = "cli.secondsig:app"
 
 [dependency-groups]
 dev = ["pytest>=8.0"]
+investigate = [
+    "google-antigravity>=0.1.22",
+]
 
 [build-system]
 requires = ["hatchling"]

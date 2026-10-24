@@ -82,7 +82,9 @@ eval/
 tests/                pytest: schemas, model adapter, evidence, floor rules, stamp, forward cases
                       (live), backward (input checks offline; bundles live). Markers: `live` needs --live + GEMINI_API_KEY; `fork` needs --fork + anvil
 scripts/              compare_benign.py: three-way report (truth, forward, backward) per case into
-                      reports/compare/, --live fills missing forms; smoke_gemini.py, forward_transfer.py
+                      reports/compare/, --live fills missing forms; smoke_gemini.py, forward_transfer.py;
+                      investigate.py: Antigravity agent (dev aid, chain lead) that explains residuals
+                      from a bundle with read-only tools, writes logs/investigations/. Never on the stamp path
 reports/compare/      <id>.md + <id>.json per case, summary.json, FINDINGS.md (which pass is wrong where)
 logs/                 calls.jsonl, verdicts.jsonl (gitignored; used by --replay)
 ```
@@ -108,6 +110,7 @@ uv run python -m judge.verdict fixtures/bundles/<id>.bundle.json           # dec
 uv run python scripts/compare_benign.py [--live] [--include-reject]        # end-to-end verdicts by replay + reports
 uv run python -m judge.run_fixture fixtures/cases/01_send_eth_ops.json [--save-trace]
 uv run python -m judge.stages.judge <case.json>... [--dump-prompt out.txt --no-call]
+uv sync --group investigate && uv run python scripts/investigate.py <id> [--slots | --cites s0 s3 | --residuals r.json]   # default: reports/compare/<id>.json
 ```
 
 Not working yet (stubs): every `uv run secondsig ...` command (`demo`, `judge`, `eval --table`, `--replay`) raises `NotImplementedError`. `anvil --load-state fixtures/anvil-state.json` needs a dump that doesn't exist yet.
