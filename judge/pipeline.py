@@ -264,7 +264,7 @@ def _finish(proposal, bundle, fwd, bwd, v: Verdict, calls, run_escalate: bool,
                 q, iid, ms = escalate.run(bundle.description, proposal.address_book, proposal.safe, v, exp, obs)
                 res.question = q
                 res.note = escalate.compose(q, v.decision.value)
-                calls.append(f"escalate {escalate.DEFAULT_MODEL} {ms} ms {iid}")
+                res.calls.append(f"escalate {escalate.DEFAULT_MODEL} {ms} ms {iid}")
             except Exception as exc:  # noqa: BLE001 - the question is a courtesy; the decision stands
                 res.note = f"{res.note}\n(escalation unavailable: {type(exc).__name__})"
     return res

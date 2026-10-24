@@ -114,7 +114,7 @@ def compare(form: ExpectedEffects, intent: dict[str, Any]) -> list[str]:
 
 
 def test_cases_exist_and_never_include_demos() -> None:
-    assert len(CASE_FILES) == 15
+    assert len(CASE_FILES) == 30, sorted(p.stem for p in CASE_FILES)
     for path in CASE_FILES:
         data = json.loads(path.read_text(encoding="utf-8"))
         assert not data["id"].startswith("demo_"), f"{path} is a demo scenario; those stay in cases/demo/"

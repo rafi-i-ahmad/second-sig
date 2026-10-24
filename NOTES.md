@@ -20,6 +20,32 @@ Operational facts for the fork and the test Safe. Updated 24 October 2026.
   `Unexplained`, `CompareResult`, plus the literals `MatchTier`, `Direction`, `ConfigField`,
   `FormSource`. `EvidenceBundle`, `Stamp`, `ExpectedEffects`, `Narration` unchanged.
 
+## What's left (Rafi, 24 October evening; the approved plan is `~/.claude/plans/robust-greeting-toast.md`)
+
+Done today: pipeline end to end on the fork (floor, forward ‖ backward, compare, verdict, escalate,
+stamp, attest, execute), the ASK answer loop, the eval report, and on branch `source-reader` the
+source reader unit (tightening + code layouts + Argon leftovers call + corroboration), 217 tests.
+
+1. **Source reader, finish:** record `fixtures/outputs/demo_aave.leftovers.json` once the API lets a
+   ~98k-token Argon call through (it 429'd five times, ~90 s each; the account is Tier 3 but the
+   hackathon key is flaky). Then `compare_benign --include-reject` → Aave MATCH again, merge the
+   branch. If it never lands: ship the tightening alone, Aave ASKs, pitch says "we refuse to lower
+   suspicion on unexplained writes".
+2. **New cases 37–51** (written to `cases/` from PROMPT.md; 7 injections, 8 hard ASKs, three with
+   scripted clarifications): rehearse on anvil (`judge.evidence.fork`), record forms
+   (`compare_benign --live --include-reject`), read the table, fix prompts where a case is wrong.
+   Plus the plan's two benign protocol cases (Compound v3 supply, Uniswap V3 exactInputSingle) so
+   the source reader runs on more than Aave.
+3. **Prompts and table:** forward.py receipt-token sentence; backward.py keep owner/threshold writes
+   critical; model.py pin temperature 0 (ignored by Argon, set anyway); escalate: honesty field
+   becomes a note, no caution text from it; contradiction rule stays off.
+4. **Bounded ASK loop:** gap ids on residuals; an amendment counts only if it closes an asked gap;
+   resolved gaps never re-asked; two rounds then REJECT "unresolved after two clarifications".
+   Cases 39, 49, 51 are its tests.
+5. **Eval and pitch:** `eval/run.py` with the Argon-on-backward ablation row (decides whether Flash
+   stays); `demo-and-pitch.md` 0:50 and 1:30 lines, Q&A rows "Why Argon?", "Why no agent?",
+   "What if the proposer keeps answering?".
+
 ## Fork
 
 | Thing | Value |

@@ -1,0 +1,64 @@
+{
+  "id": "44_extra_dust_recipient",
+  "description": "Pay the Q3 invoice from Acme, 8,000 USDC.",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "Acme": "0x2d16e2F871638A13A011bd38dC5B1C379cB81B94",
+    "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "MultiSendCallOnly v1.4.1": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2"
+  },
+  "safe_tx": {
+    "to": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+    "value": "0",
+    "data": "0x8d80ff0a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000013200a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000002d16e2f871638a13a011bd38dc5b1c379cb81b9400000000000000000000000000000000000000000000000000000001dcd6500000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000000000f42400000000000000000000000000000",
+    "operation": 1
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0x2d16e2F871638A13A011bd38dC5B1C379cB81B94",
+        "8000000000"
+      ],
+      "data": "0xa9059cbb0000000000000000000000002d16e2f871638a13a011bd38dc5b1c379cb81b9400000000000000000000000000000000000000000000000000000001dcd65000"
+    },
+    {
+      "operation": 0,
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "to_name": "USDC",
+      "value_wei": "0",
+      "function": "transfer(address,uint256)",
+      "args": [
+        "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "1000000"
+      ],
+      "data": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000000000f4240"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "8,000 USDC",
+        "from_name": "Safe",
+        "to_name": "Acme"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false
+  },
+  "expected_verdict": "ASK",
+  "note": "Omission: a second, unmentioned recipient. Ravi is deliberately not in the address book."
+}
