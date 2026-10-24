@@ -82,8 +82,14 @@ cli/
   view.py             three-panel terminal view (rich): the words, the bytes, the verdict
 web/                  the demo page. server.py: FastAPI over judge/pipeline.py (judge(..., emit=) streams the stages
                       as SSE), execute through the guard, reset by evm_snapshot/evm_revert. static/: plain HTML/CSS/JS,
-                      no build, no CDN (works offline). Replay by default; a floor REJECT shows recorded forms as reference
-sepolia/              watcher.py, attacker.py  (stubs)
+                      no build, no CDN (works offline). Replay by default; a floor REJECT shows recorded forms as reference.
+                      display.py: display forms + SSE jobs, shared. sepolia.py + static/safe-app/: the Safe{Wallet} panel
+                      (a custom Safe App at /safe-app; reads only, holds no owner key). static/render.js: shared cards
+sepolia/              the Safe{Wallet} demo on Sepolia (NOTES.md, "Sepolia"). chain.py: Sepolia + the 8546 fork, the
+                      fork-only approvedHashes signatures, redact(). txservice.py: Safe Transaction Service client; the
+                      description is Safe{Wallet}'s note in `origin`. watcher.py: queue -> rehearse -> pipeline.judge ->
+                      attest on MATCH; refuses a proposal whose fields don't hash to its safeTxHash. setup.py: create the
+                      Safe (1.4.1 L2), deploy/verify/propose the guard. attacker.py (stub)
 fixtures/
   build.py            generates every case JSON; edit the Python, not the JSON
   README.md           what every folder here is for; read it before adding a fixture
@@ -148,6 +154,8 @@ uv run secondsig judge fixtures/cases/demo/demo_auditor.json --replay [--chain]
 uv run secondsig answer fixtures/cases/demo/demo_auditor.json "Yes, the auditor invoices monthly" --owner 1 [--chain]
 uv run secondsig reset                           # anvil_reset + Safe + guard; clears logs/proposals/
 uv run uvicorn web.server:app --port 8000        # the demo page at http://localhost:8000 (anvil must be up)
+uv run python -m sepolia.setup [create-safe|fund|deploy-guard|propose-guard|...]   # Sepolia Safe + guard
+uv run python -m sepolia.watcher --once [--live]   # judge the Safe{Wallet} queue (needs anvil on 8546)
 ```
 
 The demos execute for real on the fork, so a MATCH advances the Safe's nonce and the recorded bundles (nonce 1) stop matching the chain. `secondsig reset` puts it back. Not built: `propose`, `sign`, `override`, `describe`; `eval` points at `scripts/compare_benign.py`. `anvil --load-state fixtures/anvil-state.json` needs a dump that doesn't exist yet.

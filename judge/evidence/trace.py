@@ -21,6 +21,10 @@ if TYPE_CHECKING:
 
 PRECOMPILE_MAX = 0x100
 ZERO_WORD = "0x" + "00" * 32
+# EIP-7708 (live on Sepolia, not at the mainnet fork block): every ETH value transfer also emits an
+# ERC-20-shaped Transfer log from this system address. Only the protocol can emit from it, and the
+# call's value and the balance diff already record the movement, so these logs are skipped.
+ETH_TRANSFER_LOG_ADDRESS = "0xfffffffffffffffffffffffffffffffffffffffe"
 
 
 class TraceEvidence(BaseModel):
@@ -57,6 +61,8 @@ def flatten(frame: RawFrame) -> tuple[list[Call], list[Event], dict[str, str]]:
         )
         calls.append(c)
         for log in f.logs:
+            if log.address.lower() == ETH_TRANSFER_LOG_ADDRESS:
+                continue  # EIP-7708: the protocol's log for a value transfer the call itself records
             events.append(Event(
                 id=f"e{len(events)}", call_id=c.id, address=to_checksum_address(log.address),
                 topic0=log.topics[0].lower() if log.topics else None,

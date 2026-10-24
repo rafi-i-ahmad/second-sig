@@ -39,6 +39,19 @@ Bybit goes first because it is the whole argument in a minute; Aave shows the ju
 
 **If something stalls.** The live answer past twenty seconds: say "the model is slow; this is the recorded run", play the auditor clip from the video, move on. The fork misbehaves: `uv run secondsig reset`, re-run the scenario; if it fails twice, play that scenario's clip. Never narrate a failure for more than one sentence.
 
+## The Safe{Wallet} beat (Sepolia, optional, about 45 seconds)
+
+This shows the product where owners already work: the real app.safe.global on Sepolia, with the Second Sig custom app open next to the queue. Set it up beforehand: the three proposals queued at one nonce (NOTES.md, "Sepolia"), each checked once, the panel open in Safe{Wallet}. Re-check the MATCH in the last 15 minutes before going on, because a stamp lasts about 20 minutes.
+
+| On screen | Click | Say |
+| --- | --- | --- |
+| Safe{Wallet} queue | | "Same judge, real Safe{Wallet}, public testnet. Owners write the description in Safe's own note field; nothing new to install." |
+| Second Sig app tab | select each row | "Each queued transaction was rehearsed on a fork of Sepolia and judged. The payment matches and is stamped on-chain. The auditor batch asks. Adding Ravi says 'keep approval at 2' and the bytes lower it to 1: rejected." |
+| Queue, the rejected one | `Execute` | "Safe{Wallet} already warns this will fail: the guard has no stamp for it." |
+| Queue, the match | `Execute`, MetaMask | "The stamped one goes through, with an ordinary signature in an ordinary wallet." |
+
+Q&A: "Why not Bybit on Sepolia?" Safe's Transaction Service now refuses delegatecall proposals to unknown contracts, which is a good post-Bybit change. Our guard covers the path around it, where signatures go on-chain directly. That is the fork demo.
+
 ## Video plan
 
 One 3:00 screen recording of the terminal with the script above as voice-over. It satisfies the Gemini brief (three minutes) and Agents That Ship (two to four), and it is the fallback for any live beat that fails.

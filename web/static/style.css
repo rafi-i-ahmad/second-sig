@@ -178,3 +178,34 @@ pre.raw {
 .result.pending { background: var(--subtle); color: var(--text-2); }
 .result strong { display: block; font-weight: 600; }
 .result .sub { color: var(--text-2); font-size: 12px; display: block; margin-top: 2px; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; }
+
+/* the Safe{Wallet} panel (safe-app/), sized for Safe{Wallet}'s app frame */
+body.app main { padding: 16px 20px 32px; }
+body.app .nav-inner { padding: 10px 20px; }
+body.app .summary { grid-template-columns: 1fr 1fr 2fr; }
+body.app .proposal { grid-template-columns: 1fr auto auto; }
+body.app .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+body.app .card { min-height: 300px; }
+@media (max-width: 860px) { body.app .cards, body.app .summary, body.app .proposal { grid-template-columns: 1fr; } }
+.queue { padding-bottom: 6px; }
+.queue-body { display: flex; flex-direction: column; padding: 0 12px; }
+.queue-body > .empty { padding: 8px; }
+.qrow {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) 80px 120px 150px; gap: 12px; align-items: center;
+  text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 8px; color: var(--text);
+}
+.qrow:last-child { border-bottom: none; }
+.qrow:hover { background: var(--subtle); }
+.qrow.active { background: #F0EFFF; box-shadow: inset 2px 0 0 var(--accent); }
+.qrow.later { opacity: .6; }
+.qnonce { color: var(--text-3); }
+.qmain { display: flex; flex-direction: column; min-width: 0; }
+.qnote { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qsum { color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qconf { color: var(--text-2); font-size: 12px; }
+.qstamp { font-size: 12px; }

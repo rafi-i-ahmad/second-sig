@@ -39,8 +39,12 @@ SAFE_APPROVED_HASHES = 8
 
 # Mainnet USDC proxy (FiatTokenV2_2): slot 9 packs balance and blacklist flag; slot 10 allowances
 USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+# Circle's Sepolia USDC, same FiatTokenV2_2 layout (slots 9, 10 and 11 checked against balanceOf,
+# allowance and totalSupply on Sepolia, 24 October). Keyed by address like every code label.
+USDC_SEPOLIA = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
 TOKEN_LAYOUTS = {
     USDC: {"symbol": "USDC", "balances": 9, "allowances": 10, "totalSupply": 11},
+    USDC_SEPOLIA: {"symbol": "USDC", "balances": 9, "allowances": 10, "totalSupply": 11},
 }
 
 
