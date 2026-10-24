@@ -30,6 +30,9 @@ weaker tiers (amount_unconstrained, party_unresolved, asset_unresolved) apply to
 receives, never to what it sends: "pay Dana's new wallet", "send 1,000 USDT" with no USDT in the
 book, or "pay Dana" with no amount explain nothing and the signers are asked. Likewise an
 allowance is explained only by an expected one with a known token, a known spender and an amount.
+"Known" means the address book, the Safe, or an address written in the words: a counterparty the
+resolver found only through a contract name in verified source (which its deployer chose) can
+explain what the Safe receives, never what it sends or allows.
 
 Only notable and critical observed items take part in the verdict. Info effects go to the
 log, with one exception: an info effect that cites a storage write no code layout and no
@@ -137,8 +140,10 @@ def match_movement(exp: CanonMovement, obs: CanonMovement, r: Resolver) -> Match
     t = _party_tier(exp.to_party, obs.to_party, obs.cites, r)
     if f is None or t is None:
         return None
-    if obs.direction == "out" and _OPEN_TIERS & {a, amt, f, t}:
-        return None  # an outflow the words leave open (asset, recipient or amount) explains nothing
+    if obs.direction == "out" and (_OPEN_TIERS & {a, amt, f, t} or exp.to_party.via == "sources"):
+        # an outflow the words leave open (asset, recipient or amount) explains nothing, and nor does
+        # a recipient known only by the name its own deployer gave it in verified source
+        return None
     tier = _worst(a, amt, f, t)
     notes = []
     if exp.implied:
@@ -147,8 +152,8 @@ def match_movement(exp: CanonMovement, obs: CanonMovement, r: Resolver) -> Match
 
 
 def match_permission(exp: CanonPermission, obs: CanonPermission, r: Resolver) -> Match | None:
-    if exp.new_allowance is None or not exp.asset.resolved or not exp.spender.resolved:
-        return None  # "set Ravi's allowance": an allowance the words leave open explains nothing
+    if exp.new_allowance is None or not exp.asset.resolved or not exp.spender.resolved or exp.spender.via == "sources":
+        return None  # "set Ravi's allowance", or a spender known only by its contract name: explains nothing
     a = _asset_tier(exp, obs)
     if a is None:
         return None

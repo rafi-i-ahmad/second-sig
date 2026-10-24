@@ -291,6 +291,23 @@ def test_an_asset_the_book_does_not_know_explains_no_outflow() -> None:
     assert v.decision == Decision.ASK and "asset_unresolved" not in v.compare.tiers
 
 
+def test_a_recipient_known_only_by_its_contract_name_explains_no_outflow() -> None:
+    """Case 10 with words that name the pool by the contract name its deployer chose. The resolver
+    finds it through verified source, but anyone can deploy a verified contract with any name, so
+    that can never license the Safe's money going there."""
+    cid = "10_swap_usdc_eth_uniswap"
+    pair = "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"
+    name = bundle(cid).sources[pair].name
+    assert resolver(cid).party(name).via == "sources"
+    f = forward(cid)
+    usdc_out = next(m for m in f.movements if m.from_name == "Safe")
+    to_pair = f.model_copy(update={"movements": [m.model_copy(update={"to_name": name}) if m is usdc_out else m
+                                                 for m in f.movements]})
+    v = decide(cid, to_pair, backward(cid))
+    assert v.decision == Decision.ASK
+    assert any("USDC Safe ->" in u.item for u in v.compare.observed_unexplained)
+
+
 def test_a_forward_question_is_ask_even_when_nothing_else_is_true() -> None:
     """Case 45's shape: everything matches, but the words contradict themselves and the forward
     pass asked which reading is right. The signers settle it, not the table."""
