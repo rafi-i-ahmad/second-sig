@@ -108,6 +108,7 @@ class Source(BaseModel):
     """What Etherscan knows about a contract that ran in the trace. Precompiles are not listed."""
 
     address: str
+    has_code: bool = Field(description="False for an EOA. Etherscan says 'not verified' for both.")
     verified: bool
     name: str | None = Field(default=None, description="Contract name; untrusted.")
     implementation: str | None = Field(
