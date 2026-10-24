@@ -29,7 +29,8 @@ from pydantic import BaseModel
 from sepolia import chain
 from sepolia.chain import SHORT_NAME, SepoliaUnavailable, redact
 from sepolia.watcher import Entry, Watcher
-from web.display import JOBS, Job, _amount, relay, show_backward, show_floor, show_forward, show_verdict
+from judge.labeller import plain_address_book
+from web.display import JOBS, Job, _amount, book_names, relay, show_backward, show_floor, show_forward, show_verdict
 
 STATIC = Path(__file__).resolve().parent / "static" / "safe-app"
 POLL_S = 15
@@ -139,9 +140,8 @@ def _links(safe: str, h: str | None = None) -> dict[str, str]:
 
 def _summary(t: Any, book: dict[str, str]) -> str:
     """What the bytes call, in a few words, for the queue row. Display only; never judged on."""
-    names = {v: k for k, v in book.items()}
     to = to_checksum_address(t.to)
-    who = "this Safe" if to == chain.safe_address() else names.get(to, f"{to[:6]}…{to[-4:]}")
+    who = "this Safe" if to == chain.safe_address() else book_names(book).get(to.lower(), f"{to[:6]}…{to[-4:]}")
     method = (t.data_decoded or {}).get("method") if isinstance(t.data_decoded, dict) else None
     kind = "delegatecall" if t.operation == 1 else "call"
     if method:
@@ -179,6 +179,10 @@ def state() -> dict[str, Any]:
     s["balances"] = {"ETH": _amount(s["balances"]["ETH"], 18, "ETH"), "USDC": _amount(s["balances"]["USDC"], 6, "USDC")}
     s["fork_ok"] = fork_ok
     s["auto"] = _auto()
+    # For the proposer hint: the names a note may use. Labels that are not plain names are ignored by the judge.
+    kept, dropped = plain_address_book(chain.address_book())
+    s["address_book"] = sorted(kept)
+    s["address_book_ignored"] = dropped
     s["links"] = _links(s["safe"]) | ({"guard_etherscan": f"{ETHERSCAN}/address/{s['guard']}"} if s["guard"] else {})
     return s
 

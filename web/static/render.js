@@ -100,8 +100,9 @@ export function renderForward(f) {
   const rows = f.rows.length
     ? f.rows.map((r) => el("div", { class: "row" }, el("span", { class: "kind" }, KIND[r.kind] || r.kind), el("span", { class: "text" }, tidy(r.text))))
     : [el("div", { class: "empty" }, "No effects")];
-  const extra = [];
-  for (const q of f.questions) extra.push(el("div", { class: "footer-note" }, q));
+  // A question from reading the words makes the decision ASK even when every effect matches
+  const extra = f.questions.map((q) => el("div", { class: "row" }, dot("notable"),
+    el("span", { class: "text" }, el("span", { class: "detail" }, "Open question in the words"), tidy(q))));
   fill($("told"), rows, extra);
 }
 
@@ -122,17 +123,27 @@ export function renderBackward(b) {
 export function renderVerdict(v) {
   const note = el("div", { class: "note clamp" }, tidy(v.headline));
   const more = el("button", { class: "link", onclick: () => { note.classList.toggle("clamp"); more.textContent = note.classList.contains("clamp") ? "Show more" : "Show less"; } }, "Show more");
+  // The pill is the decision, always; never inferred from the rows (an ASK can have every row matched)
   const parts = [
-    el("div", { class: "verdict-head" }, el("span", { class: `pill ${PILL[v.decision]} verdict-pill` }, LABEL[v.decision])),
+    el("div", { class: "verdict-head" }, el("span", { class: `pill ${PILL[v.decision]} verdict-pill` }, LABEL[v.decision]),
+      v.gap ? el("span", { class: "tag" }, v.gap) : null),
     note,
   ];
   parts.push(more);
+  for (const w of v.why || []) {
+    parts.push(el("div", { class: "row" }, dot("notable"), el("span", { class: "text" }, tidy(w))));
+  }
   if (v.rows.length) {
     parts.push(el("div", { class: "section-label" }, "Reconciliation"));
     for (const r of v.rows) {
+      const matched = r.state === "match";
       parts.push(el("div", { class: "row", title: r.detail }, dot(r.state),
-        el("span", { class: "text" }, tidy(r.text))));
+        el("span", { class: "text" }, tidy(r.text), !matched && r.detail ? el("span", { class: "detail" }, r.detail) : null)));
     }
+  }
+  if (v.ignored_labels && v.ignored_labels.length) {
+    parts.push(el("div", { class: "warn" }, el("span", { class: "pill warning" }, "Label ignored"),
+      ` Address-book label is not a plain name, so the judge shows the raw address: ${v.ignored_labels.map(short).join(", ")}`));
   }
   const s = v.source;
   if (s.explained.length) {
@@ -141,12 +152,24 @@ export function renderVerdict(v) {
   if (s.unlabelled.length && v.decision !== "REJECT") {
     parts.push(el("div", { class: "source" }, `${s.unlabelled.length} unverified state changes`));
   }
+  parts.push(renderCalls(v.calls || []));
   fill($("verdict"), parts);
   if (note.scrollHeight <= note.clientHeight) more.remove();
   $("stamp").replaceChildren();
   const ex = $("execute");
   if (ex) ex.disabled = false;
   if (v.decision === "ASK") $("answer-box").classList.remove("hidden");
+}
+
+// The model calls behind this verdict, from the adapter's log: latency, tokens, estimated cost
+function renderCalls(calls) {
+  if (!calls.length) return el("div", { class: "calls" }, "No model call: recorded forms, or the policy decided first");
+  const usd = calls.reduce((t, c) => t + (c.usd || 0), 0);
+  return el("div", { class: "calls" },
+    ...calls.map((c) => el("div", {}, c.model
+      ? [c.stage, " · ", c.model, ` · ${(c.ms / 1000).toFixed(1)} s`, c.tokens ? ` · ${c.tokens.toLocaleString()} tokens` : null]
+      : c.text)),
+    usd ? el("div", {}, `≈ $${usd.toFixed(3)} estimated`) : null);
 }
 
 export function renderStamp(s) {

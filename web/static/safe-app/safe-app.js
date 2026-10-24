@@ -43,6 +43,11 @@ async function loadState() {
     else if (state.guard) { g.className = "pill success"; g.textContent = "Guard active"; }
     else { g.className = "pill warning"; g.textContent = "No guard set"; }
     $("answer-owner").replaceChildren(...state.owners.map((o, i) => el("option", { value: o }, `Owner ${i + 1} ${short(o)}`)));
+    $("hint-book").replaceChildren(`Address book: ${state.address_book.join(", ") || "empty"}`,
+      state.address_book_ignored.length
+        ? el("div", {}, el("span", { class: "pill warning" }, "Label ignored"),
+          ` not a plain name, shown raw: ${state.address_book_ignored.map(short).join(", ")}`)
+        : null);
   } catch (e) {
     $("guard-pill").className = "pill danger";
     $("guard-pill").textContent = "Offline";

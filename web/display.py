@@ -7,12 +7,15 @@ because descriptions, notes and names are attacker-authorable (invariant 7).
 
 from __future__ import annotations
 
+import json
+import re
 import threading
 import time
 from typing import Any, Callable
 
-from judge import pipeline
+from judge import model, pipeline
 from judge.canon import Resolver, from_backward, from_forward, render_config, render_movement, render_permission
+from judge.labeller import plain_address_book
 from judge.schemas import Decision, EvidenceBundle, ExpectedEffects, FloorHit, Narration
 
 
@@ -33,6 +36,13 @@ JOBS: dict[str, Job] = {}
 
 def _short(addr: str) -> str:
     return f"{addr[:6]}…{addr[-4:]}"
+
+
+def book_names(book: dict[str, str]) -> dict[str, str]:
+    """address -> name, for the plain-name labels only (labeller.plain_address_book). A label the
+    judge ignores is never shown as a name either; its address shows raw."""
+    kept, _ = plain_address_book(book)
+    return {a.lower(): name for name, a in kept.items()}
 
 
 def _amount(base: int, decimals: int, symbol: str) -> str:
@@ -70,6 +80,58 @@ def show_backward(bwd: Narration, bundle: EvidenceBundle, book: dict[str, str]) 
             "confidence": bwd.confidence}
 
 
+# "forward gemini-3.8-flash 6487 ms <iid>"; the source reader adds "<n> tokens" before the id
+_CALL = re.compile(r"^(?P<stage>\S+) (?P<model>\S+) (?P<ms>\d+) ms (?:\d+ tokens )?(?P<iid>\S+)$")
+
+
+def _usage(iids: set[str]) -> dict[str, dict[str, Any]]:
+    """Token usage and estimated cost per interaction id, from the adapter's log (logs/calls.jsonl)."""
+    out: dict[str, dict[str, Any]] = {}
+    if not iids or not model.LOG_PATH.exists():
+        return out
+    for raw in reversed(model.LOG_PATH.read_text(encoding="utf-8").splitlines()):
+        try:
+            line = json.loads(raw)
+        except ValueError:
+            continue
+        iid = line.get("interaction_id")
+        if iid in iids and iid not in out:
+            out[iid] = {"usage": line.get("usage") or {}, "usd": line.get("est_usd")}
+            if len(out) == len(iids):
+                break
+    return out
+
+
+def show_calls(calls: list[str]) -> list[dict[str, Any]]:
+    """The model calls a run made, with tokens and estimated cost where the log has them. Empty
+    means no model was called: the forms were recorded (replay) or the floor decided first."""
+    parsed = [(c, _CALL.match(c)) for c in calls]
+    usage = _usage({m["iid"] for _, m in parsed if m})
+    out = []
+    for text, m in parsed:
+        if not m:
+            out.append({"stage": text.split(" ")[0], "text": text})
+            continue
+        u = usage.get(m["iid"], {})
+        tokens = sum(v for k, v in u.get("usage", {}).items() if k in ("input", "output", "thought")) or None
+        out.append({"stage": m["stage"], "model": m["model"], "ms": int(m["ms"]), "tokens": tokens, "usd": u.get("usd")})
+    return out
+
+
+_GAP = {"omission": "Omission", "contradiction": "Contradiction", "vague_description": "Vague description"}
+
+
+def _why(res: pipeline.JudgeResult) -> list[str]:
+    """Why the table did not say MATCH, for the reasons no row shows: an ASK can arrive with every
+    item matched (the forward pass raised a question), and a failed rehearsal or missing form has
+    no row. Drive the page from the decision, never from the rows."""
+    v = res.verdict
+    if v.decision == Decision.MATCH or v.floor_hits:
+        return []
+    shown = ("unexplained", "expected but not observed", "address-book label ignored")
+    return [r[0].upper() + r[1:] for r in v.reasons if r and not r.startswith(shown)]
+
+
 def _headline(res: pipeline.JudgeResult) -> str:
     q = res.question
     if q is not None:
@@ -90,16 +152,20 @@ def show_verdict(res: pipeline.JudgeResult) -> dict[str, Any]:
         rows += [{"state": "missing", "text": x, "detail": "promised in the words, not seen in the bytes"}
                  for x in v.compare.expected_unobserved]
     unlabelled = [w.id for w in b.storage_diff if not w.label]
+    gap = res.question.gap_kind if res.question and v.decision == Decision.ASK else None
     return {
         "decision": v.decision.value,
         "note": res.note,
         "headline": _headline(res),
         "reasoning": v.reasoning,
+        "gap": _GAP.get(gap or ""),
+        "why": _why(res),
         "rows": rows,
+        "ignored_labels": v.compare.ignored_labels if v.compare else [],
         "floor": show_floor(v.floor_hits),
         "source": {"explained": res.source_check, "raised": res.source_raised, "rejected": res.source_rejected,
                    "tokens": res.source_tokens, "unlabelled": unlabelled},
-        "calls": res.calls,
+        "calls": show_calls(res.calls),
         "safe_tx_hash": b.safe_tx_hash,
         "fork_block": b.fork_block,
     }
