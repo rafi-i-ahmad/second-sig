@@ -72,6 +72,7 @@
           "via": "address"
         },
         "amount_base": 1200000000,
+        "amount_max_base": null,
         "amount_human": "1200 USDC",
         "direction": "out",
         "implied": false,
@@ -100,6 +101,7 @@
           "via": "address"
         },
         "amount_base": 3400000000,
+        "amount_max_base": null,
         "amount_human": "3400 USDC",
         "direction": "out",
         "implied": false,
@@ -128,6 +130,7 @@
           "via": "address"
         },
         "amount_base": 800000000,
+        "amount_max_base": null,
         "amount_human": "800 USDC",
         "direction": "out",
         "implied": false,
@@ -169,6 +172,7 @@
           "via": "address_book"
         },
         "amount_base": 1200000000,
+        "amount_max_base": null,
         "amount_human": "1,200 USDC",
         "direction": "out",
         "implied": false,
@@ -197,6 +201,7 @@
           "via": "address_book"
         },
         "amount_base": 3400000000,
+        "amount_max_base": null,
         "amount_human": "3,400 USDC",
         "direction": "out",
         "implied": false,
@@ -225,6 +230,7 @@
           "via": "address_book"
         },
         "amount_base": 800000000,
+        "amount_max_base": null,
         "amount_human": "800 USDC",
         "direction": "out",
         "implied": false,
@@ -266,6 +272,7 @@
           "via": "address_book"
         },
         "amount_base": 1200000000,
+        "amount_max_base": null,
         "amount_human": "1,200 USDC",
         "direction": "out",
         "implied": false,
@@ -300,6 +307,7 @@
           "via": "address_book"
         },
         "amount_base": 3400000000,
+        "amount_max_base": null,
         "amount_human": "3,400 USDC",
         "direction": "out",
         "implied": false,
@@ -334,6 +342,7 @@
           "via": "address_book"
         },
         "amount_base": 800000000,
+        "amount_max_base": null,
         "amount_human": "800 USDC",
         "direction": "out",
         "implied": false,

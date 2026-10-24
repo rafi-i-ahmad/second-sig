@@ -57,7 +57,10 @@ def derive(case: dict[str, Any], r: Resolver) -> CanonEffects:
         fn = k["function"]
         value = int(k["value_wei"])
         cites = [f"call:{k['to_name']} {fn}"]
-        if value:
+        if value and (fn.startswith("(plain ETH transfer") or fn in SIMPLE):
+            # ETH attached to a plain send is the whole movement. ETH attached to a protocol call
+            # is a maximum (a router refunds what it does not spend), so the net comes from the
+            # fork's balance changes below instead.
             asset = r.asset("ETH")
             out.movements.append(canon.movement(r, asset, r.safe, to, value, cites, human=human_amount(value, asset)))
             covered.add(("ETH", "out"))

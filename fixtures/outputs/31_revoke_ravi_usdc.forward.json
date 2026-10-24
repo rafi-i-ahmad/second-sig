@@ -1,0 +1,27 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdMWTNjYXBpa0U3U0N4czBQdlBIWjZRURIXTFkzY2FwaWtFN1NDeHMwUHZQSFo2UVE",
+  "latency_ms": 76101,
+  "expected_effects": {
+    "reasoning": "The proposal explicitly requests to revoke Ravi's USDC allowance, which corresponds to setting an ERC-20 approval for USDC to 0 for spender Ravi.",
+    "movements": [],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Ravi",
+        "amount_human": "0 USDC",
+        "cites": "Revoke Ravi's USDC allowance"
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [
+      "Revoking an allowance corresponds to setting the approval amount to 0 USDC."
+    ],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

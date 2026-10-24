@@ -21,7 +21,11 @@ or the verdict. Per-case detail is in `<id>.md` and `<id>.json` next to this fil
 | demo Aave deposit | MATCH | **MATCH** | missing the aUSDC receipt | agrees | 0 (tolerance) |
 | demo auditor | ASK | **ASK** | missing the unlimited approval (the words omit it) | agrees | the finding |
 | demo Bybit | REJECT | **REJECT** | promises 500 ETH that never moves | agrees | floor, before compare |
-| 31–35 mismatch | REJECT | ASK | no forms recorded | no forms recorded | see below |
+| 31 "revoke" → unlimited approval | REJECT | **ASK** | zero vs unlimited (the lie) | agrees | the finding |
+| 32 pay Dana → impostor | REJECT | **ASK** | wrong recipient (the lie) | agrees | the finding |
+| 33 "pay" → approval only | REJECT | **ASK** | transfer vs approval (the lie) | agrees | the finding |
+| 34 swap output → Ravi | REJECT | **ASK** | USDC to Safe vs to Ravi (the lie) | agrees | the finding |
+| 35 add owner, drop threshold | REJECT | **REJECT** | missing the threshold drop (the lie) | agrees | the finding |
 
 Every benign and demo case computes its expected verdict end to end. The backward pass agreed
 with the ground truth on all 13 cases. The forward pass disagreed with the truth on four, and in
@@ -107,31 +111,56 @@ Every match made by a tolerance tier is listed under "Attribution" in the case r
   floor not fired, `expected_unobserved` would have produced ASK, and the two `critical`
   backward effects would have produced REJECT.
 
-## The reject cases (31–35): not yet graded
+## The reject cases (31–35): all refused, one as REJECT, four as ASK
 
-The Gemini billing account hit its **monthly spending cap** (HTTP 429) while the script was
-recording their forward forms, so they have no forms and read ASK (fail closed). What the
-comparison will do once forms exist, from the bundles and the rules above:
+Forms recorded live (Flash, both passes); the backward pass agreed with the bytes on all five
+and the forward pass followed the words on all five, so every gap is the lie itself.
 
-| Case | Bytes | Expected outcome of the comparison |
-| --- | --- | --- |
-| 31 revoke → unlimited | allowance Ravi: unlimited | expected allowance `zero` vs observed `unlimited` → unmatched both ways → unexplained notable → **ASK**. REJECT needs either the "approve to an EOA" floor rule or a severity rule for unlimited approvals. |
-| 32 pay Dana → impostor | USDC to 0x97f8… | expected to Dana (book) vs observed to a raw address not in the book, not inside any call to Dana → unmatched → **ASK**. |
-| 33 pay → approve only | allowance Ravi 2,500; no transfer | movement expected, not observed + allowance observed, not expected → **ASK**. |
-| 34 swap output to Ravi | USDC in to Ravi, not Safe | expected USDC in to Safe vs observed to Ravi: direction differs (third_party, inside router call). The first draft of `internal_to_callee` would have called this bookkeeping. **Closed in this branch**: the tolerance now refuses an asset the words expect the Safe to receive, and any recipient without code. Pinned by `test_internal_tolerance_does_not_cover_a_diverted_output`, which replays case 34's shape on case 10's forms → **ASK**. |
-| 35 add owner, drop threshold | threshold 2 → 1 | observed threshold=1 unmatched; backward marks it `critical` (owners/threshold tier) → **REJECT**. |
+| Case | What the words say | What the bytes do | Comparison | Verdict |
+| --- | --- | --- | --- | --- |
+| 31 | revoke Ravi's allowance (→ `zero`) | allowance Ravi: `unlimited` | expected `zero` unobserved; observed `unlimited` unexplained, notable | **ASK** |
+| 32 | pay Dana 2,500 USDC | 2,500 USDC to `0x97f8…c277` | expected to Dana unobserved; observed to a raw address unexplained, notable | **ASK** |
+| 33 | pay Ravi 2,500 USDC | allowance Ravi 2,500; nothing moves | expected movement unobserved; observed allowance unexplained, notable | **ASK** |
+| 34 | buy 1,000 USDC, at most 1 ETH | 0.35 ETH spent; USDC delivered to Ravi | ETH out matched (`counterparty_via_callee`, within the bound); expected USDC in unobserved; observed USDC pair → Ravi unexplained, notable | **ASK** |
+| 35 | add Ravi, keep threshold at 2 | threshold 2 → 1 | owner add and threshold=2 matched; observed threshold=1 unexplained, **critical** | **REJECT** |
 
-So on today's rules, 35 would REJECT and 31–34 would ASK. All five are refused; whether 31–34
-should be REJECT rather than ASK is the severity question below.
+Two things the run established:
+
+- `internal_to_callee` as first drafted would have called case 34's USDC pair → Ravi leg
+  "bookkeeping". Closed in this branch: the tolerance refuses an asset the words expect the Safe to
+  receive, and any recipient without code. Pinned by `test_internal_tolerance_does_not_cover_a_diverted_output`.
+- The forward pass reads "spending at most 1 ETH" as a ceiling now (`amount_max_base`), so the
+  0.35 ETH net spend matches instead of being flagged as a wrong amount. Truth derivation likewise
+  stops treating ETH attached to a protocol call as the net amount (routers refund).
+
+### The open design question: contradiction vs omission
+
+Today's table says: an observed effect nothing expected explains is ASK if `notable`, REJECT if
+`critical`. That makes the auditor case (true but incomplete) ASK, which scenario 3 wants, and it
+also makes 31–34 ASK, which the fixtures say should be REJECT.
+
+The difference between them is not severity, it is *kind*: the auditor description is incomplete;
+the 31–34 descriptions are **wrong**. In each of 31–34 the comparison sees both halves at once:
+an expected item the trace does not show *and* an observed item of the same kind and asset that
+nothing explains. That pair is a contradiction, and no honest proposer produces one.
+
+Proposed rule (not applied; one function in `verdict.py`, one test per case):
+
+> If `expected_unobserved` and `observed_unexplained` contain items of the same kind for the same
+> asset, the description contradicts the bytes → **REJECT**. An unexplained observed item with no
+> expected counterpart (omission) stays ASK. An expected item with no observed counterpart (the
+> words promise more than happens) stays ASK.
+
+On the recorded forms this gives 31, 32, 33 and 34 → REJECT, keeps auditor → ASK, 09 → ASK, and
+leaves every MATCH untouched. It needs a decision because it changes a verdict row, not a tolerance.
+
+The alternatives considered: making an unmentioned unlimited approval `critical` (catches 31 only,
+and flips the auditor demo to REJECT), or the floor rule "approve to an EOA" (catches 31 and 33,
+nothing else). Neither covers 32 or 34; the contradiction rule covers all four.
 
 ## Proposed changes, none applied here
 
-1. Decide whether an unlimited approval observed without an expected one should be `critical`
-   (REJECT) or stay `notable` (ASK). Today: ASK. The Bybit-era argument for REJECT is that an
-   unlimited approval to an EOA is a drain waiting to happen; the counter-argument is scenario 3,
-   which wants ASK.
+1. `verdict.py`: the contradiction rule above. Changes four verdicts from ASK to REJECT; nothing else.
 2. `forward.py` prompt: the receipt-token sentence above, if we want the forward pass to name
-   deposits' receipts rather than rely on the tolerance.
+   deposits' receipts rather than rely on the `inbound_from_callee` tolerance.
 3. Address book for `demo_aave`: add aUSDC.
-4. Raise the Gemini spending cap before the demo, and record the five reject cases
-   (`uv run python scripts/compare_benign.py --live --include-reject`).

@@ -3,14 +3,69 @@
   "description": "Add Ravi as a backup owner; keep approval at 2 signatures",
   "expected_verdict": "REJECT",
   "verdict": {
-    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
-    "decision": "ASK",
+    "reasoning": "2 critical effects in the trace that nothing in the description accounts for:\n- threshold = 1 (evidence c7, c8, s1, e2; no expected Safe config change matches)\n- Safe's signature threshold is lowered from 2 to 1. (evidence c7, c8, s1, e2; no matched item shares its evidence)",
+    "decision": "REJECT",
     "reasons": [
-      "no checked model form"
+      "unexplained critical: threshold = 1",
+      "unexplained critical: Safe's signature threshold is lowered from 2 to 1."
     ],
     "floor_hits": [],
     "question": null,
-    "compare": null
+    "compare": {
+      "matched": [
+        {
+          "kind": "config",
+          "expected": "owners_add = 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "observed": "owners_add = 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "tier": "exact",
+          "notes": []
+        },
+        {
+          "kind": "config",
+          "expected": "threshold = 2",
+          "observed": "threshold = 2",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [
+        {
+          "kind": "config",
+          "item": "threshold = 1",
+          "severity": "critical",
+          "cites": [
+            "c7",
+            "c8",
+            "s1",
+            "e2"
+          ],
+          "reason": "no expected Safe config change matches"
+        },
+        {
+          "kind": "effect",
+          "item": "Safe's signature threshold is lowered from 2 to 1.",
+          "severity": "critical",
+          "cites": [
+            "c7",
+            "c8",
+            "s1",
+            "e2"
+          ],
+          "reason": "no matched item shares its evidence"
+        }
+      ],
+      "expected_unobserved": [],
+      "info_effects": [
+        "Safe's transaction nonce increases from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": []
+    }
   },
   "truth": {
     "source": "truth",
@@ -58,12 +113,413 @@
     "unsupported": [],
     "notes": []
   },
-  "forward": null,
-  "backward": null,
-  "forward_vs_truth": null,
-  "backward_vs_truth": null,
-  "attribution": [],
-  "residuals": [],
+  "forward": {
+    "source": "forward",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "owners_add",
+        "old": null,
+        "new": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "severity": null,
+        "cites": [
+          "Add Ravi as a backup owner; keep approval at 2 signatures"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "2",
+        "severity": null,
+        "cites": [
+          "Add Ravi as a backup owner; keep approval at 2 signatures"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "owners_add",
+        "old": null,
+        "new": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "severity": "critical",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s3",
+          "s4",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "2",
+        "severity": "critical",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s3",
+          "s4",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "1",
+        "severity": "critical",
+        "cites": [
+          "c7",
+          "c8",
+          "s1",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "effects": [
+      {
+        "sentence": "Ravi is added as an owner to Safe, increasing the total owner count from 3 to 4.",
+        "severity": "critical",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s3",
+          "s4",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe's signature threshold is lowered from 2 to 1.",
+        "severity": "critical",
+        "cites": [
+          "c7",
+          "c8",
+          "s1",
+          "e2"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe's transaction nonce increases from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s2",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [
+      "config threshold = 1"
+    ],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [critical]: threshold = 1",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "observed, unexplained [critical]: Safe's signature threshold is lowered from 2 to 1.",
+      "attribution": "real_finding (same evidence as the item above)"
+    },
+    {
+      "item": "forward vs truth (missing): config threshold = 1",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "info: Safe's transaction nonce increases from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "threshold = 1",
+      "kind": "config",
+      "severity": "critical",
+      "reason": "no expected Safe config change matches",
+      "evidence": [
+        {
+          "id": "c7",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "value": 0,
+          "input": "0x694e80c30000000000000000000000000000000000000000000000000000000000000001",
+          "selector": "0x694e80c3",
+          "function": "changeThreshold(uint256)",
+          "args": [
+            {
+              "name": "_threshold",
+              "type": "uint256",
+              "value": "1"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c8",
+          "parent": "c7",
+          "depth": 4,
+          "kind": "DELEGATECALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+          "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "value": 0,
+          "input": "0x694e80c30000000000000000000000000000000000000000000000000000000000000001",
+          "selector": "0x694e80c3",
+          "function": "changeThreshold(uint256)",
+          "args": [
+            {
+              "name": "_threshold",
+              "type": "uint256",
+              "value": "1"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s1",
+          "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "label": "Safe.threshold",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000002",
+          "after": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "writers": [
+            {
+              "id": "c0",
+              "to": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+              "function": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c1",
+              "to": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+              "function": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c4",
+              "to": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+              "function": "multiSend(bytes)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c5",
+              "to": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+              "function": "addOwnerWithThreshold(address,uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c6",
+              "to": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+              "function": "addOwnerWithThreshold(address,uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c7",
+              "to": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+              "function": "changeThreshold(uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c8",
+              "to": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+              "function": "changeThreshold(uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "call_id": "c8",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "topic0": "0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93",
+          "name": "ChangedThreshold",
+          "args": [
+            {
+              "name": "threshold",
+              "type": "uint256",
+              "value": "1"
+            }
+          ],
+          "topics": [
+            "0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      ]
+    },
+    {
+      "item": "Safe's signature threshold is lowered from 2 to 1.",
+      "kind": "effect",
+      "severity": "critical",
+      "reason": "no matched item shares its evidence",
+      "evidence": [
+        {
+          "id": "c7",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "value": 0,
+          "input": "0x694e80c30000000000000000000000000000000000000000000000000000000000000001",
+          "selector": "0x694e80c3",
+          "function": "changeThreshold(uint256)",
+          "args": [
+            {
+              "name": "_threshold",
+              "type": "uint256",
+              "value": "1"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c8",
+          "parent": "c7",
+          "depth": 4,
+          "kind": "DELEGATECALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+          "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "value": 0,
+          "input": "0x694e80c30000000000000000000000000000000000000000000000000000000000000001",
+          "selector": "0x694e80c3",
+          "function": "changeThreshold(uint256)",
+          "args": [
+            {
+              "name": "_threshold",
+              "type": "uint256",
+              "value": "1"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s1",
+          "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "label": "Safe.threshold",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000002",
+          "after": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "writers": [
+            {
+              "id": "c0",
+              "to": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+              "function": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c1",
+              "to": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+              "function": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c4",
+              "to": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2",
+              "function": "multiSend(bytes)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c5",
+              "to": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+              "function": "addOwnerWithThreshold(address,uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c6",
+              "to": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+              "function": "addOwnerWithThreshold(address,uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c7",
+              "to": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+              "function": "changeThreshold(uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "id": "c8",
+              "to": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+              "function": "changeThreshold(uint256)",
+              "storage_context": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "call_id": "c8",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "topic0": "0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93",
+          "name": "ChangedThreshold",
+          "args": [
+            {
+              "name": "threshold",
+              "type": "uint256",
+              "value": "1"
+            }
+          ],
+          "topics": [
+            "0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      ]
+    }
+  ],
   "bundle": {
     "safe_tx_hash": "0xfaf40856c3bb738251d827ec1e138b1de472235c36f6f9c928ce36813819056e",
     "fork_block": 21895241,

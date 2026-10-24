@@ -64,10 +64,16 @@ def _amount_tier(exp: CanonMovement, obs: CanonMovement, r: Resolver) -> MatchTi
         return None
     if exp.amount_base is not None:
         return "exact" if exp.amount_base == obs.amount_base else None
-    if exp.amount_human is not None and obs.asset.decimals is not None:
+    if exp.amount_max_base is not None:
+        # 'at most 1 ETH': anything up to the ceiling is what the words allow
+        return "amount_unconstrained" if obs.amount_base <= exp.amount_max_base else None
+    if exp.amount_human is not None and obs.asset.decimals is not None and not exp.amount_max_base:
         # the words fixed a number but the asset's decimals were only known from the trace
         base = r.to_base(exp.amount_human, obs.asset)
         if base is not None:
+            from judge.canon import is_upper_bound
+            if is_upper_bound(exp.amount_human):
+                return "amount_unconstrained" if obs.amount_base <= base else None
             return "exact" if base == obs.amount_base else None
     return "amount_unconstrained"
 

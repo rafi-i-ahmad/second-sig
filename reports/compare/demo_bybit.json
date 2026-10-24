@@ -71,6 +71,7 @@
           "via": "address_book"
         },
         "amount_base": 500000000000000000000,
+        "amount_max_base": null,
         "amount_human": "500 ETH",
         "direction": "out",
         "implied": false,

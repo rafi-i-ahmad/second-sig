@@ -70,6 +70,7 @@
           "via": "address"
         },
         "amount_base": 1000000000000000000,
+        "amount_max_base": null,
         "amount_human": "1 ETH",
         "direction": "out",
         "implied": false,
@@ -125,6 +126,7 @@
           "via": "address"
         },
         "amount_base": 1000000000000000000,
+        "amount_max_base": null,
         "amount_human": "1 ETH",
         "direction": "out",
         "implied": false,

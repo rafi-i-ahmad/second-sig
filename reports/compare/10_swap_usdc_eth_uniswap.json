@@ -76,6 +76,7 @@
           "via": "safe"
         },
         "amount_base": 1761817265430573461,
+        "amount_max_base": null,
         "amount_human": "1.761817265430573461 ETH (ETH…)",
         "direction": "in",
         "implied": false,
@@ -105,6 +106,7 @@
           "via": "address"
         },
         "amount_base": 5000000000,
+        "amount_max_base": null,
         "amount_human": "5000 USDC",
         "direction": "out",
         "implied": false,
@@ -176,6 +178,7 @@
           "via": "address_book"
         },
         "amount_base": 5000000000,
+        "amount_max_base": null,
         "amount_human": "5,000 USDC",
         "direction": "out",
         "implied": false,
@@ -204,6 +207,7 @@
           "via": "safe"
         },
         "amount_base": null,
+        "amount_max_base": null,
         "amount_human": null,
         "direction": "in",
         "implied": false,
@@ -272,6 +276,7 @@
           "via": "address"
         },
         "amount_base": 5000000000,
+        "amount_max_base": null,
         "amount_human": "5,000 USDC",
         "direction": "out",
         "implied": false,
@@ -306,6 +311,7 @@
           "via": "safe"
         },
         "amount_base": 1761817265430573461,
+        "amount_max_base": null,
         "amount_human": "1.761817265430573461 ETH",
         "direction": "in",
         "implied": false,

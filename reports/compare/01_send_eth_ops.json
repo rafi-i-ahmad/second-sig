@@ -55,6 +55,7 @@
           "via": "address"
         },
         "amount_base": 5000000000000000000,
+        "amount_max_base": null,
         "amount_human": "5 ETH",
         "direction": "out",
         "implied": false,
@@ -96,6 +97,7 @@
           "via": "address_book"
         },
         "amount_base": 5000000000000000000,
+        "amount_max_base": null,
         "amount_human": "5 ETH",
         "direction": "out",
         "implied": false,
@@ -137,6 +139,7 @@
           "via": "address_book"
         },
         "amount_base": 5000000000000000000,
+        "amount_max_base": null,
         "amount_human": "5 ETH",
         "direction": "out",
         "implied": false,

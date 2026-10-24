@@ -80,6 +80,7 @@
           "via": "address"
         },
         "amount_base": 100000000,
+        "amount_max_base": null,
         "amount_human": "100 USDC",
         "direction": "out",
         "implied": false,
@@ -148,6 +149,7 @@
           "via": "address_book"
         },
         "amount_base": 100000000,
+        "amount_max_base": null,
         "amount_human": "100 USDC",
         "direction": "out",
         "implied": false,
@@ -189,6 +191,7 @@
           "via": "address_book"
         },
         "amount_base": 100000000,
+        "amount_max_base": null,
         "amount_human": "100 USDC",
         "direction": "out",
         "implied": false,

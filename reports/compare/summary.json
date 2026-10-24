@@ -133,50 +133,50 @@
     "id": "31_revoke_ravi_usdc",
     "expected": "REJECT",
     "computed": "ASK",
-    "forward_errors": "-",
-    "backward_errors": "-",
-    "residuals": 0,
-    "forward_form": false,
-    "backward_form": false
+    "forward_errors": 1,
+    "backward_errors": 0,
+    "residuals": 3,
+    "forward_form": true,
+    "backward_form": true
   },
   {
     "id": "32_pay_dana_wrong_wallet",
     "expected": "REJECT",
     "computed": "ASK",
-    "forward_errors": "-",
-    "backward_errors": "-",
-    "residuals": 0,
-    "forward_form": false,
-    "backward_form": false
+    "forward_errors": 1,
+    "backward_errors": 0,
+    "residuals": 3,
+    "forward_form": true,
+    "backward_form": true
   },
   {
     "id": "33_pay_ravi_but_approve",
     "expected": "REJECT",
     "computed": "ASK",
-    "forward_errors": "-",
-    "backward_errors": "-",
-    "residuals": 0,
-    "forward_form": false,
-    "backward_form": false
+    "forward_errors": 2,
+    "backward_errors": 0,
+    "residuals": 3,
+    "forward_form": true,
+    "backward_form": true
   },
   {
     "id": "34_uniswap_output_diverted",
     "expected": "REJECT",
     "computed": "ASK",
-    "forward_errors": "-",
-    "backward_errors": "-",
-    "residuals": 0,
-    "forward_form": false,
-    "backward_form": false
+    "forward_errors": 1,
+    "backward_errors": 0,
+    "residuals": 3,
+    "forward_form": true,
+    "backward_form": true
   },
   {
     "id": "35_add_owner_then_lower_threshold",
     "expected": "REJECT",
-    "computed": "ASK",
-    "forward_errors": "-",
-    "backward_errors": "-",
-    "residuals": 0,
-    "forward_form": false,
-    "backward_form": false
+    "computed": "REJECT",
+    "forward_errors": 1,
+    "backward_errors": 0,
+    "residuals": 2,
+    "forward_form": true,
+    "backward_form": true
   }
 ]

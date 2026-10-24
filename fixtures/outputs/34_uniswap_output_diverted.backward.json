@@ -1,0 +1,98 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdaNDNjYXItdk1MRFJ2ZElQLWRqVndBURIXWjQzY2FyLXZNTERSdmRJUC1kalZ3QVE",
+  "latency_ms": 10760,
+  "narration": {
+    "reasoning": "The Safe executes a call to Uniswap (UniswapV2Router02) sending 1 ETH to swapETHForExactTokens, buying 1,000 USDC (amountOut = 1,000,000,000 base units) for recipient 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3. The swap requires 354,583,927,628,692,837 wei (approx 0.3546 ETH), which is deposited into WETH and transferred to the Uniswap V2 pair (0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc). The pair transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3. The unused 645,416,072,371,307,163 wei of ETH is returned back to the Safe. The net movement is 0.354583927628692837 ETH out of the Safe to WETH, and 1,000 USDC from the pair to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+    "effects": [
+      {
+        "sentence": "The Safe's transaction nonce increases from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s6"
+        ]
+      },
+      {
+        "sentence": "The Safe calls Uniswap with 1 ETH to swap ETH for 1,000 USDC sent to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3, spending a net of 0.354583927628692837 ETH.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b1"
+        ]
+      },
+      {
+        "sentence": "Uniswap deposits 0.354583927628692837 ETH into WETH and transfers it to the Uniswap V2 pair 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc.",
+        "severity": "info",
+        "cites": [
+          "c6",
+          "c7",
+          "b0",
+          "b4",
+          "e1",
+          "e2",
+          "s5"
+        ]
+      },
+      {
+        "sentence": "The Uniswap V2 pair 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to recipient 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+        "severity": "notable",
+        "cites": [
+          "c8",
+          "c9",
+          "c10",
+          "b2",
+          "b3",
+          "e4",
+          "e5",
+          "s0",
+          "s1"
+        ]
+      },
+      {
+        "sentence": "Uniswap refunds the remaining 0.645416072371307163 ETH of unused funds back to the Safe.",
+        "severity": "info",
+        "cites": [
+          "c14",
+          "c15",
+          "e6"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "0.354583927628692837 ETH",
+        "amount_base_units": "354583927628692837",
+        "from_name": "Safe",
+        "to_name": "WETH",
+        "cites": [
+          "b0",
+          "b1",
+          "c4",
+          "c6",
+          "e1"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "1,000 USDC",
+        "amount_base_units": "1000000000",
+        "from_name": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "to_name": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "cites": [
+          "b2",
+          "b3",
+          "c9",
+          "c10",
+          "e5",
+          "s0",
+          "s1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

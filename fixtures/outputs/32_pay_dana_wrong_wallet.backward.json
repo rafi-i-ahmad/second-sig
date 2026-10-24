@@ -1,0 +1,50 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChRSbzNjYXRMVEY3RDJ4TjhQbi1OdRIUUm8zY2F0TFRGN0QyeE44UG4tTnU",
+  "latency_ms": 6496,
+  "narration": {
+    "reasoning": "The transaction calls Safe.execTransaction to transfer 2,500 USDC (2,500,000,000 base units, 6 decimals) from the Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277. The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Increment the Safe nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277",
+        "cites": [
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

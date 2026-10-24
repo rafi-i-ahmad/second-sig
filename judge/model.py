@@ -160,6 +160,13 @@ def _is_api_error(exc: BaseException) -> bool:
     return False
 
 
+def _is_rate_limit(exc: BaseException) -> bool:
+    """A 429 from the API. Google's hackathon accounts throw these intermittently; waiting a few
+    seconds and trying again is almost always enough."""
+    text = f"{type(exc).__name__}: {exc}"
+    return "RateLimit" in type(exc).__name__ or "429" in text or "RESOURCE_EXHAUSTED" in text
+
+
 def _validation_errors(exc: ValidationError) -> list[dict[str, Any]]:
     return exc.errors(include_url=False, include_input=False, include_context=False)
 
@@ -257,6 +264,42 @@ def count_tokens(model: str, system: str, user: str) -> int:
     return int(resp.total_tokens)
 
 
+_RATE_LIMIT_RETRIES = 4
+_RATE_LIMIT_SLEEP_S = 3.0  # then 6, 9, 12: about 30 s of patience in total
+
+
+def _create_with_backoff(
+    client: Any, kwargs: dict[str, Any], timeout_s: float, model: str, thinking: str, prompt_sha: str, attempt: int
+) -> Any:
+    """``interactions.create`` with a short wait and retry on 429. Any other API failure, or a
+    429 that outlasts the retries, is ModelUnavailable: the caller turns that into ASK."""
+    waits = 0
+    while True:
+        t0 = time.perf_counter()
+        try:
+            return client.interactions.create(timeout=timeout_s, **kwargs)
+        except Exception as exc:
+            if not _is_api_error(exc):
+                raise
+            if _is_rate_limit(exc) and waits < _RATE_LIMIT_RETRIES:
+                waits += 1
+                wait = _RATE_LIMIT_SLEEP_S * waits
+                _log(
+                    model=model, thinking=thinking, prompt_sha256=prompt_sha,
+                    interaction_id=None, latency_ms=_ms(t0), status="rate_limited",
+                    error=f"{type(exc).__name__}: {exc}; retrying in {wait:g}s ({waits}/{_RATE_LIMIT_RETRIES})",
+                    attempt=attempt,
+                )
+                time.sleep(wait)
+                continue
+            _log(
+                model=model, thinking=thinking, prompt_sha256=prompt_sha,
+                interaction_id=None, latency_ms=_ms(t0), status="unavailable",
+                error=f"{type(exc).__name__}: {exc}", attempt=attempt,
+            )
+            raise ModelUnavailable(f"{type(exc).__name__}: {exc}") from exc
+
+
 def complete(
     model: str,
     system: str,
@@ -273,17 +316,7 @@ def complete(
     for attempt in range(_VALIDATION_RETRIES + 1):
         kwargs = _request_kwargs(model, system, prompt, schema, thinking, stream=False)
         t0 = time.perf_counter()
-        try:
-            interaction = client.interactions.create(timeout=timeout_s, **kwargs)
-        except Exception as exc:
-            if not _is_api_error(exc):
-                raise
-            _log(
-                model=model, thinking=thinking, prompt_sha256=prompt_sha,
-                interaction_id=None, latency_ms=_ms(t0), status="unavailable",
-                error=f"{type(exc).__name__}: {exc}", attempt=attempt,
-            )
-            raise ModelUnavailable(f"{type(exc).__name__}: {exc}") from exc
+        interaction = _create_with_backoff(client, kwargs, timeout_s, model, thinking, prompt_sha, attempt)
 
         latency = _ms(t0)
         interaction_id = _get(interaction, "id") or ""

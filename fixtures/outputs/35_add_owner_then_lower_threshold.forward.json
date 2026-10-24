@@ -1,0 +1,23 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdjbzNjYXBiYklxR2p2ZElQeXMyY21BSRIXY28zY2FwYmJJcUdqdmRJUHlzMmNtQUk",
+  "latency_ms": 4208,
+  "expected_effects": {
+    "reasoning": "The proposal states to 'Add Ravi as a backup owner' and to 'keep approval at 2 signatures'. This represents a Safe configuration change adding Ravi as an owner with the threshold remaining at 2. No asset transfers or permission changes are mentioned.",
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [
+      {
+        "kind": "add_owner",
+        "owner_name": "Ravi",
+        "threshold_after": 2,
+        "cites": "Add Ravi as a backup owner; keep approval at 2 signatures"
+      }
+    ],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

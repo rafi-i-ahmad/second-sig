@@ -1,0 +1,33 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdYNDNjYXFUM0dxLWp2ZElQakl1eGtRVRIXWDQzY2FxVDNHcS1qdmRJUGpJdXhrUVU",
+  "latency_ms": 8353,
+  "expected_effects": {
+    "reasoning": "The description specifies a swap on Uniswap: purchasing exactly 1,000 USDC in exchange for native ETH, capped at a maximum expenditure of 1 ETH. This entails outgoing ETH (up to 1 ETH) from the Safe to Uniswap, and an incoming transfer of 1,000 USDC from Uniswap to the Safe. Native ETH does not require an ERC-20 approval.",
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "at most 1 ETH",
+        "from_name": "Safe",
+        "to_name": "Uniswap",
+        "cites": "spending at most 1 ETH"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "1,000 USDC",
+        "from_name": "Uniswap",
+        "to_name": "Safe",
+        "cites": "Buy 1,000 USDC on Uniswap"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [
+      "Native ETH is being spent directly via msg.value rather than wrapped WETH requiring an approval."
+    ],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

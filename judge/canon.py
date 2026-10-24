@@ -44,6 +44,8 @@ SEVERITY_RANK: dict[Severity, int] = {"info": 0, "notable": 1, "critical": 2}
 _SAFE_WORDS = {"safe", "the safe", "this safe", "our safe", "proposing safe", "the proposing safe"}
 _ARTICLES = re.compile(r"^(the|our|this)\s+", re.I)
 _NUMBER = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
+_UNLIMITED = re.compile(r"\b(unlimited|infinite|max|maximum|all of it|everything)\b", re.I)
+_UPPER_BOUND = re.compile(r"\b(at most|up to|no more than|not more than|a maximum of|max(?:imum)?\s+of|capped at)\b", re.I)
 _APPROVE_WORDS = re.compile(r"\b(approv\w*|allow\w*|permi\w*|spend\w*|authori[sz]\w*)\b", re.I)
 
 
@@ -165,21 +167,27 @@ class Resolver:
 
 
 def parse_amount(human: str | None) -> Decimal | str | None:
-    """'2,500 USDC' -> 2500; 'unlimited'/'max' -> 'unlimited'; nothing numeric -> None."""
+    """'2,500 USDC' -> 2500; 'at most 1 ETH' -> 1 (see is_upper_bound); 'unlimited' or 'max' with
+    no number -> 'unlimited'; nothing numeric -> None."""
     if human is None:
         return None
     text = human.strip().lower()
     if not text:
         return None
-    if "unlimited" in text or "max" in text or "infinite" in text or text.startswith("all "):
-        return "unlimited"
     m = _NUMBER.search(text)
-    if not m:
-        return None
-    try:
-        return Decimal(m.group(0).replace(",", ""))
-    except InvalidOperation:
-        return None
+    if m:
+        try:
+            return Decimal(m.group(0).replace(",", ""))
+        except InvalidOperation:
+            return None
+    if _UNLIMITED.search(text) or text.startswith("all "):
+        return "unlimited"
+    return None
+
+
+def is_upper_bound(human: str | None) -> bool:
+    """'at most 1 ETH', 'up to 500 USDC': the words fix a ceiling, not the amount."""
+    return bool(human) and bool(_UPPER_BOUND.search(human))
 
 
 def allowance_value(human: str | None, base: int | None) -> int | str | None:
@@ -230,9 +238,12 @@ def from_forward(form: ExpectedEffects, description: str, r: Resolver) -> CanonE
         asset = r.asset(m.asset)
         f, t = r.party(m.from_name), r.party(m.to_name)
         ok = checker.phrase_supported(m.cites, description)
+        base = r.to_base(m.amount_human, asset)
+        bound = is_upper_bound(m.amount_human)
         cm = CanonMovement(
-            asset=asset, from_party=f, to_party=t, amount_base=r.to_base(m.amount_human, asset),
-            amount_human=m.amount_human, direction=r.direction(f, t), cites=[m.cites], cited_ok=ok, source="forward",
+            asset=asset, from_party=f, to_party=t, amount_base=None if bound else base,
+            amount_max_base=base if bound else None, amount_human=m.amount_human, direction=r.direction(f, t),
+            cites=[m.cites], cited_ok=ok, source="forward",
         )
         out.movements.append(cm)
         if not ok:

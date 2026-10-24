@@ -376,6 +376,7 @@ class CanonMovement(BaseModel):
     from_party: Party
     to_party: Party
     amount_base: int | None = Field(default=None, description="Base units; None if the form fixed no amount.")
+    amount_max_base: int | None = Field(default=None, description="Upper bound in base units ('at most 1 ETH').")
     amount_human: str | None = None
     direction: Direction
     implied: bool = False

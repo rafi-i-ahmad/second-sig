@@ -231,12 +231,14 @@ signed on a stale rehearsal (or a `forkBlock` in the future) is refused at `atte
 `uv run python scripts/compare_benign.py` runs the whole judge on recorded forms with no model
 call: floor, then canon/compare of the forward and backward forms, then the decision table. Result
 on the 13 benign and demo cases: 01–08 and 10 MATCH, 09 ASK, Aave MATCH, auditor ASK, Bybit
-REJECT. Every expected verdict met. Reports in `reports/compare/`, findings in
-`reports/compare/FINDINGS.md`. The five reject cases have no recorded forms yet: the Gemini billing
-account hit its **monthly spending cap** (HTTP 429) on 24 October while recording them, so they
-read ASK (fail closed) until the cap is raised at ai.studio/billing and `--live --include-reject`
-is run again. Forward forms for the three demos and backward forms for 02–10 were recorded before
-the cap hit.
+REJECT. Every expected verdict met. The five reject cases (`--include-reject`): 35 REJECT (the
+threshold drop is `critical`), 31–34 ASK (a mismatch between words and bytes is `notable`, so
+the table asks). All five refused; whether a *contradiction* should be REJECT where an *omission*
+is ASK is the open design question in `reports/compare/FINDINGS.md`. Reports in `reports/compare/`.
+
+One 429 labelled "monthly spending cap" interrupted the first live run (16 calls that day; our
+account is not shared with other teams). It cleared within the hour and did not recur; the adapter
+now waits and retries 429s. All 18 cases have recorded forward and backward forms.
 
 Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
 01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss

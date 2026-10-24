@@ -72,6 +72,32 @@ def test_chain_symbol_is_never_identity_but_evidence_is() -> None:
     assert r.asset("ETH").address == "ETH" and r.asset("ETH").decimals == 18
 
 
+def test_upper_bounds_and_unlimited_words() -> None:
+    assert canon.parse_amount("at most 1 ETH") == 1 and canon.is_upper_bound("at most 1 ETH")
+    assert canon.is_upper_bound("up to 500 USDC") and not canon.is_upper_bound("500 USDC")
+    assert canon.parse_amount("a maximum of 2 ETH") == 2, "a number wins over the word maximum"
+    assert canon.parse_amount("maximum") == "unlimited" and canon.parse_amount("unlimited") == "unlimited"
+
+
+def test_at_most_matches_anything_up_to_the_ceiling() -> None:
+    """Case 34's words: 'spending at most 1 ETH'. The recorded trace spends 0.35 ETH net, which the
+    backward pass reports as ETH Safe -> WETH inside the router call."""
+    fwd = ExpectedEffects(
+        reasoning="", confidence="high", nothing_else=True,
+        movements=[{"asset": "ETH", "amount_human": "at most 1 ETH", "from_name": "Safe", "to_name": "Uniswap",
+                    "cites": "spending at most 1 ETH"}],
+    )
+    r = resolver("34_uniswap_output_diverted")
+    e = canon.from_forward(fwd, bundle("34_uniswap_output_diverted").description, r)
+    assert e.movements[0].amount_base is None and e.movements[0].amount_max_base == 10**18
+    o = canon.from_backward(backward("34_uniswap_output_diverted"), r)
+    eth_out = next(m for m in o.movements if m.asset.address == "ETH" and m.direction == "out")
+    m = compare.match_movement(e.movements[0], eth_out, r)
+    assert m is not None and m.tier in ("amount_unconstrained", "counterparty_via_callee")
+    too_much = eth_out.model_copy(update={"amount_base": 2 * 10**18})
+    assert compare.match_movement(e.movements[0], too_much, r) is None
+
+
 def test_amounts_to_base_units_and_allowances() -> None:
     r = resolver("demo_aave")
     assert r.to_base("10,000 USDC", r.asset("USDC")) == 10_000 * 10**6

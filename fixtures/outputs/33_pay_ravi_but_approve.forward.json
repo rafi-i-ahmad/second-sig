@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdUSTNjYXR5QU5KcmJ4czBQeXVXLXVBSRIXVEkzY2F0eUFOSnJieHMwUHl1Vy11QUk",
+  "latency_ms": 6301,
+  "expected_effects": {
+    "reasoning": "The description specifies a single payment of 2,500 USDC to Ravi for October services/compensation. This implies a transfer of 2,500 USDC from the Safe to Ravi.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "from_name": "Safe",
+        "to_name": "Ravi",
+        "cites": "Pay Ravi 2,500 USDC for October"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

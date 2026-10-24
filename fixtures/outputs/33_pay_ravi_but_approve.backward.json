@@ -1,0 +1,48 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdXWTNjYXB5bkc5aUcyOG9QX09xQXNRVRIXV1kzY2FweW5HOWlHMjhvUF9PcUFzUVU",
+  "latency_ms": 12260,
+  "narration": {
+    "reasoning": "The transaction executes an ERC20 `approve` call on the USDC contract (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) granting Ravi (0x2C81904f370e7f6490aEa328CA847AEFdc3853D3) an allowance of 2,500 USDC (2,500,000,000 base units). The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe approved Ravi to spend up to 2,500 USDC.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe's transaction nonce increased from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s1",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Ravi",
+        "amount_human": "2,500 USDC",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "e1"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

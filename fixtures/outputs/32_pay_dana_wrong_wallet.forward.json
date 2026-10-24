@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdQNDNjYXJ6ZEk2UGN4czBQbHVPcThRcxIXUDQzY2FyemRJNlBjeHMwUGx1T3E4UXM",
+  "latency_ms": 6762,
+  "expected_effects": {
+    "reasoning": "The description clearly specifies a single transfer of 2,500 USDC from the Safe to Dana for October compensation/payment.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana 2,500 USDC for October"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

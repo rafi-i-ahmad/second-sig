@@ -167,6 +167,8 @@ def attribute(cmp: CompareResult, fwd_grade: dict[str, list[str]] | None, bwd_gr
             why = "backward_fault"  # backward alone has it; truth does not
         elif bwd_grade is not None and fwd_grade is not None and fwd_grade["missing"]:
             why = "forward_fault" if benign else "real_finding"  # truth and backward have it, forward does not
+        elif not benign and bwd_grade is not None and not any(bwd_grade.values()):
+            why = "real_finding"  # backward agrees with the bytes; the words are what differ
         else:
             why = "needs_investigation"
         by_cites[frozenset(u.cites)] = why
@@ -187,6 +189,8 @@ def attribute(cmp: CompareResult, fwd_grade: dict[str, list[str]] | None, bwd_gr
             why = "forward_fault" if benign else "real_finding"  # forward alone has it: the words promise what the bytes do not do
         elif bwd_grade is not None and bwd_grade["missing"]:
             why = "backward_fault"  # truth and forward have it, backward does not
+        elif not benign:
+            why = "real_finding"  # the words promise what the bytes do not do
         else:
             why = "needs_investigation"
         out.append({"item": f"expected, not observed: {x}", "attribution": why})
