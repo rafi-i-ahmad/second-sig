@@ -55,13 +55,18 @@ judge/
                       unobserved, or nothing_else false -> ASK; else MATCH. Verdict carries the CompareResult
   stamp.py            EIP-712 signing with the judge key: make_stamp(bundle), sign(), digest(),
                       attest(). The only module that reads JUDGE_PRIVATE_KEY
+  pipeline.py         the whole judge: judge(proposal, bundle, replay=) runs floor, forward ‖ backward,
+                      compare, verdict, escalate, and makes the stamp on MATCH; answer() lets an owner
+                      amend the description and re-runs on the same bytes; sign_stamp/attest/execute talk
+                      to the fork. Proposal records (amendments, forms) in logs/proposals/
   stages/
     sources.py        Etherscan verified source + ABI, cached in fixtures/sources/, proxies followed
     judge.py          the naive one-call baseline (see below the invariants). Eval only
   run_fixture.py      runs a fixture through the test Safe on the fork; --save-trace writes the trace
 cli/
-  secondsig.py        propose, judge, sign, execute, override, describe, demo, eval  (all stubs)
-  view.py             three-panel terminal view (rich)  (stub)
+  secondsig.py        judge CASE [--replay] [--chain]; answer CASE TEXT --owner N; demo bybit|aave|auditor
+                      [--live]; execute CASE; reset. (propose, sign, override, describe: not built)
+  view.py             three-panel terminal view (rich): the words, the bytes, the verdict
 sepolia/              watcher.py, attacker.py  (stubs)
 fixtures/
   build.py            generates every case JSON; edit the Python, not the JSON
@@ -116,7 +121,15 @@ uv run python -m judge.stages.judge <case.json>... [--dump-prompt out.txt --no-c
 uv sync --group investigate && uv run python scripts/investigate.py <id> [--slots | --cites s0 s3 | --residuals r.json]   # default: reports/compare/<id>.json
 ```
 
-Not working yet (stubs): every `uv run secondsig ...` command (`demo`, `judge`, `eval --table`, `--replay`) raises `NotImplementedError`. `anvil --load-state fixtures/anvil-state.json` needs a dump that doesn't exist yet.
+```
+uv run secondsig demo aave                       # replay forms, then stamp, attest, execute on anvil
+uv run secondsig demo bybit                      # REJECT; the guard reverts the two-signature execution
+uv run secondsig judge fixtures/cases/demo/demo_auditor.json --replay [--chain]
+uv run secondsig answer fixtures/cases/demo/demo_auditor.json "Yes, the auditor invoices monthly" --owner 1 [--chain]
+uv run secondsig reset                           # anvil_reset + Safe + guard; clears logs/proposals/
+```
+
+The demos execute for real on the fork, so a MATCH advances the Safe's nonce and the recorded bundles (nonce 1) stop matching the chain. `secondsig reset` puts it back. Not built: `propose`, `sign`, `override`, `describe`; `eval` points at `scripts/compare_benign.py`. `anvil --load-state fixtures/anvil-state.json` needs a dump that doesn't exist yet.
 
 Fixtures carry the Safe placeholder `0x5AFE…5AFE`. `run_fixture.py` and `fork.py` substitute the real address at run time. A Bybit-shaped run overwrites the Safe's slot 0, so reset the fork afterwards (`NOTES.md`). Once the guard is set, `run_fixture.py` reverts with `SecondSig__NoStamp`. `fork.py` doesn't, because it zeroes the guard slot inside its snapshot.
 

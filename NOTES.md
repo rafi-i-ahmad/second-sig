@@ -226,6 +226,21 @@ Signature facts the guard relies on and eth_account satisfies: 65 bytes `r ‖ s
 low `s` (the guard rejects `s > n/2`). `MAX_STAMP_AGE` is 100 blocks from `forkBlock`, so a stamp
 signed on a stale rehearsal (or a `forkBlock` in the future) is refused at `attest`.
 
+### The whole flow on the fork (24 October, Rafi)
+
+`uv run secondsig demo aave|auditor|bybit` runs `judge/pipeline.py` end to end on the running
+anvil: recorded forms by default (`--live` to call the models), then the chain: on MATCH the
+judge key signs the stamp, owner 2 submits `attest`, owners 0 and 1's `execTransaction` goes
+through; on ASK or REJECT the same `execTransaction` is sent anyway and the guard's
+`SecondSig__NoStamp` revert is shown. `secondsig answer CASE "text" --owner N` is the ASK flow: the
+owner's words become an amendment to the description (attributed, untrusted, spotlighted), the
+forward pass re-runs once on the amended words, the backward pass and bundle are reused, and the
+table decides again; `--chain` then stamps and executes if it is MATCH. Proposal records with
+amendments and the forms they produced live in `logs/proposals/<id>.json` (gitignored).
+
+A MATCH that executes advances the Safe's nonce, after which the recorded bundles (nonce 1) no
+longer match the chain. `secondsig reset` rewinds anvil and rebuilds Safe + guard.
+
 ### End to end by replay (24 October, Rafi, branch `compare`)
 
 `uv run python scripts/compare_benign.py` runs the whole judge on recorded forms with no model
