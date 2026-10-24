@@ -21,7 +21,10 @@ BENIGN_CASES = [
     "10_swap_usdc_eth_uniswap", "demo_aave", "demo_auditor",
 ]
 # Floor-clean but the description contradicts the bytes: expected REJECT, from the model, not the floor.
-MISMATCH_CASES = ["31_revoke_ravi_usdc"]
+MISMATCH_CASES = [
+    "31_revoke_ravi_usdc", "32_pay_dana_wrong_wallet", "33_pay_ravi_but_approve", "34_uniswap_output_diverted",
+    "35_add_owner_then_lower_threshold",
+]
 CASES = ["demo_bybit", *BENIGN_CASES, *MISMATCH_CASES]
 
 SAFE = "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"

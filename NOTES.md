@@ -157,7 +157,7 @@ On the fork, through the real Safe with two owner signatures:
 | 01 "Send 5 ETH to the ops wallet" | `ExecutionSuccess`, 5 ETH moved, nonce 0 to 1; call tree is proxy, delegatecall to singleton, two ecrecover staticcalls, one CALL with 5 ETH and empty data. Rerun after the refactor at nonce 1, same result. |
 
 Rehearsed with `judge.evidence.fork`, bundles in `fixtures/bundles/`: 01, Bybit, Aave and auditor
-(Daniel), then cases 02 to 10 (Rafi), all on 24 October. All 13 cases.
+(Daniel), then cases 02 to 10 and mismatch 31 to 35 (Rafi), all on 24 October. All 18 cases.
 
 ### Hard floor false-positive check (24 October, Rafi)
 
@@ -174,7 +174,13 @@ its snapshot). The question was whether `rules.py` rejects anything honest. It d
 | 10 approve + swapExactTokensForETH | touches UniswapV2Router02, the USDC/WETH pair, WETH9 | no hits: all verified on Etherscan (cached in `fixtures/sources/`) |
 | Aave deposit, auditor payment | batches, 11 unlabelled Aave slot writes, unlimited approve | no hits |
 | Bybit | | rules 1, 2 and 3 |
-| 31 "Revoke Ravi's USDC allowance" (`fixtures/mismatch/`), bytes grant an unlimited allowance | approve to an EOA | no hits, as designed: approvals are not a floor rule. Expected REJECT must come from the model. If we want the floor to catch it, the spec's "approve or setApprovalForAll to an EOA" rule would, and no benign case approves an EOA |
+| 31–35 `fixtures/mismatch/` (description contradicts the bytes; expected REJECT) | approve to an EOA; a payment to a non-address-book EOA; a swap delivered to an EOA; threshold lowered by a Safe self-call | no hits on any, as designed: none of these is an attack *shape*, each is an honest-looking transaction with a lying description. The REJECT has to come from the model. If we want the floor to catch 31 and 33, the spec's "approve or setApprovalForAll to an EOA" rule would, and no benign case approves an EOA |
+
+What the bundles show for the mismatch cases, which is what the backward pass will have to say
+out loud: 31 `USDC.allowances[Safe][Ravi]` goes to `uint256 max`; 32 the 2,500 USDC land at
+`0x97f8…c277`, an address the address book does not know, while the words say Dana; 33 no balance
+changes at all, one allowance write; 34 the Safe pays 0.3546 ETH to the WETH/USDC pair and the
+1,000 USDC go to Ravi, not the Safe; 35 `Safe.threshold` 2 → 1 after `Safe.ownerCount` 3 → 4.
 
 Two conservative behaviours worth knowing: our own Safe proxy shows `verified=False` because
 Etherscan has never seen a fork-only address, and rule 3 skips the Safe itself for that reason.

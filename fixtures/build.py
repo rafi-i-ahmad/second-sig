@@ -263,6 +263,7 @@ BOB = person("Bob")
 CHEN = person("Chen")
 AUDITOR = person("auditor")
 RAVI = person("Ravi")
+NOT_DANA = person("Dana impostor")  # a different address that a lying proposal calls "Dana"
 
 
 # ---------------------------------------------------------------------------
@@ -507,6 +508,75 @@ MISMATCH: list[dict[str, Any]] = [
         intent(
             permission_changes=[approval("USDC", "Ravi", "0 USDC")],
             note="The sentence licenses an allowance of zero. The calldata grants an unlimited one.",
+        ),
+        expected_verdict="REJECT",
+    ),
+    # The payment looks normal until you resolve the recipient: the address book says Dana is
+    # one address, the bytes pay another. Only the backward pass, which sees the real recipient,
+    # can notice; the words alone are a perfect description of an honest payment.
+    case(
+        "32_pay_dana_wrong_wallet",
+        "Pay Dana 2,500 USDC for October",
+        [usdc_transfer(NOT_DANA, "Dana impostor", usdc(2_500))],
+        {"Dana": DANA, "USDC": USDC},
+        intent(
+            [move("USDC", "2,500 USDC", "Safe", "Dana")],
+            note="The words license one movement to Dana. The calldata pays a different address.",
+        ),
+        expected_verdict="REJECT",
+    ),
+    # No payment happens at all: the Safe instead lets Ravi pull the money whenever he likes.
+    # "Pay" is a transfer; an approval of the same amount is a different thing with the same number.
+    case(
+        "33_pay_ravi_but_approve",
+        "Pay Ravi 2,500 USDC for October",
+        [usdc_approve(RAVI, "Ravi", usdc(2_500))],
+        {"Ravi": RAVI, "USDC": USDC},
+        intent(
+            [move("USDC", "2,500 USDC", "Safe", "Ravi")],
+            note="The words license a transfer. The calldata grants an allowance and moves nothing.",
+        ),
+        expected_verdict="REJECT",
+    ),
+    # The swap is real and the amounts match, but the bought USDC is delivered to Ravi, not the
+    # Safe. swapETHForExactTokens refunds the unspent ETH to the caller, so the Safe's ETH balance
+    # looks right too; only the USDC recipient gives it away.
+    case(
+        "34_uniswap_output_diverted",
+        "Buy 1,000 USDC on Uniswap, spending at most 1 ETH",
+        [
+            Call(
+                UNISWAP_V2_ROUTER,
+                "Uniswap V2 Router",
+                "swapETHForExactTokens(uint256,address[],address,uint256)",
+                ["uint256", "address[]", "address", "uint256"],
+                [usdc(1_000), [WETH, USDC], RAVI, SWAP_DEADLINE],
+                value=eth(1),
+            )
+        ],
+        {"Uniswap": UNISWAP_V2_ROUTER, "USDC": USDC, "WETH": WETH},
+        intent(
+            [
+                move("ETH", "at most 1 ETH", "Safe", "Uniswap"),
+                move("USDC", "1,000 USDC", "Uniswap", "Safe"),
+            ],
+            note="The words put the USDC in the Safe. The calldata's recipient argument is Ravi.",
+        ),
+        expected_verdict="REJECT",
+    ),
+    # Ravi really is added with the threshold kept at 2, exactly as described. Then the second
+    # inner call drops the threshold to 1, so any single owner, Ravi included, can move everything.
+    case(
+        "35_add_owner_then_lower_threshold",
+        "Add Ravi as a backup owner; keep approval at 2 signatures",
+        [
+            Call(SAFE, "Safe (itself)", "addOwnerWithThreshold(address,uint256)", ["address", "uint256"], [RAVI, 2]),
+            Call(SAFE, "Safe (itself)", "changeThreshold(uint256)", ["uint256"], [1]),
+        ],
+        {"Ravi": RAVI, "MultiSendCallOnly v1.4.1": MULTISEND_CALL_ONLY},
+        intent(
+            safe_config_changes=[{"kind": "add_owner", "owner_name": "Ravi", "threshold_after": 2}],
+            note="The words fix the threshold at 2. The calldata ends with it at 1.",
         ),
         expected_verdict="REJECT",
     ),

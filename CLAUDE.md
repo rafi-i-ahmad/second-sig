@@ -1,5 +1,7 @@
 # Second Sig
 
+NOTE! Do NOT get too hung up on the spec it is okay to deviate from it somewhat.
+
 An extra signer for Safe multisigs. It rehearses a proposed transaction on a fork, compares what the bytes actually do with what the description says, and signs a stamp only on a match. A guard contract on the Safe refuses every transaction that has no valid stamp for its exact hash, unless every owner has approved an override and the delay has passed.
 
 Hackathon build: two people, about 2.5 days, Encode London. `Second Sig build spec v2.md` (plus the UI and demo docs next to it) is a rough guide, not the source of truth: where it disagrees with this file, this file wins. This file holds what an agent working in the repo must not get wrong. `NOTES.md` holds the live operational state (fork, test Safe, what has run, schema changes); read it before touching the fork.
@@ -52,14 +54,15 @@ fixtures/
   build.py            generates every case JSON; edit the Python, not the JSON
   cases/              ten ordinary proposals, the forward-pass test set. Never a demo scenario
   bybit/ aave/ auditor/   the three demo scenarios (case.json, with expected_verdict)
-  mismatch/           description contradicts the bytes, expected REJECT; floor-clean, so the model's job
+  mismatch/           31-35: description contradicts the bytes, expected REJECT; floor-clean, so the model's job
+  README.md           what every folder here is for; read it before adding a fixture
   transfer/           first forward-pass dry run
   tornado/ injection/ not built yet
   outputs/            model outputs: <id>.forward.json, <id>.naive.json
   sources/            Etherscan cache, one file per address
   traces/             callTracer + prestate diff + ERC-20 balances, from run_fixture --save-trace
   bundles/            <id>.bundle.json (EvidenceBundle) + <id>.rehearsal.json (raw traces), from fork.py.
-                      All 13 cases (01-10 and the three demos) as of 24 October
+                      All 18 cases (01-10, the three demos, mismatch 31-35) as of 24 October
   examples/           bybit.bundle.json, the hand-checked example the schema tests validate
 eval/
   run.py              the eval table  (stub)
