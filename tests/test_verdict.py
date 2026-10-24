@@ -8,7 +8,7 @@ import pytest
 
 from judge import verdict
 from judge.schemas import Decision, EvidenceBundle, Verdict
-from tests.test_evidence import BENIGN_CASES
+from tests.test_evidence import BENIGN_CASES, MISMATCH_CASES
 
 BUNDLES = Path(__file__).resolve().parent.parent / "fixtures" / "bundles"
 
@@ -66,6 +66,15 @@ def test_floor_never_rejects_a_benign_case(case: str) -> None:
     v = verdict.decide(load(case))
     assert v.decision == Decision.ASK
     assert v.floor_hits == [] and "no checked model form" in v.reasons
+
+
+@pytest.mark.parametrize("case", MISMATCH_CASES)
+def test_mismatch_cases_are_not_the_floors_job(case: str) -> None:
+    """'Revoke Ravi's allowance' that grants an unlimited one: expected REJECT, but no floor rule
+    fires (approvals to plain addresses are legal). Today, with no model, this is ASK. When the
+    judge is wired, its REJECT passes through the last row of the table."""
+    assert verdict.decide(load(case)).decision == Decision.ASK
+    assert verdict.decide(load(case), model_says(Decision.REJECT)).decision == Decision.REJECT
 
 
 def test_failed_rehearsal_is_ask_even_if_the_model_said_match() -> None:

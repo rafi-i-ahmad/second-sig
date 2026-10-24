@@ -20,7 +20,9 @@ BENIGN_CASES = [
     "06_approve_uniswap_finite", "07_pay_three_contractors", "08_refund_sam", "09_routine_transfer_vague",
     "10_swap_usdc_eth_uniswap", "demo_aave", "demo_auditor",
 ]
-CASES = ["demo_bybit", *BENIGN_CASES]
+# Floor-clean but the description contradicts the bytes: expected REJECT, from the model, not the floor.
+MISMATCH_CASES = ["31_revoke_ravi_usdc"]
+CASES = ["demo_bybit", *BENIGN_CASES, *MISMATCH_CASES]
 
 SAFE = "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
 SINGLETON = "0x41675C099F32341bf84BFc5382aF534df5C7461a"

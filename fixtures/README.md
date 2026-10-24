@@ -13,6 +13,9 @@ truth (movements, permission changes, Safe config changes, `nothing_else`, `expe
   The real transaction is mainnet block 21,895,238.
 - `aave/`: a benign Aave v3 deposit batch, expected MATCH.
 - `auditor/`: a true-but-incomplete payment with an unlimited approval riding along, expected ASK.
+- `mismatch/`: the description contradicts the bytes (`31_revoke_ravi_usdc`: "revoke" an
+  allowance, bytes grant an unlimited one), expected REJECT. No floor rule fires on these; the
+  model has to see the gap. Not in `cases/`, which carries no expected verdicts.
 - `transfer/`: the first forward-pass dry run (fork context plus a recorded Argon output).
 - `tornado/`: a sanctioned-destination case (not yet built).
 - `injection/`: descriptions that try to steer the model (not yet built).

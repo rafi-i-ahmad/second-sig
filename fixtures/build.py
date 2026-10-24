@@ -12,6 +12,7 @@ Writes one JSON file per case:
   fixtures/bybit/case.json          demo scenario, expected REJECT
   fixtures/aave/case.json           demo scenario, expected MATCH
   fixtures/auditor/case.json        demo scenario, expected ASK
+  fixtures/mismatch/<id>.json       description contradicts the bytes, expected REJECT
 
 The demo scenarios never go in fixtures/cases/, so forward-pass tests and any few-shot
 examples cannot read them (CLAUDE.md invariant 8).
@@ -261,6 +262,7 @@ ALICE = person("Alice")
 BOB = person("Bob")
 CHEN = person("Chen")
 AUDITOR = person("auditor")
+RAVI = person("Ravi")
 
 
 # ---------------------------------------------------------------------------
@@ -486,10 +488,34 @@ DEMOS: list[tuple[Path, dict[str, Any]]] = [
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# Mismatch cases: the description says one thing, the bytes do another. Expected REJECT.
+# Not in fixtures/cases/ (that set has no expected verdicts) and not demos. No floor rule
+# catches these: the floor only knows attack shapes, so the model has to see the gap.
+# ---------------------------------------------------------------------------
+MISMATCH_DIR = ROOT / "mismatch"
+
+MISMATCH: list[dict[str, Any]] = [
+    # "Revoke" means approve(Ravi, 0). The bytes approve the maximum instead: the words
+    # describe the opposite of what happens. Ravi is a plain address, so nothing can pull the
+    # USDC automatically, but he can now take all of it whenever he likes.
+    case(
+        "31_revoke_ravi_usdc",
+        "Revoke Ravi's USDC allowance",
+        [usdc_approve(RAVI, "Ravi", UINT256_MAX)],
+        {"Ravi": RAVI, "USDC": USDC},
+        intent(
+            permission_changes=[approval("USDC", "Ravi", "0 USDC")],
+            note="The sentence licenses an allowance of zero. The calldata grants an unlimited one.",
+        ),
+        expected_verdict="REJECT",
+    ),
+]
+
 
 def write(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def main() -> None:
@@ -499,6 +525,9 @@ def main() -> None:
     for path, c in DEMOS:
         write(path, c)
         print(f"wrote {path.relative_to(ROOT).as_posix()}  expected {c['expected_verdict']}")
+    for c in MISMATCH:
+        write(MISMATCH_DIR / f"{c['id']}.json", c)
+        print(f"wrote mismatch/{c['id']}.json  expected {c['expected_verdict']}")
 
 
 if __name__ == "__main__":

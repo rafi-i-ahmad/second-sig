@@ -52,6 +52,7 @@ fixtures/
   build.py            generates every case JSON; edit the Python, not the JSON
   cases/              ten ordinary proposals, the forward-pass test set. Never a demo scenario
   bybit/ aave/ auditor/   the three demo scenarios (case.json, with expected_verdict)
+  mismatch/           description contradicts the bytes, expected REJECT; floor-clean, so the model's job
   transfer/           first forward-pass dry run
   tornado/ injection/ not built yet
   outputs/            model outputs: <id>.forward.json, <id>.naive.json

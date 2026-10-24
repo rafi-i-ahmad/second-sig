@@ -174,6 +174,7 @@ its snapshot). The question was whether `rules.py` rejects anything honest. It d
 | 10 approve + swapExactTokensForETH | touches UniswapV2Router02, the USDC/WETH pair, WETH9 | no hits: all verified on Etherscan (cached in `fixtures/sources/`) |
 | Aave deposit, auditor payment | batches, 11 unlabelled Aave slot writes, unlimited approve | no hits |
 | Bybit | | rules 1, 2 and 3 |
+| 31 "Revoke Ravi's USDC allowance" (`fixtures/mismatch/`), bytes grant an unlimited allowance | approve to an EOA | no hits, as designed: approvals are not a floor rule. Expected REJECT must come from the model. If we want the floor to catch it, the spec's "approve or setApprovalForAll to an EOA" rule would, and no benign case approves an EOA |
 
 Two conservative behaviours worth knowing: our own Safe proxy shows `verified=False` because
 Etherscan has never seen a fork-only address, and rule 3 skips the Safe itself for that reason.
