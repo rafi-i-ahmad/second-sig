@@ -16,6 +16,7 @@ from __future__ import annotations
 from eth_abi import encode
 from eth_utils import keccak, to_checksum_address
 
+from judge.evidence import slots
 from judge.schemas import Call, EvidenceBundle, FloorHit, SlotWrite
 
 ZERO = "0x0000000000000000000000000000000000000000"
@@ -48,7 +49,7 @@ SLOT_GUARD = "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8
 # keccak256("fallback_manager.handler.address")
 SLOT_FALLBACK_HANDLER = "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5"
 MODULES_MAPPING_SLOT = 1
-SENTINEL = "0x0000000000000000000000000000000000000001"
+SENTINEL = slots.SENTINEL
 
 PROTECTED_FIXED_SLOTS = {
     SLOT_SINGLETON: "singleton (slot 0)",
@@ -132,23 +133,6 @@ def _module_slot(key: str) -> str:
     return "0x" + keccak(encode(["address", "uint256"], [key, MODULES_MAPPING_SLOT])).hex()
 
 
-def _candidate_addresses(bundle: EvidenceBundle) -> set[str]:
-    """Every address that appears in the evidence: possible keys of the modules mapping."""
-    out = {SENTINEL}
-    for c in bundle.call_tree:
-        out |= {c.from_address, c.to_address, c.storage_context}
-        out |= {a.value for a in c.args if a.type == "address"}
-    for e in bundle.events:
-        out |= {a.value for a in e.args if a.type == "address"}
-        out |= {"0x" + t[-40:] for t in e.topics[1:]}
-    data = bytes.fromhex(bundle.safe_tx.data.removeprefix("0x"))
-    for i in range(4, len(data) - 31):  # any 32-byte word that could be an address
-        word = data[i : i + 32]
-        if word[:12] == b"\x00" * 12 and word[12:] != b"\x00" * 20:
-            out.add("0x" + word[12:].hex())
-    return {to_checksum_address(a) for a in out if len(a) == 42}
-
-
 def _protected_slot_name(w: SlotWrite, module_slots: dict[str, str]) -> str | None:
     slot = w.slot.lower()
     if slot in PROTECTED_FIXED_SLOTS:
@@ -162,7 +146,7 @@ def _protected_slot_name(w: SlotWrite, module_slots: dict[str, str]) -> str | No
 
 def _protected_slots(bundle: EvidenceBundle) -> list[FloorHit]:
     safe = to_checksum_address(bundle.safe_address)
-    module_slots = {_module_slot(a): a for a in _candidate_addresses(bundle)}
+    module_slots = {_module_slot(a): a for a in slots.candidate_keys(bundle)}
     hits = []
     for w in bundle.storage_diff:
         if to_checksum_address(w.contract) != safe:
