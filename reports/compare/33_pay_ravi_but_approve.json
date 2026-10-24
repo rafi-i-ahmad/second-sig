@@ -1,15 +1,15 @@
 {
   "id": "33_pay_ravi_but_approve",
   "description": "Pay Ravi 2,500 USDC for October",
-  "expected_verdict": "REJECT",
+  "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> Ravi: 2500000000 (evidence c4, c5, s0, e1)\n- The Safe approved Ravi to spend up to 2,500 USDC. (evidence c4, c5, s0, e1)",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> Ravi: 2500000000 (evidence c4, c5, s0, e1)\n- The Safe grants Ravi an allowance of 2,500 USDC. (evidence c4, c5, s0, e1)",
     "decision": "ASK",
     "reasons": [
       "unexplained: allowance USDC Safe -> Ravi: 2500000000"
     ],
     "floor_hits": [],
-    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: 2500000000; The Safe approved Ravi to spend up to 2,500 USDC.",
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: 2500000000; The Safe grants Ravi an allowance of 2,500 USDC.",
     "compare": {
       "matched": [],
       "observed_unexplained": [
@@ -27,7 +27,7 @@
         },
         {
           "kind": "effect",
-          "item": "The Safe approved Ravi to spend up to 2,500 USDC.",
+          "item": "The Safe grants Ravi an allowance of 2,500 USDC.",
           "severity": "notable",
           "cites": [
             "c4",
@@ -42,13 +42,15 @@
         "movement 2,500 USDC Safe -> Ravi"
       ],
       "info_effects": [
-        "The Safe's transaction nonce increased from 1 to 2."
+        "The Safe increments its transaction nonce from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
       "tiers": [],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -112,12 +114,14 @@
         },
         "amount_base": 2500000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "2,500 USDC",
         "direction": "out",
         "implied": false,
         "severity": null,
         "cites": [
-          "Pay Ravi 2,500 USDC for October"
+          "Pay Ravi 2,500 USDC"
         ],
         "cited_ok": true,
         "source": "forward"
@@ -169,23 +173,22 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe approved Ravi to spend up to 2,500 USDC.",
+        "sentence": "The Safe increments its transaction nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s1",
+          "e0"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe grants Ravi an allowance of 2,500 USDC.",
         "severity": "notable",
         "cites": [
           "c4",
           "c5",
           "s0",
           "e1"
-        ],
-        "cited_ok": true
-      },
-      {
-        "sentence": "The Safe's transaction nonce increased from 1 to 2.",
-        "severity": "info",
-        "cites": [
-          "c1",
-          "s1",
-          "e0"
         ],
         "cited_ok": true
       }
@@ -218,7 +221,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "observed, unexplained [notable]: The Safe approved Ravi to spend up to 2,500 USDC.",
+      "item": "observed, unexplained [notable]: The Safe grants Ravi an allowance of 2,500 USDC.",
       "attribution": "real_finding (same evidence as the item above)"
     },
     {
@@ -234,7 +237,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "info: The Safe's transaction nonce increased from 1 to 2.",
+      "item": "info: The Safe increments its transaction nonce from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],
@@ -354,7 +357,7 @@
       ]
     },
     {
-      "item": "The Safe approved Ravi to spend up to 2,500 USDC.",
+      "item": "The Safe grants Ravi an allowance of 2,500 USDC.",
       "kind": "effect",
       "severity": "notable",
       "reason": "no matched item shares its evidence",

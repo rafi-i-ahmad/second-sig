@@ -3,13 +3,13 @@
   "description": "Pay our auditor 100 USDC",
   "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> auditor: unlimited (evidence c7, c8, s2, e2)\n- Safe grants auditor an unlimited USDC allowance. (evidence c7, c8, s2, e2)",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> auditor: unlimited (evidence c7, c8, s2, e2)\n- The Safe grants an unlimited USDC allowance to auditor. (evidence c7, c8, s2, e2)",
     "decision": "ASK",
     "reasons": [
       "unexplained: allowance USDC Safe -> auditor: unlimited"
     ],
     "floor_hits": [],
-    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> auditor: unlimited; Safe grants auditor an unlimited USDC allowance.",
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> auditor: unlimited; The Safe grants an unlimited USDC allowance to auditor.",
     "compare": {
       "matched": [
         {
@@ -35,7 +35,7 @@
         },
         {
           "kind": "effect",
-          "item": "Safe grants auditor an unlimited USDC allowance.",
+          "item": "The Safe grants an unlimited USDC allowance to auditor.",
           "severity": "notable",
           "cites": [
             "c7",
@@ -48,7 +48,7 @@
       ],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe's transaction nonce is incremented from 1 to 2."
+        "The Safe's nonce increments from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
@@ -56,7 +56,9 @@
         "exact"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -81,6 +83,8 @@
         },
         "amount_base": 100000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "100 USDC",
         "direction": "out",
         "implied": false,
@@ -150,6 +154,8 @@
         },
         "amount_base": 100000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "100 USDC",
         "direction": "out",
         "implied": false,
@@ -192,18 +198,20 @@
         },
         "amount_base": 100000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "100 USDC",
         "direction": "out",
         "implied": false,
         "severity": "notable",
         "cites": [
-          "c5",
-          "c6",
-          "s0",
-          "s1",
           "b0",
           "b1",
-          "e1"
+          "e1",
+          "s0",
+          "s1",
+          "c5",
+          "c6"
         ],
         "cited_ok": true,
         "source": "backward"
@@ -243,16 +251,17 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe's transaction nonce is incremented from 1 to 2.",
+        "sentence": "The Safe's nonce increments from 1 to 2.",
         "severity": "info",
         "cites": [
           "s3",
+          "c1",
           "e0"
         ],
         "cited_ok": true
       },
       {
-        "sentence": "Safe transfers 100 USDC to auditor.",
+        "sentence": "The Safe transfers 100 USDC to auditor.",
         "severity": "notable",
         "cites": [
           "c5",
@@ -266,7 +275,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "Safe grants auditor an unlimited USDC allowance.",
+        "sentence": "The Safe grants an unlimited USDC allowance to auditor.",
         "severity": "notable",
         "cites": [
           "c7",
@@ -303,7 +312,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "observed, unexplained [notable]: Safe grants auditor an unlimited USDC allowance.",
+      "item": "observed, unexplained [notable]: The Safe grants an unlimited USDC allowance to auditor.",
       "attribution": "real_finding (same evidence as the item above)"
     },
     {
@@ -311,7 +320,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "info: The Safe's transaction nonce is incremented from 1 to 2.",
+      "item": "info: The Safe's nonce increments from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],
@@ -443,7 +452,7 @@
       ]
     },
     {
-      "item": "Safe grants auditor an unlimited USDC allowance.",
+      "item": "The Safe grants an unlimited USDC allowance to auditor.",
       "kind": "effect",
       "severity": "notable",
       "reason": "no matched item shares its evidence",

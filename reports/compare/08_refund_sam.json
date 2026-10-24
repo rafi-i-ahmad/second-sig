@@ -23,8 +23,7 @@
       "observed_unexplained": [],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe's nonce increments from 1 to 2.",
-        "The Safe emits an ExecutionSuccess event."
+        "The Safe's nonce increments from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
@@ -32,7 +31,9 @@
         "exact"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -57,6 +58,8 @@
         },
         "amount_base": 500000000000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "0.5 ETH",
         "direction": "out",
         "implied": false,
@@ -99,6 +102,8 @@
         },
         "amount_base": 500000000000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "0.5 ETH",
         "direction": "out",
         "implied": false,
@@ -141,6 +146,8 @@
         },
         "amount_base": 500000000000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "0.5 ETH",
         "direction": "out",
         "implied": false,
@@ -158,16 +165,6 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe transfers 0.5 ETH to Sam.",
-        "severity": "notable",
-        "cites": [
-          "c4",
-          "b0",
-          "b1"
-        ],
-        "cited_ok": true
-      },
-      {
         "sentence": "The Safe's nonce increments from 1 to 2.",
         "severity": "info",
         "cites": [
@@ -176,10 +173,12 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe emits an ExecutionSuccess event.",
-        "severity": "info",
+        "sentence": "The Safe transfers 0.5 ETH to Sam.",
+        "severity": "notable",
         "cites": [
-          "e0"
+          "c4",
+          "b0",
+          "b1"
         ],
         "cited_ok": true
       }
@@ -205,10 +204,6 @@
   "attribution": [
     {
       "item": "info: The Safe's nonce increments from 1 to 2.",
-      "attribution": "bookkeeping"
-    },
-    {
-      "item": "info: The Safe emits an ExecutionSuccess event.",
       "attribution": "bookkeeping"
     }
   ],

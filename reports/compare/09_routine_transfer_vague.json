@@ -3,13 +3,13 @@
   "description": "Routine transfer",
   "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "The trace shows 2 effects the description does not mention:\n- 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (evidence c4, b0, b1)\n- The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (evidence c4, b0, b1)",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (evidence c4, b0, b1)\n- The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (evidence c4, b0, b1)",
     "decision": "ASK",
     "reasons": [
       "unexplained: 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31"
     ],
     "floor_hits": [],
-    "question": "The transaction also does the following, which the description does not mention. Is that intended? 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31; The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31; The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
     "compare": {
       "matched": [],
       "observed_unexplained": [
@@ -26,7 +26,7 @@
         },
         {
           "kind": "effect",
-          "item": "The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+          "item": "The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
           "severity": "notable",
           "cites": [
             "c4",
@@ -38,15 +38,18 @@
       ],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe's nonce incremented from 1 to 2."
+        "The Safe's transaction nonce increments from 1 to 2.",
+        "The Safe records the successful execution of the transaction."
       ],
       "uncited": [],
       "unsupported": [],
       "tiers": [],
       "nothing_else": false,
       "questions": [
-        "What asset, amount, and recipient are intended for this transfer?"
-      ]
+        "What asset, amount, and recipient are intended for the 'Routine transfer'?"
+      ],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -71,6 +74,8 @@
         },
         "amount_base": 1000000000000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1 ETH",
         "direction": "out",
         "implied": false,
@@ -99,7 +104,7 @@
     "effects": [],
     "nothing_else": false,
     "questions": [
-      "What asset, amount, and recipient are intended for this transfer?"
+      "What asset, amount, and recipient are intended for the 'Routine transfer'?"
     ],
     "uncited": [],
     "unsupported": [],
@@ -127,6 +132,8 @@
         },
         "amount_base": 1000000000000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1 ETH",
         "direction": "out",
         "implied": false,
@@ -144,7 +151,7 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+        "sentence": "The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
         "severity": "notable",
         "cites": [
           "c4",
@@ -154,10 +161,17 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe's nonce incremented from 1 to 2.",
+        "sentence": "The Safe's transaction nonce increments from 1 to 2.",
         "severity": "info",
         "cites": [
-          "s0",
+          "s0"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe records the successful execution of the transaction.",
+        "severity": "info",
+        "cites": [
           "e0"
         ],
         "cited_ok": true
@@ -189,7 +203,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "observed, unexplained [notable]: The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+      "item": "observed, unexplained [notable]: The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
       "attribution": "real_finding (same evidence as the item above)"
     },
     {
@@ -197,7 +211,11 @@
       "attribution": "real_finding"
     },
     {
-      "item": "info: The Safe's nonce incremented from 1 to 2.",
+      "item": "info: The Safe's transaction nonce increments from 1 to 2.",
+      "attribution": "bookkeeping"
+    },
+    {
+      "item": "info: The Safe records the successful execution of the transaction.",
       "attribution": "bookkeeping"
     }
   ],
@@ -247,7 +265,7 @@
       ]
     },
     {
-      "item": "The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+      "item": "The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
       "kind": "effect",
       "severity": "notable",
       "reason": "no matched item shares its evidence",

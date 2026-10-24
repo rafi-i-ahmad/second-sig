@@ -3,14 +3,54 @@
   "description": "Pay the Q3 invoice from Acme, 8,000 USDC.",
   "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "reasoning": "The trace shows 1 effect the description does not mention:\n- 1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3 (evidence c7, c8, s0, s1, b0, b2, e2)",
     "decision": "ASK",
     "reasons": [
-      "no checked model form"
+      "unexplained: 1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
     ],
     "floor_hits": [],
-    "question": null,
-    "compare": null
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? 1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "8,000 USDC Safe -> Acme",
+          "observed": "8,000 USDC Safe -> Acme",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [
+        {
+          "kind": "movement",
+          "item": "1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "severity": "notable",
+          "cites": [
+            "c7",
+            "c8",
+            "s0",
+            "s1",
+            "b0",
+            "b2",
+            "e2"
+          ],
+          "reason": "no expected movement matches (asset, route, amount)"
+        }
+      ],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe increments its nonce from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
   },
   "truth": {
     "source": "truth",
@@ -87,12 +127,385 @@
     "unsupported": [],
     "notes": []
   },
-  "forward": null,
-  "backward": null,
-  "forward_vs_truth": null,
-  "backward_vs_truth": null,
-  "attribution": [],
-  "residuals": [],
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Acme",
+          "address": "0x2d16e2F871638A13A011bd38dC5B1C379cB81B94",
+          "via": "address_book"
+        },
+        "amount_base": 8000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "8,000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Pay the Q3 invoice from Acme, 8,000 USDC."
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Acme",
+          "address": "0x2d16e2F871638A13A011bd38dC5B1C379cB81B94",
+          "via": "address_book"
+        },
+        "amount_base": 8000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "8,000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address"
+        },
+        "amount_base": 1000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe transfers 8,000 USDC to Acme.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe transfers 1 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe increments its nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s3",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [
+      "movement 1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+    ],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [notable]: 1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "forward vs truth (missing): movement 1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "info: The Safe increments its nonce from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "1 USDC Safe -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+      "kind": "movement",
+      "severity": "notable",
+      "reason": "no expected movement matches (asset, route, amount)",
+      "evidence": [
+        {
+          "id": "c7",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000000000f4240",
+          "selector": "0xa9059cbb",
+          "function": "transfer(address,uint256)",
+          "args": [
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c8",
+          "parent": "c7",
+          "depth": 4,
+          "kind": "DELEGATECALL",
+          "from_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "to_address": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000000000f4240",
+          "selector": "0xa9059cbb",
+          "function": "transfer(address,uint256)",
+          "args": [
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s0",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x096dd619cd2c4170b38907621d8867e5cbd5a41ec8e9f09b8df03981132df3de",
+          "label": "USDC.balanceOf[0x2C81…53D3]",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "0x00000000000000000000000000000000000000000000000000000000000f4240",
+          "writers": [
+            {
+              "id": "c5",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c6",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c7",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c8",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "s1",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x2af6e45109ed6c3f87addc9868ad92048225ec319f059ae1d594169e71fbbeb6",
+          "label": "USDC.balanceOf[0xDFEC…aE47]",
+          "before": "0x00000000000000000000000000000000000000000000000000000002540be400",
+          "after": "0x00000000000000000000000000000000000000000000000000000000772651c0",
+          "writers": [
+            {
+              "id": "c5",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c6",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c7",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c8",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "b0",
+          "holder": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "asset": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6,
+          "before": 0,
+          "after": 1000000,
+          "delta": 1000000
+        },
+        {
+          "id": "b2",
+          "holder": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "asset": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6,
+          "before": 10000000000,
+          "after": 1999000000,
+          "delta": -8001000000
+        },
+        {
+          "id": "e2",
+          "call_id": "c8",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "name": "Transfer",
+          "args": [
+            {
+              "name": "from",
+              "type": "address",
+              "value": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000"
+            }
+          ],
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae47",
+            "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000000000000000f4240"
+        }
+      ]
+    }
+  ],
   "bundle": {
     "safe_tx_hash": "0x076758f3e05c619525d10ecf89f5a54050d4ba2e120a79d8b9ff447870d46535",
     "fork_block": 21895241,

@@ -39,8 +39,7 @@
       "observed_unexplained": [],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe increments its transaction nonce from 1 to 2.",
-        "The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions."
+        "The Safe's transaction nonce is incremented from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
@@ -48,7 +47,9 @@
         "exact"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -73,6 +74,8 @@
         },
         "amount_base": 1200000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1200 USDC",
         "direction": "out",
         "implied": false,
@@ -102,6 +105,8 @@
         },
         "amount_base": 3400000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "3400 USDC",
         "direction": "out",
         "implied": false,
@@ -131,6 +136,8 @@
         },
         "amount_base": 800000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "800 USDC",
         "direction": "out",
         "implied": false,
@@ -173,6 +180,8 @@
         },
         "amount_base": 1200000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1,200 USDC",
         "direction": "out",
         "implied": false,
@@ -202,6 +211,8 @@
         },
         "amount_base": 3400000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "3,400 USDC",
         "direction": "out",
         "implied": false,
@@ -231,6 +242,8 @@
         },
         "amount_base": 800000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "800 USDC",
         "direction": "out",
         "implied": false,
@@ -273,6 +286,8 @@
         },
         "amount_base": 1200000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1,200 USDC",
         "direction": "out",
         "implied": false,
@@ -308,6 +323,8 @@
         },
         "amount_base": 3400000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "3,400 USDC",
         "direction": "out",
         "implied": false,
@@ -343,6 +360,8 @@
         },
         "amount_base": 800000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "800 USDC",
         "direction": "out",
         "implied": false,
@@ -364,9 +383,10 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe increments its transaction nonce from 1 to 2.",
+        "sentence": "The Safe's transaction nonce is incremented from 1 to 2.",
         "severity": "info",
         "cites": [
+          "c0",
           "c1",
           "s4",
           "e0"
@@ -374,18 +394,10 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions.",
-        "severity": "info",
-        "cites": [
-          "c1",
-          "c4"
-        ],
-        "cited_ok": true
-      },
-      {
         "sentence": "The Safe transfers 1,200 USDC to Alice.",
         "severity": "notable",
         "cites": [
+          "c4",
           "c5",
           "c6",
           "s1",
@@ -400,6 +412,7 @@
         "sentence": "The Safe transfers 3,400 USDC to Bob.",
         "severity": "notable",
         "cites": [
+          "c4",
           "c7",
           "c8",
           "s0",
@@ -414,6 +427,7 @@
         "sentence": "The Safe transfers 800 USDC to Chen.",
         "severity": "notable",
         "cites": [
+          "c4",
           "c9",
           "c10",
           "s1",
@@ -445,11 +459,7 @@
   },
   "attribution": [
     {
-      "item": "info: The Safe increments its transaction nonce from 1 to 2.",
-      "attribution": "bookkeeping"
-    },
-    {
-      "item": "info: The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions.",
+      "item": "info: The Safe's transaction nonce is incremented from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],

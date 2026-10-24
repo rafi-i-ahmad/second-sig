@@ -3,14 +3,63 @@
   "description": "Pay Dana 0.5 WETH.",
   "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- 0.5 ETH Safe -> WETH (evidence c5, b0, b1, e1)\n- The Safe wraps 0.5 ETH into WETH by depositing 0.5 ETH into WETH. (evidence c5, b0, b1, e1)",
     "decision": "ASK",
     "reasons": [
-      "no checked model form"
+      "unexplained: 0.5 ETH Safe -> WETH"
     ],
     "floor_hits": [],
-    "question": null,
-    "compare": null
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? 0.5 ETH Safe -> WETH; The Safe wraps 0.5 ETH into WETH by depositing 0.5 ETH into WETH.",
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "0.5 WETH Safe -> Dana",
+          "observed": "0.5 WETH Safe -> Dana",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [
+        {
+          "kind": "movement",
+          "item": "0.5 ETH Safe -> WETH",
+          "severity": "notable",
+          "cites": [
+            "c5",
+            "b0",
+            "b1",
+            "e1"
+          ],
+          "reason": "no expected movement matches (asset, route, amount)"
+        },
+        {
+          "kind": "effect",
+          "item": "The Safe wraps 0.5 ETH into WETH by depositing 0.5 ETH into WETH.",
+          "severity": "notable",
+          "cites": [
+            "c5",
+            "b0",
+            "b1",
+            "e1"
+          ],
+          "reason": "no matched item shares its evidence"
+        }
+      ],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's nonce increments from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
   },
   "truth": {
     "source": "truth",
@@ -90,12 +139,333 @@
       "protocol call WETH.deposit(): asset flows taken from the fork's balance changes"
     ]
   },
-  "forward": null,
-  "backward": null,
-  "forward_vs_truth": null,
-  "backward_vs_truth": null,
-  "attribution": [],
-  "residuals": [],
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address_book"
+        },
+        "amount_base": 500000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.5 WETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Pay Dana 0.5 WETH."
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book"
+        },
+        "amount_base": 500000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "b0",
+          "b1",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address_book"
+        },
+        "amount_base": 500000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.5 WETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c6",
+          "s0",
+          "b2",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe wraps 0.5 ETH into WETH by depositing 0.5 ETH into WETH.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "b0",
+          "b1",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe transfers 0.5 WETH to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c6",
+          "s0",
+          "b2",
+          "e2"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s1",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [
+      "movement 0.5 ETH (ETH…) Safe -> WETH"
+    ],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [notable]: 0.5 ETH Safe -> WETH",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "observed, unexplained [notable]: The Safe wraps 0.5 ETH into WETH by depositing 0.5 ETH into WETH.",
+      "attribution": "real_finding (same evidence as the item above)"
+    },
+    {
+      "item": "forward vs truth (missing): movement 0.5 ETH (ETH…) Safe -> WETH",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "info: The Safe's nonce increments from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "0.5 ETH Safe -> WETH",
+      "kind": "movement",
+      "severity": "notable",
+      "reason": "no expected movement matches (asset, route, amount)",
+      "evidence": [
+        {
+          "id": "c5",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "storage_context": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "value": 500000000000000000,
+          "input": "0xd0e30db0",
+          "selector": "0xd0e30db0",
+          "function": "deposit()",
+          "args": [],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "b0",
+          "holder": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 2945050502305156238716997,
+          "after": 2945051002305156238716997,
+          "delta": 500000000000000000
+        },
+        {
+          "id": "b1",
+          "holder": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 1000000000000000000000,
+          "after": 999500000000000000000,
+          "delta": -500000000000000000
+        },
+        {
+          "id": "e1",
+          "call_id": "c5",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "topic0": "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c",
+          "name": "Deposit",
+          "args": [
+            {
+              "name": "dst",
+              "type": "address",
+              "value": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "name": "wad",
+              "type": "uint256",
+              "value": "500000000000000000"
+            }
+          ],
+          "topics": [
+            "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c",
+            "0x000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae47"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000006f05b59d3b20000"
+        }
+      ]
+    },
+    {
+      "item": "The Safe wraps 0.5 ETH into WETH by depositing 0.5 ETH into WETH.",
+      "kind": "effect",
+      "severity": "notable",
+      "reason": "no matched item shares its evidence",
+      "evidence": [
+        {
+          "id": "c5",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "storage_context": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "value": 500000000000000000,
+          "input": "0xd0e30db0",
+          "selector": "0xd0e30db0",
+          "function": "deposit()",
+          "args": [],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "b0",
+          "holder": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 2945050502305156238716997,
+          "after": 2945051002305156238716997,
+          "delta": 500000000000000000
+        },
+        {
+          "id": "b1",
+          "holder": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 1000000000000000000000,
+          "after": 999500000000000000000,
+          "delta": -500000000000000000
+        },
+        {
+          "id": "e1",
+          "call_id": "c5",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "topic0": "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c",
+          "name": "Deposit",
+          "args": [
+            {
+              "name": "dst",
+              "type": "address",
+              "value": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "name": "wad",
+              "type": "uint256",
+              "value": "500000000000000000"
+            }
+          ],
+          "topics": [
+            "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c",
+            "0x000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae47"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000006f05b59d3b20000"
+        }
+      ]
+    }
+  ],
   "bundle": {
     "safe_tx_hash": "0x789eb6ad7a2f83a80ec602e579c27e7a8d31372b55298951751714f3c919d081",
     "fork_block": 21895241,

@@ -31,7 +31,7 @@
       "observed_unexplained": [],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe's execution nonce increments from 1 to 2."
+        "The Safe's transaction nonce increments from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
@@ -39,7 +39,9 @@
         "exact"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -152,7 +154,7 @@
     ],
     "effects": [
       {
-        "sentence": "Priya is added as an owner of the Safe, increasing total owners from 3 to 4 with the signing threshold set to 2.",
+        "sentence": "Priya (0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8) is added as an owner of the Safe, with the threshold set to 2.",
         "severity": "critical",
         "cites": [
           "c4",
@@ -165,10 +167,9 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe's execution nonce increments from 1 to 2.",
+        "sentence": "The Safe's transaction nonce increments from 1 to 2.",
         "severity": "info",
         "cites": [
-          "c1",
           "s1",
           "e0"
         ],
@@ -195,7 +196,7 @@
   },
   "attribution": [
     {
-      "item": "info: The Safe's execution nonce increments from 1 to 2.",
+      "item": "info: The Safe's transaction nonce increments from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],

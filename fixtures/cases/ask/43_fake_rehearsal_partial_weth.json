@@ -53,6 +53,12 @@
       {
         "asset": "WETH",
         "amount_human": "0.5 WETH",
+        "from_name": "WETH",
+        "to_name": "Safe"
+      },
+      {
+        "asset": "WETH",
+        "amount_human": "0.5 WETH",
         "from_name": "Safe",
         "to_name": "Ravi"
       }

@@ -72,6 +72,8 @@
         },
         "amount_base": 500000000000000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "500 ETH",
         "direction": "out",
         "implied": false,
@@ -99,15 +101,16 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe executed a delegatecall to unverified contract 0x96221423681A6d52E184D440a8eFCEbB105C7242.",
+        "sentence": "The Safe performs a delegatecall to unverified contract 0x96221423681A6d52E184D440a8eFCEbB105C7242.",
         "severity": "critical",
         "cites": [
+          "c1",
           "c4"
         ],
         "cited_ok": true
       },
       {
-        "sentence": "The Safe's singleton implementation address was overwritten from 0x41675C099F32341bf84BFc5382aF534df5C7461a to 0xbdd077f651Ebe7f7b3cE16fE5F2B025be2969516.",
+        "sentence": "The Safe's singleton implementation address is overwritten from 0x41675C099F32341bf84BFc5382aF534df5C7461a to 0xBDd077f651EbE7f7b3Ce16fe5f2b025Be2969516.",
         "severity": "critical",
         "cites": [
           "s0",
@@ -116,18 +119,10 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe's transaction nonce increased from 1 to 2.",
+        "sentence": "The Safe's transaction nonce increases from 1 to 2.",
         "severity": "info",
         "cites": [
           "s1"
-        ],
-        "cited_ok": true
-      },
-      {
-        "sentence": "The Safe emitted an ExecutionSuccess event.",
-        "severity": "info",
-        "cites": [
-          "e0"
         ],
         "cited_ok": true
       }

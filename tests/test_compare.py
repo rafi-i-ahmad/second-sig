@@ -433,7 +433,7 @@ def decide_aave(fwd, bwd):
 def test_aave_backward_against_a_forward_that_promises_the_deposit() -> None:
     """USDC lands in the aToken contract, not the Pool the words name, and the receipt token is
     minted from the zero address: both are inside the Safe's call into the Pool, so they match
-    under counterparty_via_callee; 'aUSDC' is not in the address book, so asset_unresolved."""
+    under counterparty_via_callee; 'aUSDC' is in the address book, so the asset matches exactly."""
     fwd = ExpectedEffects(
         reasoning="", confidence="high", nothing_else=True,
         movements=[
@@ -447,17 +447,27 @@ def test_aave_backward_against_a_forward_that_promises_the_deposit() -> None:
     )
     v = decide_aave(fwd, backward("demo_aave"))
     assert v.decision == Decision.MATCH, v.reasoning
-    assert set(v.compare.tiers) >= {"exact", "counterparty_via_callee", "asset_unresolved"}
+    assert set(v.compare.tiers) == {"exact", "counterparty_via_callee"}
     assert v.compare.observed_unexplained == [] and v.compare.expected_unobserved == []
 
 
-def test_aave_recorded_forward_without_the_receipt_token_still_matches() -> None:
-    """The recorded Flash forward form read the deposit as USDC out plus the approval, with no
-    aUSDC coming back. The mint is received from inside the Safe's call into the Pool, so it is
-    explained under inbound_from_callee: receiving an asset cannot drain the Safe."""
-    v = decide_aave(forward("demo_aave"), backward("demo_aave"))
+def test_aave_forward_without_the_receipt_token_still_matches() -> None:
+    """A forward form that reads the deposit as USDC out plus the approval, with no aUSDC coming
+    back (Flash wrote one like that before the prompt named receipt tokens). The mint is received
+    from inside the Safe's call into the Pool, so it is explained under inbound_from_callee:
+    receiving an asset cannot drain the Safe."""
+    f = forward("demo_aave")
+    no_receipt = f.model_copy(update={"movements": [m for m in f.movements if m.from_name == "Safe"]})
+    assert len(no_receipt.movements) < len(f.movements)
+    v = decide_aave(no_receipt, backward("demo_aave"))
     assert v.decision == Decision.MATCH, v.reasoning
     assert "inbound_from_callee" in v.compare.tiers and v.compare.observed_unexplained == []
+
+
+def test_aave_recorded_forms_match_with_the_receipt_token_named() -> None:
+    v = decide_aave(forward("demo_aave"), backward("demo_aave"))
+    assert v.decision == Decision.MATCH, v.reasoning
+    assert v.compare.observed_unexplained == [] and v.compare.expected_unobserved == []
 
 
 def test_inbound_tolerance_never_explains_an_outbound_movement() -> None:
@@ -482,7 +492,16 @@ def test_internal_tolerance_does_not_cover_a_diverted_output() -> None:
     v = decide("10_swap_usdc_eth_uniswap", forward("10_swap_usdc_eth_uniswap"), spiked)
     assert v.decision == Decision.ASK
     assert any(ravi in u.item for u in v.compare.observed_unexplained)
-    assert "internal_to_callee" not in v.compare.tiers
+    assert not any(ravi in m.observed for m in v.compare.matched)
+
+
+def test_unwrapping_into_the_named_router_is_plumbing() -> None:
+    """Case 10 as recorded: WETH unwraps the output into the router the words name, and the router
+    pays the Safe. The first leg is internal; only the delivery to the Safe is checked."""
+    v = decide("10_swap_usdc_eth_uniswap", forward("10_swap_usdc_eth_uniswap"), backward("10_swap_usdc_eth_uniswap"))
+    assert v.decision == Decision.MATCH, v.reasoning
+    assert any(m.tier == "internal_to_callee" and m.observed.endswith(" ETH WETH -> Uniswap router")
+               for m in v.compare.matched)
 
 
 def test_internal_tolerance_covers_contract_to_contract_plumbing() -> None:

@@ -47,13 +47,12 @@ itself. Your job is to state exactly what the description licenses, and nothing 
 - nothing_else: true only if the words leave no room for other effects.
 - questions_for_human: what the signers must settle before this could be approved.
   - Something the Safe would send or allow whose asset, amount or recipient the words leave
-    open: leave that item out of the lists, set nothing_else to false and ask about it. Still
-    list the items the words do fix. If nothing at all is fixed, every list stays empty.
+    open, including a recipient the address book does not hold (a new wallet, an address from
+    an email or a form) and words that could mean more than one entry: leave that item out of
+    the lists, set nothing_else to false and ask about it. Still list the items the words do
+    fix. If nothing at all is fixed, every list stays empty.
   - Words that contradict themselves (two amounts for one payment, a base-unit figure that
     disagrees with the amount): list the plain reading and ask which is right.
-  - A recipient the address book does not hold (a new wallet, an address from an email or a
-    form), or words that could mean more than one entry: name the party as the words do and
-    ask for the address.
 
 Leave a list empty when the words describe no item of that kind. Never add an entry
 to fill space: an entry with no owner, threshold, amount or recipient is wrong.

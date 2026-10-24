@@ -29,10 +29,8 @@ Every effect in the trace is accounted for by the description, and everything th
 | 10,000 USDC Safe -> hot wallet | exact |
 
 Info (bookkeeping):
-- The Safe's transaction nonce is incremented from 1 to 2.
-- Safe delegates execution to MultiSendCallOnly v1.4.1 to execute multiple sub-transactions.
+- The Safe incremented its nonce from 1 to 2.
 
 ## Attribution
 
-- `bookkeeping`: info: The Safe's transaction nonce is incremented from 1 to 2.
-- `bookkeeping`: info: Safe delegates execution to MultiSendCallOnly v1.4.1 to execute multiple sub-transactions.
+- `bookkeeping`: info: The Safe incremented its nonce from 1 to 2.

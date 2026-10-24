@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdadW5jYXJmRkpfeUJ4czBQN1B1NGdBVRIXWnVuY2FyZkZKX3lCeHMwUDdQdTRnQVU",
+  "latency_ms": 4971,
+  "expected_effects": {
+    "reasoning": "The description specifies paying an invoice from 'Acme' for the amount of '8,000 USDC'. This licenses a direct transfer of 8,000 USDC from the Safe to Acme. Both Acme and USDC exist in the address book. No permissions or config changes are requested.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "8,000 USDC",
+        "from_name": "Safe",
+        "to_name": "Acme",
+        "cites": "Pay the Q3 invoice from Acme, 8,000 USDC."
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

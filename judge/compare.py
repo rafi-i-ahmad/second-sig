@@ -376,14 +376,18 @@ def _is_addr(value: object) -> bool:
 
 def _is_internal(obs: CanonMovement, expected: CanonEffects, callees, r: Resolver) -> bool:
     """Bookkeeping between contracts inside a licensed call, and nothing more. Refused when:
-    - the asset is one the words expect the Safe to *receive* (a swap's output delivered to a
-      third party is a diversion, not plumbing), or
+    - the asset is one the words expect the Safe to *receive* and it goes anywhere but a contract
+      the words license (a swap's output delivered to a third party is a diversion, not plumbing;
+      WETH unwrapping the output into the router the words name is plumbing, and the router's
+      delivery to the Safe is still checked against the words), or
     - the recipient has no code (a plain address inside a protocol call is someone's wallet)."""
     if not any(r.inside_call_to(obs.cites, p.address) for p in callees):
         return False
     expected_in = {m.asset.address for m in expected.movements if m.direction == "in" and m.asset.resolved}
     expected_in_labels = {m.asset.label.lower() for m in expected.movements if m.direction == "in"}
-    if obs.asset.address in expected_in or obs.asset.label.lower() in expected_in_labels:
+    licensed = {p.address for p in callees}
+    if (obs.asset.address in expected_in or obs.asset.label.lower() in expected_in_labels) \
+            and obs.to_party.address not in licensed:
         return False
     to = obs.to_party.address
     if to is None:

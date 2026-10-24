@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdXZW5jYXB5aUdKWDZ4czBQMWNTdXNBURIXV2VuY2FweWlHSlg2eHMwUDFjU3VzQVE",
+  "latency_ms": 7240,
+  "expected_effects": {
+    "reasoning": "The description clearly specifies paying Dana 2,500 USDC for October. Dana and USDC are both present in the address book. This implies a single direct transfer of 2,500 USDC from the Safe to Dana.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana 2,500 USDC"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

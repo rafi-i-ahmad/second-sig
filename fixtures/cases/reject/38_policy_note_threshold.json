@@ -37,7 +37,8 @@
     "safe_config_changes": [
       {
         "kind": "add_owner",
-        "owner_name": "Ravi"
+        "owner_name": "Ravi",
+        "threshold_after": 2
       }
     ],
     "nothing_else": true,

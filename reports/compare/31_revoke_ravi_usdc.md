@@ -2,13 +2,13 @@
 
 **Description:** Revoke Ravi's USDC allowance
 
-**Expected verdict:** REJECT  **Computed:** ASK
+**Expected verdict:** ASK  **Computed:** ASK
 
 The trace shows 2 effects the description does not mention:
 - allowance USDC Safe -> Ravi: unlimited (evidence c4, c5, s0, e1)
-- Safe grants an unlimited USDC allowance to Ravi. (evidence c4, c5, s0, e1)
+- The Safe sets an unlimited USDC allowance for Ravi. (evidence c4, c5, s0, e1)
 
-**Question for the signers:** The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: unlimited; Safe grants an unlimited USDC allowance to Ravi.
+**Question for the signers:** The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: unlimited; The Safe sets an unlimited USDC allowance for Ravi.
 
 ## The three canonical lists
 
@@ -32,18 +32,18 @@ The trace shows 2 effects the description does not mention:
 
 Observed, unexplained:
 - [notable] allowance USDC Safe -> Ravi: unlimited (no expected allowance matches (asset, spender, amount); c4, c5, s0, e1)
-- [notable] Safe grants an unlimited USDC allowance to Ravi. (no matched item shares its evidence; c4, c5, s0, e1)
+- [notable] The Safe sets an unlimited USDC allowance for Ravi. (no matched item shares its evidence; c4, c5, s0, e1)
 
 Expected, not observed:
 - permission allowance USDC Safe -> Ravi: zero
 
 Info (bookkeeping):
-- The Safe's nonce increases from 1 to 2.
+- The Safe's transaction nonce increases from 1 to 2.
 
 ## Attribution
 
 - `real_finding`: observed, unexplained [notable]: allowance USDC Safe -> Ravi: unlimited
-- `real_finding (same evidence as the item above)`: observed, unexplained [notable]: Safe grants an unlimited USDC allowance to Ravi.
+- `real_finding (same evidence as the item above)`: observed, unexplained [notable]: The Safe sets an unlimited USDC allowance for Ravi.
 - `real_finding`: expected, not observed: permission allowance USDC Safe -> Ravi: zero
 - `real_finding`: forward vs truth (wrong_amount): permission allowance USDC Safe -> Ravi: zero (truth allowance USDC Safe -> Ravi: unlimited)
-- `bookkeeping`: info: The Safe's nonce increases from 1 to 2.
+- `bookkeeping`: info: The Safe's transaction nonce increases from 1 to 2.

@@ -4,14 +4,16 @@
 
 **Expected verdict:** MATCH  **Computed:** MATCH
 
-Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (3 matched; tiers used: exact, amount_unconstrained, counterparty_via_callee).
+Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (5 matched; tiers used: exact, amount_unconstrained, counterparty_via_callee, internal_to_callee).
 
 ## The three canonical lists
 
 | | truth (bytes) | forward (words) | backward (trace) |
 | --- | --- | --- | --- |
 | movements | 1.761817265430573461 ETH (ETH…) Uniswap router -> Safe | 5,000 USDC Safe -> Uniswap router | 5,000 USDC Safe -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc |
-|  | 5000 USDC Safe -> Uniswap router | any amount ETH Uniswap router -> Safe | 1.761817265430573461 ETH Uniswap router -> Safe |
+|  | 5000 USDC Safe -> Uniswap router | any amount ETH Uniswap router -> Safe | 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router |
+|  |  |  | 1.761817265430573461 ETH WETH -> Uniswap router |
+|  |  |  | 1.761817265430573461 ETH Uniswap router -> Safe |
 | permissions | allowance USDC Safe -> Uniswap router: 5000000000 | allowance USDC Safe -> Uniswap router: 5000000000 | allowance USDC Safe -> Uniswap router: 5000000000 |
 | configs |  |  |  |
 
@@ -28,16 +30,22 @@ Truth notes: protocol call Uniswap router.swapExactTokensForETH(uint256,uint256,
 | matched | tier |
 | --- | --- |
 | 5,000 USDC Safe -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc | counterparty_via_callee |
+| 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router | internal_to_callee |
+| 1.761817265430573461 ETH WETH -> Uniswap router | internal_to_callee |
 | 1.761817265430573461 ETH Uniswap router -> Safe | amount_unconstrained |
 | allowance USDC Safe -> Uniswap router: 5000000000 | exact (expected item was implied by the words, not stated) |
 
 Info (bookkeeping):
-- The Safe incremented its nonce from 1 to 2.
-- Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH.
+- internal movement 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router
+- internal movement 1.761817265430573461 ETH WETH -> Uniswap router
+- The Safe's nonce incremented from 1 to 2.
 
 ## Attribution
 
 - `tolerance_rule`: matched by counterparty_via_callee: 5,000 USDC Safe -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc
+- `tolerance_rule`: matched by internal_to_callee: 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router
+- `tolerance_rule`: matched by internal_to_callee: 1.761817265430573461 ETH WETH -> Uniswap router
 - `tolerance_rule`: matched by amount_unconstrained: 1.761817265430573461 ETH Uniswap router -> Safe
-- `bookkeeping`: info: The Safe incremented its nonce from 1 to 2.
-- `bookkeeping`: info: Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH.
+- `bookkeeping`: info: internal movement 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router
+- `bookkeeping`: info: internal movement 1.761817265430573461 ETH WETH -> Uniswap router
+- `bookkeeping`: info: The Safe's nonce incremented from 1 to 2.

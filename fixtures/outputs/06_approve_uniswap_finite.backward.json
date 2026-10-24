@@ -1,10 +1,10 @@
 {
   "model": "gemini-3.8-flash",
   "thinking": "low",
-  "interaction_id": "v1_ChdIWWJjYXBuc01JT0N2ZElQemNMeHFBVRIXSFliY2FwbnNNSU9DdmRJUHpjTHhxQVU",
-  "latency_ms": 5932,
+  "interaction_id": "v1_ChdFZWZjYXAzOUtQN29uc0VQenEySmlRZxIXRWVmY2FwMzlLUDdvbnNFUHpxMkppUWc",
+  "latency_ms": 5874,
   "narration": {
-    "reasoning": "The Safe executes a call to the USDC contract (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) calling `approve(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 1000000000)`. This grants Uniswap router an allowance of 1,000 USDC (6 decimals). The Safe nonce increments from 1 to 2.",
+    "reasoning": "The transaction executes an approve(address,uint256) call from the Safe on USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) approving Uniswap router (0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) to spend 1,000,000,000 base units (1,000 USDC). The Safe's nonce increments from 1 to 2.",
     "effects": [
       {
         "sentence": "The Safe approves Uniswap router to spend up to 1,000 USDC.",
@@ -17,7 +17,7 @@
         ]
       },
       {
-        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "sentence": "The Safe's transaction execution nonce increases from 1 to 2.",
         "severity": "info",
         "cites": [
           "s1",

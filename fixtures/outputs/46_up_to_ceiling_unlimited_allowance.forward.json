@@ -1,0 +1,40 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdjZW5jYXZxS0Mtam14TjhQcGV1RXVRNBIXY2VuY2F2cUtDLWpteE44UHBldUV1UTQ",
+  "latency_ms": 5644,
+  "expected_effects": {
+    "reasoning": "The description proposes swapping USDC for WETH via Uniswap. Specifically, the Safe spends 'up to 1,000 USDC' to receive 'at least 0.000001 WETH'. A swap on Uniswap implies granting an ERC-20 token approval to Uniswap for the input amount ('up to 1,000 USDC').",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "up to 1,000 USDC",
+        "from_name": "Safe",
+        "to_name": "Uniswap",
+        "cites": "Use up to 1,000 USDC on Uniswap"
+      },
+      {
+        "asset": "WETH",
+        "amount_human": "at least 0.000001 WETH",
+        "from_name": "Uniswap",
+        "to_name": "Safe",
+        "cites": "buy at least 0.000001 WETH for the Safe"
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap",
+        "amount_human": "up to 1,000 USDC",
+        "cites": "Use up to 1,000 USDC on Uniswap"
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

@@ -1,15 +1,15 @@
 {
   "id": "31_revoke_ravi_usdc",
   "description": "Revoke Ravi's USDC allowance",
-  "expected_verdict": "REJECT",
+  "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> Ravi: unlimited (evidence c4, c5, s0, e1)\n- Safe grants an unlimited USDC allowance to Ravi. (evidence c4, c5, s0, e1)",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> Ravi: unlimited (evidence c4, c5, s0, e1)\n- The Safe sets an unlimited USDC allowance for Ravi. (evidence c4, c5, s0, e1)",
     "decision": "ASK",
     "reasons": [
       "unexplained: allowance USDC Safe -> Ravi: unlimited"
     ],
     "floor_hits": [],
-    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: unlimited; Safe grants an unlimited USDC allowance to Ravi.",
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: unlimited; The Safe sets an unlimited USDC allowance for Ravi.",
     "compare": {
       "matched": [],
       "observed_unexplained": [
@@ -27,7 +27,7 @@
         },
         {
           "kind": "effect",
-          "item": "Safe grants an unlimited USDC allowance to Ravi.",
+          "item": "The Safe sets an unlimited USDC allowance for Ravi.",
           "severity": "notable",
           "cites": [
             "c4",
@@ -42,13 +42,15 @@
         "permission allowance USDC Safe -> Ravi: zero"
       ],
       "info_effects": [
-        "The Safe's nonce increases from 1 to 2."
+        "The Safe's transaction nonce increases from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
       "tiers": [],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -166,21 +168,23 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe's nonce increases from 1 to 2.",
-        "severity": "info",
-        "cites": [
-          "s1"
-        ],
-        "cited_ok": true
-      },
-      {
-        "sentence": "Safe grants an unlimited USDC allowance to Ravi.",
+        "sentence": "The Safe sets an unlimited USDC allowance for Ravi.",
         "severity": "notable",
         "cites": [
           "c4",
           "c5",
           "s0",
           "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's transaction nonce increases from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s1",
+          "e0"
         ],
         "cited_ok": true
       }
@@ -211,7 +215,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "observed, unexplained [notable]: Safe grants an unlimited USDC allowance to Ravi.",
+      "item": "observed, unexplained [notable]: The Safe sets an unlimited USDC allowance for Ravi.",
       "attribution": "real_finding (same evidence as the item above)"
     },
     {
@@ -223,7 +227,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "info: The Safe's nonce increases from 1 to 2.",
+      "item": "info: The Safe's transaction nonce increases from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],
@@ -343,7 +347,7 @@
       ]
     },
     {
-      "item": "Safe grants an unlimited USDC allowance to Ravi.",
+      "item": "The Safe sets an unlimited USDC allowance for Ravi.",
       "kind": "effect",
       "severity": "notable",
       "reason": "no matched item shares its evidence",

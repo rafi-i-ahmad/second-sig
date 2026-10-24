@@ -1,17 +1,17 @@
 {
   "model": "gemini-3.8-flash",
   "thinking": "low",
-  "interaction_id": "v1_ChdZS3JiYXNmNU1mbk5rZFVQMS12Z2dRURIXWUtyYmFzZjVNZm5Oa2RVUDEtdmdnUVE",
-  "latency_ms": 6154,
+  "interaction_id": "v1_ChdtT25jYXZIOU5hSzR2ZElQdi1hdi1RRRIXbU9uY2F2SDlOYUs0dmRJUHYtYXYtUUU",
+  "latency_ms": 8371,
   "expected_effects": {
-    "reasoning": "The description specifies a direct payment of 2,500 USDC to Dana for October. This implies a transfer of 2,500 USDC from the Safe to Dana.",
+    "reasoning": "The description specifies a direct payment of 2,500 USDC to Dana for October. Dana and USDC are both present in the address book. This describes a single ERC-20 transfer from the Safe to Dana.",
     "movements": [
       {
         "asset": "USDC",
         "amount_human": "2,500 USDC",
         "from_name": "Safe",
         "to_name": "Dana",
-        "cites": "Pay Dana 2,500 USDC for October"
+        "cites": "Pay Dana 2,500 USDC"
       }
     ],
     "permission_changes": [],
