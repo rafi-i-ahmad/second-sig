@@ -47,5 +47,6 @@
     "expect_question": false,
     "note": "The words license one movement to Dana. The calldata pays a different address."
   },
-  "expected_verdict": "REJECT"
+  "expected_verdict": "ASK",
+  "note": "Contradiction: the words state one thing and the bytes do another of the same kind. ASK by decision of 24 October 2026: REJECT is kept for the floor and for critical effects; both refuse the stamp."
 }

@@ -43,6 +43,6 @@
     "nothing_else": true,
     "expect_question": false
   },
-  "expected_verdict": "ASK",
-  "note": "The words add an owner and say nothing about the threshold. The calldata sets it to 1."
+  "expected_verdict": "REJECT",
+  "note": "The words add an owner and say nothing about the threshold. The calldata sets it to 1. An unmentioned drop to 1-of-4 lets any single owner move everything; owner and threshold changes are critical, so this is REJECT (decision of 24 October 2026)."
 }

@@ -136,6 +136,20 @@ def test_compare_helper_wildcard_amount() -> None:
     assert compare(form, intent) == []
 
 
+def test_address_book_is_spotlit_and_a_label_that_is_not_a_name_is_dropped() -> None:
+    """Case 40: the address book can be written by the proposer. Its names reach the model only
+    inside spotlight tags, and a label that is not a plain name does not reach it at all."""
+    (path,) = CASES_DIR.glob("*/40_address_book_name_injection.json")
+    case = json.loads(path.read_text(encoding="utf-8"))
+    injected = next(k for k in case["address_book"] if len(k) > 48)
+    user = forward.build_user_turn(case["description"], case["address_book"], case["safe"])
+    assert injected not in user and "0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277" not in user
+    tags = re.findall(r"<untrusted_([0-9a-f]{12})>", user)
+    assert len(set(tags)) == 2, "address book and description, each in its own tags"
+    book_block = user.split(f"<untrusted_{tags[0]}>")[2].split(f"</untrusted_{tags[0]}>")[0]
+    assert '"Dana"' in book_block and '"Dana"' not in user.split("<untrusted_")[0]
+
+
 @pytest.mark.live
 @pytest.mark.parametrize("case_path", CASE_FILES, ids=[p.stem for p in CASE_FILES])
 def test_forward_case(case_path: Path) -> None:
@@ -152,7 +166,7 @@ def test_forward_case(case_path: Path) -> None:
              "latency_ms": latency_ms, "expected_effects": form.model_dump(mode="json")},
             indent=2,
         ) + "\n",
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
 
     problems = compare(form, case["intent"])

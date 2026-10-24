@@ -244,11 +244,131 @@ def test_missing_backward_form_is_ask() -> None:
     assert v.decision == Decision.ASK and "no checked backward form" in v.reasons
 
 
-def test_none_amount_matches_any_observed_amount() -> None:
+def test_a_payment_with_no_amount_explains_no_outflow() -> None:
+    """'Send ETH to the ops wallet' with no amount licenses nothing that leaves the Safe."""
     f = forward("01_send_eth_ops")
     loose = f.model_copy(update={"movements": [f.movements[0].model_copy(update={"amount_human": None})]})
     v = decide("01_send_eth_ops", loose, backward("01_send_eth_ops"))
-    assert v.decision == Decision.MATCH and v.compare.tiers == ["amount_unconstrained"]
+    assert v.decision == Decision.ASK and "amount_unconstrained" not in v.compare.tiers
+    assert v.compare.observed_unexplained and v.compare.expected_unobserved
+
+
+def test_a_receipt_with_no_amount_still_matches() -> None:
+    """'Swap 5,000 USDC for ETH': the ETH coming back has no amount in the words, and receiving
+    cannot drain the Safe, so any amount of it is what the words allow."""
+    v = decide("10_swap_usdc_eth_uniswap", forward("10_swap_usdc_eth_uniswap"), backward("10_swap_usdc_eth_uniswap"))
+    assert v.decision == Decision.MATCH and "amount_unconstrained" in v.compare.tiers
+
+
+# --------------------------------------------------------------------------- fail-open paths, closed
+
+
+def test_an_allowance_the_words_leave_open_explains_nothing() -> None:
+    """Case 39's shape on case 06: 'set the router's allowance' with no amount must not explain
+    whatever allowance the bytes set, unlimited included."""
+    f = forward("06_approve_uniswap_finite")
+    vague = f.model_copy(update={"permission_changes": [
+        f.permission_changes[0].model_copy(update={"amount_human": "whatever it needs"})]})
+    v = decide("06_approve_uniswap_finite", vague, backward("06_approve_uniswap_finite"))
+    assert v.decision == Decision.ASK
+    assert any(u.kind == "permission" for u in v.compare.observed_unexplained)
+
+
+def test_a_recipient_the_book_does_not_know_explains_no_outflow() -> None:
+    """Case 49's shape on case 01: 'send 5 ETH to the ops team's new wallet' names no address."""
+    f = forward("01_send_eth_ops")
+    new_wallet = f.model_copy(update={"movements": [f.movements[0].model_copy(update={"to_name": "ops team's new wallet"})]})
+    v = decide("01_send_eth_ops", new_wallet, backward("01_send_eth_ops"))
+    assert v.decision == Decision.ASK and "party_unresolved" not in v.compare.tiers
+
+
+def test_an_asset_the_book_does_not_know_explains_no_outflow() -> None:
+    """'Pay Dana 2,500 USDT' with no USDT in the book must not explain 2,500 of whatever token moved."""
+    f = forward("02_pay_dana_usdc")
+    usdt = f.model_copy(update={"movements": [f.movements[0].model_copy(
+        update={"asset": "USDT", "amount_human": "2,500 USDT"})]})
+    v = decide("02_pay_dana_usdc", usdt, backward("02_pay_dana_usdc"))
+    assert v.decision == Decision.ASK and "asset_unresolved" not in v.compare.tiers
+
+
+def test_a_forward_question_is_ask_even_when_nothing_else_is_true() -> None:
+    """Case 45's shape: everything matches, but the words contradict themselves and the forward
+    pass asked which reading is right. The signers settle it, not the table."""
+    f = forward("01_send_eth_ops").model_copy(update={"questions_for_human": ["5 ETH or 5,000 ETH?"]})
+    assert f.nothing_else is True
+    v = decide("01_send_eth_ops", f, backward("01_send_eth_ops"))
+    assert v.decision == Decision.ASK and v.question == "5 ETH or 5,000 ETH?"
+
+
+def _without(narr: Narration, ids: set[str]) -> Narration:
+    """The narration with every item and sentence that cites any of ``ids`` left out."""
+    keep = lambda item: not set(item.cites) & ids  # noqa: E731
+    return narr.model_copy(update={
+        "effects": [e for e in narr.effects if keep(e)], "movements": [m for m in narr.movements if keep(m)],
+        "permission_changes": [p for p in narr.permission_changes if keep(p)],
+        "safe_config_changes": [c for c in narr.safe_config_changes if keep(c)],
+    })
+
+
+def test_an_outflow_the_narration_leaves_out_is_caught() -> None:
+    """Cases 42 and 44: the words explain the main payment and the backward pass drops the extra
+    one. Code checks the Safe's balance change against the listed movements."""
+    cid = "07_pay_three_contractors"
+    f, n = forward(cid), backward(cid)
+    dropped = n.movements[-1]
+    shared = {i for m in n.movements[:-1] for i in m.cites}  # the Safe's own balance entry and slot
+    narr = _without(n, set(dropped.cites) - shared)
+    words = f.model_copy(update={"movements": [m for m in f.movements if m.to_name.lower() != dropped.to_name.lower()]})
+    assert len(narr.movements) == len(words.movements) == len(f.movements) - 1
+    v = decide(cid, words, narr)
+    assert v.decision == Decision.ASK
+    (gap,) = v.compare.observed_unexplained
+    assert "balance falls by" in gap.item and gap.severity == "notable"
+
+
+def test_an_allowance_the_narration_leaves_out_is_caught() -> None:
+    """The auditor demo with a backward pass that forgets the unlimited approval: the Safe's own
+    Approval event still has to be accounted for."""
+    b = bundle("demo_auditor")
+    approval = next(e.id for e in b.events if e.name == "Approval")
+    fwd = ExpectedEffects(reasoning="", confidence="high", nothing_else=True, movements=[
+        {"asset": "USDC", "amount_human": "100 USDC", "from_name": "Safe", "to_name": "auditor",
+         "cites": "Pay our auditor 100 USDC"}])
+    narr = _without(backward("demo_auditor"), {approval} | {
+        p_id for p in backward("demo_auditor").permission_changes for p_id in p.cites})
+    v = decide("demo_auditor", fwd, narr)
+    assert v.decision == Decision.ASK
+    assert any(u.kind == "permission" and approval in u.cites for u in v.compare.observed_unexplained)
+
+
+def test_a_threshold_change_the_narration_leaves_out_is_critical() -> None:
+    """Case 50's shape on case 35: drop the threshold change from the narration and the Safe's own
+    ChangedThreshold event makes it an unexplained critical change: REJECT."""
+    b = bundle("35_add_owner_then_lower_threshold")
+    changed = next(e for e in b.events if e.name == "ChangedThreshold")
+    threshold_slot = next(s.id for s in b.storage_diff if s.label == "Safe.threshold")
+    narr = _without(backward("35_add_owner_then_lower_threshold"), {changed.id, threshold_slot})
+    v = decide("35_add_owner_then_lower_threshold", forward("35_add_owner_then_lower_threshold"), narr)
+    assert v.decision == Decision.REJECT
+    assert any(u.kind == "config" and u.severity == "critical" and changed.id in u.cites
+               for u in v.compare.observed_unexplained)
+
+
+def test_only_case_40s_label_is_not_a_plain_name() -> None:
+    from judge.labeller import plain_address_book
+    dropped = {c.stem: plain_address_book(json.loads(c.read_text(encoding="utf-8"))["address_book"])[1]
+               for c in (FIXTURES / "cases").glob("*/*.json")}
+    assert {k: v for k, v in dropped.items() if v} == {
+        "40_address_book_name_injection": ["0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277"]}
+
+
+def test_a_label_that_is_not_a_name_never_resolves_and_is_reported() -> None:
+    cid = "40_address_book_name_injection"
+    r = resolver(cid)
+    injected = next(k for k in case(cid)["address_book"] if len(k) > 48)
+    assert not r.party(injected).resolved and r.party("Dana").resolved
+    assert r.party("0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277").label == "0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277"
+    assert r.ignored_labels == ["0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277"]
 
 
 def test_uncited_critical_effect_forces_reject_even_with_matching_lists() -> None:

@@ -59,5 +59,6 @@
     "expect_question": false,
     "note": "The words put the USDC in the Safe. The calldata's recipient argument is Ravi."
   },
-  "expected_verdict": "REJECT"
+  "expected_verdict": "ASK",
+  "note": "Contradiction: the words state one thing and the bytes do another of the same kind. ASK by decision of 24 October 2026: REJECT is kept for the floor and for critical effects; both refuse the stamp."
 }

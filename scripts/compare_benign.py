@@ -10,7 +10,14 @@ self-contained: every residual carries the bundle entries it cites, slot labels,
 frames that could have written each residual slot, so another agent can pick one up later
 without re-running anything.
 
-    uv run python scripts/compare_benign.py [--live] [--include-reject] [--only <id>]
+    uv run python scripts/compare_benign.py [--live] [--include-reject] [--only <id>[,<id>...]]
+
+With --live, a pass whose recorded output is missing is run and saved; a recorded one is never
+re-run, and neither is a recorded source-reader classification (the ~98k-token Argon call).
+
+Ablation: --backward-variant NAME [--backward-model M --backward-thinking T] reads and records the
+backward form as <id>.backward.NAME.json instead, and writes the reports to reports/compare-NAME/,
+so a second model's narration can be set against the recorded forward forms and the truth.
 """
 
 from __future__ import annotations
@@ -48,8 +55,12 @@ def load_forward(cid: str) -> ExpectedEffects | None:
     return ExpectedEffects.model_validate(json.loads(p.read_text(encoding="utf-8"))["expected_effects"]) if p.exists() else None
 
 
-def load_backward(cid: str) -> Narration | None:
-    p = OUTPUTS / f"{cid}.backward.json"
+def backward_path(cid: str, variant: str | None = None) -> Path:
+    return OUTPUTS / (f"{cid}.backward.{variant}.json" if variant else f"{cid}.backward.json")
+
+
+def load_backward(cid: str, variant: str | None = None) -> Narration | None:
+    p = backward_path(cid, variant)
     return Narration.model_validate(json.loads(p.read_text(encoding="utf-8"))["narration"]) if p.exists() else None
 
 
@@ -69,12 +80,15 @@ def run_forward_live(case: dict[str, Any]) -> ExpectedEffects:
     return form
 
 
-def run_backward_live(case: dict[str, Any], bundle: EvidenceBundle) -> Narration:
+def run_backward_live(case: dict[str, Any], bundle: EvidenceBundle, variant: str | None = None,
+                      model: str | None = None, thinking: str | None = None) -> Narration:
     from judge.jobs import backward
-    form, iid, ms = backward.run(bundle, case["address_book"], case["safe"])
-    _save(OUTPUTS / f"{case['id']}.backward.json", backward.DEFAULT_MODEL, backward.DEFAULT_THINKING, iid, ms,
-          "narration", form)
-    print(f"  backward live {ms:6d} ms  {iid}")
+    model, thinking = model or backward.DEFAULT_MODEL, thinking or backward.DEFAULT_THINKING
+    timeout = 120.0 if model == backward.DEFAULT_MODEL else 600.0
+    form, iid, ms = backward.run(bundle, case["address_book"], case["safe"], model=model, thinking=thinking,
+                                 timeout_s=timeout)
+    _save(backward_path(case["id"], variant), model, thinking, iid, ms, "narration", form)
+    print(f"  backward live {ms:6d} ms  {iid}  ({model}, {thinking})")
     return form
 
 
@@ -313,7 +327,8 @@ def report_md(case: dict[str, Any], v: Verdict, t: CanonEffects, f: CanonEffects
 # --------------------------------------------------------------------------- main
 
 
-def process(case_path: Path, live: bool) -> dict[str, Any]:
+def process(case_path: Path, args: argparse.Namespace) -> dict[str, Any]:
+    live, variant = args.live, args.backward_variant
     case = load_case(case_path)
     cid = case["id"]
     print(f"== {cid}")
@@ -321,20 +336,21 @@ def process(case_path: Path, live: bool) -> dict[str, Any]:
     if bundle is None:
         print("  no bundle; rehearse it first")
         return {"id": cid, "expected": case.get("expected_verdict"), "computed": "(no bundle)"}
-    fwd, bwd = load_forward(cid), load_backward(cid)
+    fwd, bwd = load_forward(cid), load_backward(cid, variant)
     from judge.model import ModelFormError, ModelUnavailable
     try:
         if fwd is None and live:
             fwd = run_forward_live(case)
         if bwd is None and live:
-            bwd = run_backward_live(case, bundle)
+            bwd = run_backward_live(case, bundle, variant, args.backward_model, args.backward_thinking)
     except (ModelUnavailable, ModelFormError) as exc:
         # The pipeline's own rule: a pass that cannot produce a checked form leaves that side
         # missing, and the verdict below is ASK. Report it rather than stop.
         print(f"  model unavailable, continuing with recorded forms only: {str(exc)[:160]}")
 
     from judge import pipeline
-    sc = pipeline.source_check(bundle, cid, replay=not live, live=live)
+    recorded = pipeline.recorded_leftovers(cid)[0] is not None
+    sc = pipeline.source_check(bundle, cid, replay=not live or recorded, live=live)
     bundle = sc.bundle
     if sc.call:
         print(f"  {sc.call}")
@@ -376,14 +392,21 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--live", action="store_true", help="run a pass whose recorded output is missing")
     ap.add_argument("--include-reject", action="store_true")
-    ap.add_argument("--only", help="one case id")
+    ap.add_argument("--only", help="case ids, comma-separated, run in that order")
+    ap.add_argument("--backward-variant", help="read/record <id>.backward.NAME.json; reports to reports/compare-NAME/")
+    ap.add_argument("--backward-model", help="model for a live backward pass (default: backward.DEFAULT_MODEL)")
+    ap.add_argument("--backward-thinking", choices=["low", "medium", "high"])
     args = ap.parse_args(argv)
+    global REPORTS
+    if args.backward_variant:
+        REPORTS = REPO / "reports" / f"compare-{args.backward_variant}"
 
     folders = ["match", "ask", "demo"] + (["reject"] if args.include_reject else [])
     paths = sorted(p for d in folders for p in (FIXTURES / "cases" / d).glob("*.json"))
     if args.only:
-        paths = [p for p in paths if p.stem == args.only]
-    rows = [process(p, args.live) for p in paths]
+        by_id = {p.stem: p for p in paths}
+        paths = [by_id[i] for i in args.only.split(",") if i in by_id]
+    rows = [process(p, args) for p in paths]
 
     print("\n| case | expected | computed | forward errors | backward errors | residuals |")
     print("| --- | --- | --- | --- | --- | --- |")
@@ -391,7 +414,11 @@ def main(argv: list[str]) -> int:
         flag = "" if row["expected"] == row["computed"] else "  <-- differs"
         print(f"| {row['id']} | {row['expected']} | {row['computed']}{flag} | {row.get('forward_errors', '-')} | "
               f"{row.get('backward_errors', '-')} | {row.get('residuals', '-')} |")
-    (REPORTS / "summary.json").write_text(json.dumps(rows, indent=2), encoding="utf-8", newline="\n")
+    # an --only run updates its rows in the summary instead of replacing the whole table
+    summary = REPORTS / "summary.json"
+    merged = {r["id"]: r for r in (json.loads(summary.read_text(encoding="utf-8")) if summary.exists() else [])}
+    merged.update({r["id"]: r for r in rows})
+    summary.write_text(json.dumps(list(merged.values()), indent=2), encoding="utf-8", newline="\n")
     return 0
 
 
