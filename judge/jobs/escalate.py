@@ -43,10 +43,13 @@ You do not decide anything. The decision is already made and is given to you. Yo
   written these words for these bytes? "yes" if the gap is a natural shorthand or a detail a
   treasurer would not think to mention; "unlikely" if it takes carelessness; "no" if the words
   misdescribe what the money does.
-- question: one or two plain sentences a treasurer can answer, naming the amounts, assets and
-  parties by the address-book names given, or by address if there is none. Ask about the gap,
-  not about the parts that match.
-- what_to_check: two to four concrete things the signer should verify before answering.
+- If decision_already_made is ASK: write `question`, one or two plain sentences a treasurer can
+  answer, naming the amounts, assets and parties by the address-book names given, or by address
+  if there is none. Ask about the gap, not about the parts that match. Leave `statement` null.
+- If decision_already_made is REJECT: do not ask anything; the decision is final. Write
+  `statement`, two or three plain sentences telling the signers why the transaction was refused
+  and what it would have done to the Safe. Leave `question` null.
+- what_to_check: two to four concrete things the signer should verify.
 
 Base every statement on the lists you are given. Do not speculate about motives. Reply with
 JSON matching the schema and nothing else."""
@@ -97,6 +100,35 @@ def build_user_turn(
         f"{lit.text}\n\n"
         "Produce the human question."
     )
+
+
+CAUTION = {
+    "no": (
+        "Caution: the words and the bytes disagree in a way an honest proposer is unlikely to have "
+        "written. Treat this proposal as suspect, and do not sign on the proposer's say-so alone."
+    ),
+    "unlikely": (
+        "Note: the gap between the words and the bytes is one a careful proposer would not normally "
+        "leave. Check the answer independently before signing."
+    ),
+    "yes": "",
+}
+GAP_LABEL = {
+    "omission": "The description leaves out something the transaction does.",
+    "contradiction": "The description says one thing and the transaction does another.",
+    "vague_description": "The description is too thin to check the transaction against.",
+    "none": "",
+}
+
+
+def compose(form: HumanQuestion, decision: str) -> str:
+    """The text the signers see. REJECT: the statement, no question. ASK: the model's reading of
+    the gap, the honesty caution where it applies, then the question."""
+    if decision == "REJECT":
+        return (form.statement or form.question or "").strip()
+    parts = [GAP_LABEL.get(form.gap_kind, ""), CAUTION.get(form.would_an_honest_proposer_write_this, ""),
+             form.question or ""]
+    return " ".join(p for p in parts if p).strip()
 
 
 def run(

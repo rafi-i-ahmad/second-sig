@@ -339,9 +339,21 @@ class HumanQuestion(BaseModel):
     would_an_honest_proposer_write_this: Literal["yes", "unlikely", "no"] = Field(
         description="Could someone acting in good faith have written this description for these bytes?"
     )
-    question: str = Field(description="One or two plain sentences a treasurer can answer, naming amounts and parties.")
+    question: str | None = Field(
+        default=None, description="ASK only: one or two plain sentences a treasurer can answer, naming amounts and parties."
+    )
+    statement: str | None = Field(
+        default=None, description="REJECT only: two or three plain sentences saying why the transaction was refused "
+        "and what it would have done. No question; the decision is final."
+    )
     what_to_check: list[str] = Field(default_factory=list, description="Concrete things the signer should verify first.")
     confidence: Literal["high", "medium", "low"]
+
+    @model_validator(mode="after")
+    def _one_of_question_or_statement(self) -> "HumanQuestion":
+        if not (self.question or self.statement):
+            raise ValueError("either question (for ASK) or statement (for REJECT) must be filled")
+        return self
 
 
 # --------------------------------------------------------------------------- canonical form (layer 4)

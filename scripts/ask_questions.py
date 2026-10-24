@@ -38,25 +38,28 @@ def main(argv: list[str]) -> int:
             "model": escalate.DEFAULT_MODEL, "thinking": escalate.DEFAULT_THINKING, "interaction_id": iid,
             "latency_ms": ms, "verdict": verdict.decision.value, "question": form.model_dump(mode="json"),
         }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        text = escalate.compose(form, verdict.decision.value)
         print(f"== {cid}  ({verdict.decision.value}, {ms} ms)")
         print(f"   gap: {form.gap_kind}   honest proposer: {form.would_an_honest_proposer_write_this}   "
               f"confidence: {form.confidence}")
-        print(f"   Q: {form.question}")
+        print(f"   {'STATEMENT' if verdict.decision.value == 'REJECT' else 'TO THE SIGNERS'}: {text}")
         for c in form.what_to_check:
             print(f"   - {c}")
-        rows.append((cid, rep["description"], verdict.decision.value, form))
+        rows.append((cid, rep["description"], verdict.decision.value, form, text))
 
-    md = ["# What the escalation step asks the signers", "",
+    md = ["# What the escalation step tells the signers", "",
           f"Model: `{escalate.DEFAULT_MODEL}`, thinking {escalate.DEFAULT_THINKING}. Inputs: the saved comparison for each "
           "case (reports/compare/<id>.json). The decision was made by code before the model was asked; the "
-          "model's reading of the gap is advisory.", "",
-          "| Case | Description | Verdict (code) | Gap kind (model) | Honest proposer? | Question |",
+          "model's reading of the gap is advisory. For ASK the text is: the kind of gap, a caution when the "
+          "model judges that an honest proposer would not have written the description, then the question. "
+          "For REJECT it is a statement of why; no question is asked.", "",
+          "| Case | Description | Verdict (code) | Gap kind (model) | Honest proposer? | What the signers see |",
           "| --- | --- | --- | --- | --- | --- |"]
-    for cid, desc, dec, f in rows:
-        md.append(f"| {cid} | {desc} | {dec} | {f.gap_kind} | {f.would_an_honest_proposer_write_this} | {f.question} |")
+    for cid, desc, dec, f, text in rows:
+        md.append(f"| {cid} | {desc} | {dec} | {f.gap_kind} | {f.would_an_honest_proposer_write_this} | {text} |")
     md += [""]
-    for cid, _, _, f in rows:
-        md += [f"## {cid}", "", f"**Question:** {f.question}", "", "What to check:"] + [f"- {c}" for c in f.what_to_check]
+    for cid, _, dec, f, text in rows:
+        md += [f"## {cid} ({dec})", "", text, "", "What to check:"] + [f"- {c}" for c in f.what_to_check]
         md += ["", f"<details><summary>reasoning</summary>\n\n{f.reasoning}\n\n</details>", ""]
     (REPORTS / "QUESTIONS.md").write_text("\n".join(md), encoding="utf-8", newline="\n")
     print(f"\nwritten to {REPORTS / 'QUESTIONS.md'}")
