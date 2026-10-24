@@ -79,6 +79,68 @@ def test_upper_bounds_and_unlimited_words() -> None:
     assert canon.parse_amount("maximum") == "unlimited" and canon.parse_amount("unlimited") == "unlimited"
 
 
+def test_lower_bounds_approximations_and_fractions() -> None:
+    assert canon.is_lower_bound("at least 0.000001 WETH") and canon.is_lower_bound("a minimum of 5 ETH")
+    assert canon.is_lower_bound("0.5 ETH or more") and not canon.is_lower_bound("0.5 ETH")
+    assert canon.is_approximate("about 2 ETH") and canon.is_approximate("~500 USDC")
+    assert canon.parse_amount("10% of the USDC") is None and canon.parse_amount("half the balance") is None
+    b = canon.bounds("at least 0.1 WETH", 10**17)
+    assert b == {"amount_base": None, "amount_min_base": 10**17}
+    b = canon.bounds("about 2 ETH", 2 * 10**18)
+    assert b["amount_approx"] and b["amount_min_base"] == int(1.8 * 10**18) and b["amount_max_base"] >= int(2.2 * 10**18)
+    assert canon.bounds("2 ETH", 2 * 10**18) == {"amount_base": 2 * 10**18}
+
+
+def _swap_forward(weth_amount: str) -> ExpectedEffects:
+    return ExpectedEffects(
+        reasoning="", confidence="high", nothing_else=True,
+        movements=[
+            {"asset": "USDC", "amount_human": "up to 1,000 USDC", "from_name": "Safe", "to_name": "Uniswap",
+             "cites": "Use up to 1,000 USDC on Uniswap"},
+            {"asset": "WETH", "amount_human": weth_amount, "from_name": "Uniswap", "to_name": "Safe",
+             "cites": "to buy at least 0.000001 WETH for the Safe"},
+        ],
+        permission_changes=[{"asset": "USDC", "owner_name": "Safe", "spender_name": "Uniswap",
+                             "amount_human": "1,000 USDC", "cites": "Use up to 1,000 USDC on Uniswap"}],
+    )
+
+
+def _needs_recorded_backward(cid: str) -> None:
+    if not (FIXTURES / "outputs" / f"{cid}.backward.json").exists():
+        pytest.skip(f"no recorded backward form for {cid}; record it with "
+                    f"`uv run python scripts/compare_benign.py --live --include-reject --only {cid}`")
+
+
+def test_at_least_is_a_floor_case_46() -> None:
+    """Case 46's recorded trace: 0.3524 WETH came back. 'at least 0.000001 WETH' is satisfied, so the
+    promise is consumed by the match (amount_bounded) and nothing is left 'promised, not seen'."""
+    _needs_recorded_backward("46_up_to_ceiling_unlimited_allowance")
+    v = decide("46_up_to_ceiling_unlimited_allowance", _swap_forward("at least 0.000001 WETH"),
+               backward("46_up_to_ceiling_unlimited_allowance"))
+    assert v.decision == Decision.ASK  # the unlimited allowance is still the finding
+    assert v.compare.expected_unobserved == [p for p in v.compare.expected_unobserved if "WETH" not in p]
+    weth = next(m for m in v.compare.matched if "WETH" in m.observed)
+    assert weth.tier in ("amount_bounded", "counterparty_via_callee")
+
+
+def test_a_floor_not_met_is_a_promise_not_kept() -> None:
+    """'at least 1 WETH' against 0.3524 WETH received: the leg is explained as inbound (receiving
+    cannot drain the Safe) but the promise stays unobserved, so the table asks about it."""
+    _needs_recorded_backward("46_up_to_ceiling_unlimited_allowance")
+    v = decide("46_up_to_ceiling_unlimited_allowance", _swap_forward("at least 1 WETH"),
+               backward("46_up_to_ceiling_unlimited_allowance"))
+    assert any("WETH" in p for p in v.compare.expected_unobserved)
+
+
+def test_about_matches_within_ten_percent_only() -> None:
+    f = forward("01_send_eth_ops")
+    about = f.model_copy(update={"movements": [f.movements[0].model_copy(update={"amount_human": "about 5 ETH"})]})
+    assert decide("01_send_eth_ops", about, backward("01_send_eth_ops")).compare.tiers == ["amount_bounded"]
+    far = f.model_copy(update={"movements": [f.movements[0].model_copy(update={"amount_human": "about 4 ETH"})]})
+    v = decide("01_send_eth_ops", far, backward("01_send_eth_ops"))
+    assert v.decision == Decision.ASK and v.compare.expected_unobserved
+
+
 def test_at_most_matches_anything_up_to_the_ceiling() -> None:
     """Case 34's words: 'spending at most 1 ETH'. The recorded trace spends 0.35 ETH net, which the
     backward pass reports as ETH Safe -> WETH inside the router call."""
@@ -93,7 +155,7 @@ def test_at_most_matches_anything_up_to_the_ceiling() -> None:
     o = canon.from_backward(backward("34_uniswap_output_diverted"), r)
     eth_out = next(m for m in o.movements if m.asset.address == "ETH" and m.direction == "out")
     m = compare.match_movement(e.movements[0], eth_out, r)
-    assert m is not None and m.tier in ("amount_unconstrained", "counterparty_via_callee")
+    assert m is not None and m.tier in ("amount_bounded", "counterparty_via_callee")
     too_much = eth_out.model_copy(update={"amount_base": 2 * 10**18})
     assert compare.match_movement(e.movements[0], too_much, r) is None
 

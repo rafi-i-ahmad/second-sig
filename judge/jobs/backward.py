@@ -51,7 +51,7 @@ what it actually did, and nothing more:
   integer exactly as the trace has it. A deposit that mints a receipt token is two
   movements: the asset going in and the receipt token coming back.
 - permission_changes: every token allowance set, from approve calls and Approval events.
-  2**256-1 is 'unlimited'.
+  2**256-1 is 'unlimited'. `kind` is always the string 'erc20_approval'.
 - safe_config_changes: owner or threshold changes to the Safe itself.
 
 Name parties by address-book name, 'Safe' for the proposing Safe, and otherwise by

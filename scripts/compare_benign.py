@@ -197,7 +197,8 @@ def attribute(cmp: CompareResult, fwd_grade: dict[str, list[str]] | None, bwd_gr
     for obs, tier in tiers_by_observed.items():
         if tier in ("party_unresolved", "asset_unresolved"):
             out.append({"item": f"matched by {tier}: {obs}", "attribution": "address_book_gap"})
-        elif tier in ("counterparty_via_callee", "inbound_from_callee", "internal_to_callee", "amount_unconstrained"):
+        elif tier in ("counterparty_via_callee", "inbound_from_callee", "internal_to_callee", "amount_unconstrained",
+                      "amount_bounded"):
             out.append({"item": f"matched by {tier}: {obs}", "attribution": "tolerance_rule"})
     if not benign and fwd_grade is not None:
         for key in ("missing", "extra", "wrong_amount", "wrong_party"):

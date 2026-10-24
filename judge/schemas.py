@@ -402,8 +402,8 @@ ConfigField = Literal[
     "module_enable", "module_disable", "singleton",
 ]
 MatchTier = Literal[
-    "exact", "amount_unconstrained", "party_unresolved", "asset_unresolved", "counterparty_via_callee",
-    "inbound_from_callee", "internal_to_callee", "unmatched",
+    "exact", "amount_bounded", "amount_unconstrained", "party_unresolved", "asset_unresolved",
+    "counterparty_via_callee", "inbound_from_callee", "internal_to_callee", "unmatched",
 ]
 
 
@@ -434,6 +434,8 @@ class CanonMovement(BaseModel):
     to_party: Party
     amount_base: int | None = Field(default=None, description="Base units; None if the form fixed no amount.")
     amount_max_base: int | None = Field(default=None, description="Upper bound in base units ('at most 1 ETH').")
+    amount_min_base: int | None = Field(default=None, description="Lower bound in base units ('at least 0.1 WETH').")
+    amount_approx: bool = Field(default=False, description="'about 2 ETH': within APPROX_TOLERANCE of the figure.")
     amount_human: str | None = None
     direction: Direction
     implied: bool = False

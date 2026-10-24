@@ -44,8 +44,16 @@ SEVERITY_RANK: dict[Severity, int] = {"info": 0, "notable": 1, "critical": 2}
 _SAFE_WORDS = {"safe", "the safe", "this safe", "our safe", "proposing safe", "the proposing safe"}
 _ARTICLES = re.compile(r"^(the|our|this)\s+", re.I)
 _NUMBER = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
-_UNLIMITED = re.compile(r"\b(unlimited|infinite|max|maximum|all of it|everything)\b", re.I)
-_UPPER_BOUND = re.compile(r"\b(at most|up to|no more than|not more than|a maximum of|max(?:imum)?\s+of|capped at)\b", re.I)
+_UNLIMITED = re.compile(r"\b(unlimited|infinite|max|maximum|all of it|everything|the (?:whole|entire|remaining) balance)\b", re.I)
+_UPPER_BOUND = re.compile(
+    r"\b(at most|up to|no more than|not more than|not exceeding|a maximum of|max(?:imum)?\s+of|capped at|under|below"
+    r"|less than)\b|<=?\s*\d|≤", re.I)
+_LOWER_BOUND = re.compile(
+    r"\b(at least|a minimum of|min(?:imum)?\s+of|no less than|not less than|or more|and above|over|above|more than"
+    r"|exceeding)\b|>=?\s*\d|≥", re.I)
+_APPROX = re.compile(r"\b(about|around|roughly|approximately|approx\.?|circa|close to|nearly|some)\b|~\s*\d|≈", re.I)
+_PERCENT = re.compile(r"\d\s*(%|percent\b|per cent\b)|\b(half|a third|a quarter|two thirds)\b", re.I)
+APPROX_TOLERANCE = 0.10  # 'about 2 ETH' accepts 1.8 to 2.2
 _APPROVE_WORDS = re.compile(r"\b(approv\w*|allow\w*|permi\w*|spend\w*|authori[sz]\w*)\b", re.I)
 
 
@@ -168,11 +176,14 @@ class Resolver:
 
 def parse_amount(human: str | None) -> Decimal | str | None:
     """'2,500 USDC' -> 2500; 'at most 1 ETH' -> 1 (see is_upper_bound); 'unlimited' or 'max' with
-    no number -> 'unlimited'; nothing numeric -> None."""
+    no number -> 'unlimited'; a percentage or fraction of something ('10%', 'half') -> None, since
+    the words fix no amount of the asset; nothing numeric -> None."""
     if human is None:
         return None
     text = human.strip().lower()
     if not text:
+        return None
+    if _PERCENT.search(text):
         return None
     m = _NUMBER.search(text)
     if m:
@@ -188,6 +199,37 @@ def parse_amount(human: str | None) -> Decimal | str | None:
 def is_upper_bound(human: str | None) -> bool:
     """'at most 1 ETH', 'up to 500 USDC': the words fix a ceiling, not the amount."""
     return bool(human) and bool(_UPPER_BOUND.search(human))
+
+
+def is_lower_bound(human: str | None) -> bool:
+    """'at least 0.1 WETH', 'a minimum of 5 ETH': the words fix a floor, not the amount."""
+    return bool(human) and bool(_LOWER_BOUND.search(human))
+
+
+def is_approximate(human: str | None) -> bool:
+    """'about 2 ETH', '~500 USDC': the words fix a figure loosely."""
+    return bool(human) and bool(_APPROX.search(human))
+
+
+def bounds(human: str | None, base: int | None) -> dict[str, Any]:
+    """The CanonMovement amount fields for a forward-pass amount: exact, a ceiling, a floor, a
+    loose figure, or nothing fixed. Both a floor and a ceiling ('between') is treated as a floor
+    and a ceiling together."""
+    if base is None:
+        return {"amount_base": None}
+    upper, lower, approx = is_upper_bound(human), is_lower_bound(human), is_approximate(human)
+    if not (upper or lower or approx):
+        return {"amount_base": base}
+    out: dict[str, Any] = {"amount_base": None}
+    if upper:
+        out["amount_max_base"] = base
+    if lower:
+        out["amount_min_base"] = base
+    if approx and not (upper or lower):
+        out["amount_approx"] = True
+        out["amount_min_base"] = int(base * (1 - APPROX_TOLERANCE))
+        out["amount_max_base"] = int(base * (1 + APPROX_TOLERANCE)) + 1
+    return out
 
 
 def allowance_value(human: str | None, base: int | None) -> int | str | None:
@@ -239,11 +281,9 @@ def from_forward(form: ExpectedEffects, description: str, r: Resolver) -> CanonE
         f, t = r.party(m.from_name), r.party(m.to_name)
         ok = checker.phrase_supported(m.cites, description)
         base = r.to_base(m.amount_human, asset)
-        bound = is_upper_bound(m.amount_human)
         cm = CanonMovement(
-            asset=asset, from_party=f, to_party=t, amount_base=None if bound else base,
-            amount_max_base=base if bound else None, amount_human=m.amount_human, direction=r.direction(f, t),
-            cites=[m.cites], cited_ok=ok, source="forward",
+            asset=asset, from_party=f, to_party=t, **bounds(m.amount_human, base), amount_human=m.amount_human,
+            direction=r.direction(f, t), cites=[m.cites], cited_ok=ok, source="forward",
         )
         out.movements.append(cm)
         if not ok:

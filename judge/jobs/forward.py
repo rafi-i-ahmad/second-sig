@@ -28,7 +28,11 @@ mapping names to addresses, and basic facts about the Safe. You do NOT see the t
 itself. Your job is to state exactly what the description licenses, and nothing more:
 
 - movements: every asset transfer the words imply, by address-book name. Use 'Safe' for the
-  proposing Safe. Give the amount as written; if the words fix no amount, use null.
+  proposing Safe. Give the amount as written, keeping any qualifier with it: 'up to 1,000 USDC',
+  'at least 0.5 WETH', 'about 2 ETH', 'all of it'. Never turn a bound into a plain figure. If the
+  words fix no amount, use null. A deposit into a lending protocol also returns a receipt token
+  (Aave: aUSDC for USDC) to the depositor: list it as a movement in, amount as deposited.
+- permission_changes[].kind is always the string 'erc20_approval'.
 - permission_changes: every token allowance the words grant. A deposit into a protocol
   implies an approval to that protocol for the same amount.
 - safe_config_changes: owner or threshold changes the words describe. If the words add an

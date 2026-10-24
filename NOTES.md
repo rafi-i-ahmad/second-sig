@@ -32,8 +32,12 @@ source reader unit (tightening + code layouts + Argon leftovers call + corrobora
    branch. If it never lands: ship the tightening alone, Aave ASKs, pitch says "we refuse to lower
    suspicion on unexplained writes".
 2. **New cases 37–51** (written to `cases/` from PROMPT.md; 7 injections, 8 hard ASKs, three with
-   scripted clarifications): rehearse on anvil (`judge.evidence.fork`), record forms
-   (`compare_benign --live --include-reject`), read the table, fix prompts where a case is wrong.
+   scripted clarifications): rehearsed on anvil, bundles saved. **Forms not yet recorded** (the API
+   was flaky): `compare_benign --live --include-reject` records forward and backward for all of them;
+   `tests/test_compare.py`'s two case-46 tests skip until `46_….backward.json` exists. The forward
+   prompt changed on 24 October (keep qualifiers such as "up to" / "at least" in `amount_human`;
+   receipt tokens; `kind` is always `erc20_approval`), so **re-record the forward forms for 01–35 and
+   the demos too** before the eval table, or the table measures the old prompt.
    Plus the plan's two benign protocol cases (Compound v3 supply, Uniswap V3 exactInputSingle) so
    the source reader runs on more than Aave.
 3. **Prompts and table:** forward.py receipt-token sentence; backward.py keep owner/threshold writes

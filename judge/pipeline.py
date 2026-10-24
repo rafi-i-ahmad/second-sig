@@ -112,6 +112,17 @@ def _sha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
+def _record(case_id: str, which: str, model: str, thinking: str, iid: str, ms: int, key: str, form: Any) -> None:
+    """A live form becomes a recorded one (fixtures/outputs/<id>.<pass>.json) if none exists yet, so
+    the next run can replay it with no model call (invariant 11). Never overwrites."""
+    OUTPUTS.mkdir(exist_ok=True)
+    p = OUTPUTS / f"{case_id}.{which}.json"
+    if p.exists():
+        return
+    p.write_text(json.dumps({"model": model, "thinking": thinking, "interaction_id": iid, "latency_ms": ms,
+                             key: form.model_dump(mode="json")}, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
 # --------------------------------------------------------------------------- recorded forms
 
 
@@ -223,10 +234,14 @@ def judge(
         fwd, iid, ms = forward.run(description, proposal.address_book, proposal.safe)
         calls.append(f"forward {forward.DEFAULT_MODEL} {ms} ms {iid}")
         proposal.forward_forms[key] = fwd.model_dump(mode="json")
+        if not proposal.amendments:
+            _record(proposal.id, "forward", forward.DEFAULT_MODEL, forward.DEFAULT_THINKING, iid, ms,
+                    "expected_effects", fwd)
     bwd = backward_form or (recorded_backward(proposal.id) if replay else None)
     if bwd is None:
         bwd, iid, ms = backward.run(bundle, proposal.address_book, proposal.safe)
         calls.append(f"backward {backward.DEFAULT_MODEL} {ms} ms {iid}")
+        _record(proposal.id, "backward", backward.DEFAULT_MODEL, backward.DEFAULT_THINKING, iid, ms, "narration", bwd)
 
     # 3. the source check: code labels, the source reader explains the rest, code corroborates
     sc = source_check(bundle, proposal.id, replay=replay)

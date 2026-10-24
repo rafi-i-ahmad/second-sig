@@ -5,6 +5,8 @@ against the forward pass's and returns a CompareResult. Pure, deterministic, no 
 
 Tiers, best first. Each match records the weakest rule it needed:
 - exact: same asset, direction, parties and amount.
+- amount_bounded: the words fixed a ceiling ('up to'), a floor ('at least') or a loose figure
+  ('about'), and the observed amount is inside it.
 - amount_unconstrained: the words fixed no amount; any amount for that asset and route.
 - counterparty_via_callee: the counterparty differs, but the observed movement happened
   inside the Safe's call into the expected counterparty (USDC lands in Aave's aToken
@@ -42,8 +44,8 @@ from judge.schemas import (
 )
 
 TIER_RANK: dict[MatchTier, int] = {
-    "exact": 0, "amount_unconstrained": 1, "counterparty_via_callee": 2, "party_unresolved": 3,
-    "asset_unresolved": 4, "inbound_from_callee": 5, "internal_to_callee": 6, "unmatched": 9,
+    "exact": 0, "amount_bounded": 1, "amount_unconstrained": 2, "counterparty_via_callee": 3, "party_unresolved": 4,
+    "asset_unresolved": 5, "inbound_from_callee": 6, "internal_to_callee": 7, "unmatched": 9,
 }
 
 
@@ -69,17 +71,23 @@ def _amount_tier(exp: CanonMovement, obs: CanonMovement, r: Resolver) -> MatchTi
         return None
     if exp.amount_base is not None:
         return "exact" if exp.amount_base == obs.amount_base else None
-    if exp.amount_max_base is not None:
-        # 'at most 1 ETH': anything up to the ceiling is what the words allow
-        return "amount_unconstrained" if obs.amount_base <= exp.amount_max_base else None
-    if exp.amount_human is not None and obs.asset.decimals is not None and not exp.amount_max_base:
+    if exp.amount_max_base is not None or exp.amount_min_base is not None:
+        # 'up to', 'at least', 'about': inside the bound is what the words allow
+        lo = exp.amount_min_base if exp.amount_min_base is not None else 0
+        hi = exp.amount_max_base if exp.amount_max_base is not None else None
+        inside = obs.amount_base >= lo and (hi is None or obs.amount_base <= hi)
+        return "amount_bounded" if inside else None
+    if exp.amount_human is not None and obs.asset.decimals is not None:
         # the words fixed a number but the asset's decimals were only known from the trace
+        from judge.canon import bounds
         base = r.to_base(exp.amount_human, obs.asset)
         if base is not None:
-            from judge.canon import is_upper_bound
-            if is_upper_bound(exp.amount_human):
-                return "amount_unconstrained" if obs.amount_base <= base else None
-            return "exact" if base == obs.amount_base else None
+            b = bounds(exp.amount_human, base)
+            if b.get("amount_base") is not None:
+                return "exact" if base == obs.amount_base else None
+            lo = b.get("amount_min_base", 0) or 0
+            hi = b.get("amount_max_base")
+            return "amount_bounded" if obs.amount_base >= lo and (hi is None or obs.amount_base <= hi) else None
     return "amount_unconstrained"
 
 
