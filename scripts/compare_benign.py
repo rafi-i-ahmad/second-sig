@@ -332,13 +332,19 @@ def process(case_path: Path, live: bool) -> dict[str, Any]:
         # missing, and the verdict below is ASK. Report it rather than stop.
         print(f"  model unavailable, continuing with recorded forms only: {str(exc)[:160]}")
 
+    from judge import pipeline
+    sc = pipeline.source_check(bundle, cid, replay=not live, live=live)
+    bundle = sc.bundle
+    if sc.call:
+        print(f"  {sc.call}")
     r = Resolver(bundle, case["address_book"])
     t = truth.derive(case, r)
     f = canon.from_forward(fwd, bundle.description, r) if fwd else None
     b = canon.from_backward(bwd, r) if bwd else None
     fg = grade(t, f, r) if f else None
     bg = grade(t, b, r) if b else None
-    v = verdict.decide(bundle, expected=fwd, observed=bwd, address_book=case["address_book"])
+    v = verdict.decide(bundle, expected=fwd, observed=bwd, address_book=case["address_book"],
+                       raised=sc.raised, explained_slots=sc.explained)
     cmp = v.compare or CompareResult()
     tiers_by_observed = {m.observed: m.tier for m in cmp.matched}
     attribution = attribute(cmp, fg, bg, tiers_by_observed, case.get("expected_verdict"))

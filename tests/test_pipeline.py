@@ -35,6 +35,14 @@ def replay(cid: str) -> pipeline.JudgeResult:
 # --------------------------------------------------------------------------- the table by replay
 
 
+def _needs_source_check(cid: str) -> None:
+    """Aave's MATCH depends on the recorded source-reader classification (fixtures/outputs/
+    demo_aave.leftovers.json). Without it the comparison asks about the unlabelled writes, by
+    design; tests/test_source_reader.py pins both outcomes with hand-written claims."""
+    if cid == "demo_aave" and pipeline.recorded_leftovers(cid)[0] is None:
+        pytest.skip("no recorded leftovers classification for demo_aave; run the source reader live to record one")
+
+
 @pytest.mark.parametrize("cid,decision", [
     ("01_send_eth_ops", Decision.MATCH), ("10_swap_usdc_eth_uniswap", Decision.MATCH), ("demo_aave", Decision.MATCH),
     ("demo_auditor", Decision.ASK), ("09_routine_transfer_vague", Decision.ASK),
@@ -42,11 +50,13 @@ def replay(cid: str) -> pipeline.JudgeResult:
     ("demo_bybit", Decision.REJECT),
 ])
 def test_replay_reaches_the_expected_verdict_without_a_model(cid: str, decision: Decision) -> None:
+    _needs_source_check(cid)
     res = replay(cid)
     assert res.verdict.decision == decision and res.calls == []
 
 
 def test_match_carries_a_stamp_and_nothing_else_does() -> None:
+    _needs_source_check("demo_aave")
     aave = replay("demo_aave")
     assert aave.stamp is not None and aave.stamp.safeTxHash == aave.bundle.safe_tx_hash
     assert aave.stamp.forkBlock == aave.bundle.fork_block and aave.stamp_signature is None

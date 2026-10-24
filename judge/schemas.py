@@ -318,8 +318,39 @@ class Narration(BaseModel):
     confidence: Literal["high", "medium", "low"]
 
 
+class SourceCite(BaseModel):
+    path: str = Field(description="A source file path exactly as given in the input.")
+    line: int = Field(description="1-based line number in that file, as numbered in the input.")
+
+
+class SlotClaim(BaseModel):
+    """One unlabelled storage write, explained from the verified source. Code checks every field
+    before the explanation counts (judge/corroborate.py): the source lines must exist and name the
+    variable, and keccak(key, base_slot) + offset (or base_slot + offset) must equal the slot."""
+
+    cites: list[str] = Field(min_length=1, description="The s-ids this claim explains.")
+    contract: str = Field(description="The contract whose storage changed (the proxy address, as in the input).")
+    variable: str = Field(description="The state variable, e.g. '_reserves' or '_userState'.")
+    base_slot: int = Field(description="The variable's own slot from the storage layout, counting inherited contracts first.")
+    key: str | None = Field(default=None, description="Mapping key if the variable is a mapping; None for a plain slot.")
+    key_type: Literal["address", "uint256", "bytes32"] = "address"
+    offset: int = Field(default=0, description="Struct field offset in slots from the mapping value's base.")
+    source_cites: list[SourceCite] = Field(min_length=1, description="Declaration lines for the variable and struct field.")
+    reading: Literal["routine_bookkeeping", "asset_or_permission", "control", "unknown"] = Field(
+        description="routine_bookkeeping: indexes, rates, timestamps, supply counters, a user's own position. "
+        "asset_or_permission: a balance or allowance of someone other than the Safe. control: ownership, admin, "
+        "implementation, pause or access flags. unknown: cannot tell from the source."
+    )
+    sentence: str = Field(description="One plain sentence: what this write is.")
+    confidence: Literal["high", "medium", "low"]
+
+
 class Classification(BaseModel):
-    """Leftovers pass: classification of unexplained effects."""
+    """Leftovers pass (jobs/leftovers.py): what the unlabelled storage writes are, from the source.
+    Advisory until corroborated by code; it can raise suspicion, never lower it on its own."""
+
+    reasoning: str = Field(description="Work out each contract's storage layout from the source first.")
+    items: list[SlotClaim] = Field(default_factory=list)
 
 
 class ProbeHypothesis(BaseModel):
@@ -484,6 +515,9 @@ class CompareResult(BaseModel):
     tiers: list[MatchTier] = Field(default_factory=list)
     nothing_else: bool | None = None
     questions: list[str] = Field(default_factory=list)
+    explained_slots: list[str] = Field(
+        default_factory=list, description="Storage writes labelled from the source and corroborated by code."
+    )
 
 
 class Decision(str, Enum):

@@ -47,10 +47,26 @@ def show(res: JudgeResult) -> None:
         body = Group(_lists(obs), Text(""), effects)
     else:
         body = Text("(no backward form)")
-    floor = ""
+    extras = []
     if v.floor_hits:
-        floor = "\n".join(f"[red]FLOOR {h.rule}[/]: {h.reason}" for h in v.floor_hits)
-    console.print(Panel(Group(body, Text(""), Text.from_markup(floor)) if floor else body,
+        extras.append(Text.from_markup("\n".join(f"[red]FLOOR {h.rule}[/]: {h.reason}" for h in v.floor_hits)))
+    if res.source_check or res.source_raised or res.source_rejected:
+        src = Table.grid(padding=(0, 1))
+        for line in res.source_check:
+            src.add_row("[green]source[/]", line)
+        for sid, why in res.source_raised.items():
+            src.add_row("[red]source[/]", f"{sid}: {why}")
+        for line in res.source_rejected:
+            src.add_row("[dim]unconfirmed[/]", f"[dim]{line}[/]")
+        head = "storage writes explained from verified source and checked by code"
+        if res.source_tokens:
+            head += f" ({res.source_tokens:,} tokens of source read)"
+        extras += [Text(head, style="bold"), src]
+    unl = [w for w in b.storage_diff if not w.label]
+    if unl:
+        extras.append(Text(f"{len(unl)} storage write(s) nobody has explained: {', '.join(w.id for w in unl)}",
+                           style="yellow"))
+    console.print(Panel(Group(body, Text(""), *extras) if extras else body,
                         title=f"The bytes (backward pass) · safeTxHash {b.safe_tx_hash[:10]}… · block {b.fork_block}",
                         border_style="magenta"))
 

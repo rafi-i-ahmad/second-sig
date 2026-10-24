@@ -231,6 +231,23 @@ def test_auditor_backward_against_a_forward_that_promises_only_the_payment() -> 
     assert "unlimited" in v.question and any(m.tier == "exact" for m in v.compare.matched)
 
 
+def aave_checked():
+    """The Aave bundle with its eight reserve-accounting writes labelled by corroborated source
+    claims (see tests/test_source_reader.py); without them the comparison asks about the writes."""
+    from judge import corroborate
+    from tests.test_source_reader import aave_claims
+    b = bundle("demo_aave")
+    c = corroborate.apply(b, aave_claims(b))
+    assert c.rejected == []
+    return c
+
+
+def decide_aave(fwd, bwd):
+    c = aave_checked()
+    return verdict.decide(c.bundle, expected=fwd, observed=bwd, address_book=case("demo_aave")["address_book"],
+                          raised=c.raised, explained_slots=c.explained)
+
+
 def test_aave_backward_against_a_forward_that_promises_the_deposit() -> None:
     """USDC lands in the aToken contract, not the Pool the words name, and the receipt token is
     minted from the zero address: both are inside the Safe's call into the Pool, so they match
@@ -246,7 +263,7 @@ def test_aave_backward_against_a_forward_that_promises_the_deposit() -> None:
         permission_changes=[{"asset": "USDC", "owner_name": "Safe", "spender_name": "Aave v3 Pool",
                              "amount_human": "10,000 USDC", "cites": "Deposit 10,000 USDC into Aave v3"}],
     )
-    v = decide("demo_aave", fwd, backward("demo_aave"))
+    v = decide_aave(fwd, backward("demo_aave"))
     assert v.decision == Decision.MATCH, v.reasoning
     assert set(v.compare.tiers) >= {"exact", "counterparty_via_callee", "asset_unresolved"}
     assert v.compare.observed_unexplained == [] and v.compare.expected_unobserved == []
@@ -256,7 +273,7 @@ def test_aave_recorded_forward_without_the_receipt_token_still_matches() -> None
     """The recorded Flash forward form read the deposit as USDC out plus the approval, with no
     aUSDC coming back. The mint is received from inside the Safe's call into the Pool, so it is
     explained under inbound_from_callee: receiving an asset cannot drain the Safe."""
-    v = decide("demo_aave", forward("demo_aave"), backward("demo_aave"))
+    v = decide_aave(forward("demo_aave"), backward("demo_aave"))
     assert v.decision == Decision.MATCH, v.reasoning
     assert "inbound_from_callee" in v.compare.tiers and v.compare.observed_unexplained == []
 

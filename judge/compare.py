@@ -23,7 +23,12 @@ Tiers, best first. Each match records the weakest rule it needed:
   delivers the Safe's purchase to someone else is not internal and stays unexplained.
 
 Only notable and critical observed items take part in the verdict. Info effects go to the
-log. An observed item whose citations do not resolve is never explained (fail closed).
+log, with one exception: an info effect that cites a storage write no code layout and no
+corroborated source claim has labelled is *not* explained. A model calling an unknown write
+"bookkeeping" with nothing behind it would be lowering suspicion on its own; the write stays
+unexplained at notable until judge/corroborate.py labels it. ``raised`` carries writes the
+source reader read as control or asset changes; those are unexplained whatever the backward
+pass said. An observed item whose citations do not resolve is never explained (fail closed).
 An expected item whose phrase is not in the description explains nothing.
 """
 
@@ -141,11 +146,15 @@ def match_config(exp: CanonConfig, obs: CanonConfig) -> Match | None:
 # --------------------------------------------------------------------------- reconcile
 
 
-def reconcile(expected: CanonEffects, observed: CanonEffects, r: Resolver) -> CompareResult:
+def reconcile(expected: CanonEffects, observed: CanonEffects, r: Resolver, raised: dict[str, str] | None = None,
+              explained_slots: list[str] | None = None) -> CompareResult:
     res = CompareResult(
         uncited=list(observed.uncited), unsupported=list(expected.unsupported),
         nothing_else=expected.nothing_else, questions=list(expected.questions),
+        explained_slots=list(explained_slots or []),
     )
+    raised = raised or {}
+    unlabelled = {w.id for w in r.bundle.storage_diff if not w.label}
     explained_cites: set[str] = set()
     used_expected: set[int] = set()
 
@@ -247,10 +256,21 @@ def reconcile(expected: CanonEffects, observed: CanonEffects, r: Resolver) -> Co
 
     # sentences: everything the trace showed must be covered by something matched
     for e in observed.effects:
+        hot = [c for c in e.cites if c in raised]
+        dark = [c for c in e.cites if c in unlabelled]
         if not e.cited_ok:
             res.observed_unexplained.append(Unexplained(
                 kind="effect", item=e.sentence, severity=e.severity, cites=e.cites,
                 reason="citations do not resolve; treated as unexplained"))
+        elif hot:
+            res.observed_unexplained.append(Unexplained(
+                kind="effect", item=e.sentence, severity="notable" if e.severity == "info" else e.severity,
+                cites=e.cites, reason=f"the source reader read {hot[0]} as {raised[hot[0]]}"))
+        elif e.severity == "info" and dark:
+            res.observed_unexplained.append(Unexplained(
+                kind="effect", item=e.sentence, severity="notable", cites=e.cites,
+                reason=f"cites storage writes nobody has labelled ({', '.join(dark)}); 'info' from a model with "
+                       "no layout and no source does not explain them"))
         elif e.severity == "info":
             res.info_effects.append(e.sentence)
         elif set(e.cites) & explained_cites:

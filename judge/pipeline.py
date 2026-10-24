@@ -27,11 +27,13 @@ from eth_utils import to_checksum_address
 from pydantic import BaseModel, Field
 from web3 import Web3
 
-from judge import canon, compare, stamp as stamping, verdict as verdicting
+from judge import canon, compare, corroborate, layouts, stamp as stamping, verdict as verdicting
 from judge.canon import Resolver
 from judge.evidence import fork
-from judge.jobs import backward, escalate, forward
-from judge.schemas import Decision, EvidenceBundle, ExpectedEffects, HumanQuestion, Narration, Stamp, Verdict
+from judge.jobs import backward, escalate, forward, leftovers
+from judge.schemas import (
+    Classification, Decision, EvidenceBundle, ExpectedEffects, HumanQuestion, Narration, Stamp, Verdict,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURES = REPO / "fixtures"
@@ -99,6 +101,10 @@ class JudgeResult(BaseModel):
     stamp: Stamp | None = None
     stamp_signature: str | None = None
     calls: list[str] = Field(default_factory=list, description="Model calls made, for the record.")
+    source_check: list[str] = Field(default_factory=list, description="Writes explained from source, corroborated.")
+    source_raised: dict[str, str] = Field(default_factory=dict, description="Writes the source reader flagged.")
+    source_rejected: list[str] = Field(default_factory=list, description="Source claims code could not confirm.")
+    source_tokens: int | None = None
 
 
 def _sha(text: str) -> str:
@@ -124,9 +130,55 @@ def recorded_question(case_id: str) -> HumanQuestion | None:
     return HumanQuestion.model_validate(json.loads(p.read_text(encoding="utf-8"))["question"]) if p.exists() else None
 
 
+def recorded_leftovers(case_id: str) -> tuple[Classification | None, int | None]:
+    p = OUTPUTS / f"{case_id}.leftovers.json"
+    if not p.exists():
+        return None, None
+    raw = json.loads(p.read_text(encoding="utf-8"))
+    return Classification.model_validate(raw["classification"]), raw.get("tokens")
+
+
 def recorded_bundle(case_id: str) -> EvidenceBundle | None:
     p = FIXTURES / "bundles" / f"{case_id}.bundle.json"
     return EvidenceBundle.model_validate_json(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+# --------------------------------------------------------------------------- the source check
+
+
+class SourceCheck(BaseModel):
+    bundle: EvidenceBundle
+    explained: list[str] = Field(default_factory=list)
+    raised: dict[str, str] = Field(default_factory=dict)
+    rejected: list[str] = Field(default_factory=list)
+    tokens: int | None = None
+    call: str | None = None
+
+
+def source_check(bundle: EvidenceBundle, case_id: str, *, replay: bool, live: bool = True) -> SourceCheck:
+    """Label what code knows (judge/layouts.py), then ask the source reader about the rest and keep
+    only what judge/corroborate.py confirms. With ``replay`` the recorded classification is used; a
+    missing one leaves the writes unlabelled and the comparison will ask about them."""
+    bundle = layouts.label_known(bundle)
+    if all(w.label for w in bundle.storage_diff):
+        return SourceCheck(bundle=bundle)
+    cls, tokens, call = None, None, None
+    if replay:
+        cls, tokens = recorded_leftovers(case_id)
+    elif live:
+        try:
+            cls, iid, ms, summary = leftovers.run(bundle)
+            tokens = summary.get("tokens")
+            call = f"leftovers {leftovers.DEFAULT_MODEL} {ms} ms {tokens} tokens {iid}"
+            OUTPUTS.mkdir(exist_ok=True)
+            (OUTPUTS / f"{case_id}.leftovers.json").write_text(json.dumps({
+                "model": leftovers.DEFAULT_MODEL, "thinking": leftovers.DEFAULT_THINKING, "interaction_id": iid,
+                "latency_ms": ms, "tokens": tokens, "summary": summary,
+                "classification": cls.model_dump(mode="json")}, indent=2) + "\n", encoding="utf-8", newline="\n")
+        except Exception as exc:  # noqa: BLE001 - no labels is the safe outcome: the table asks
+            call = f"leftovers unavailable: {type(exc).__name__}"
+    c = corroborate.apply(bundle, cls)
+    return SourceCheck(bundle=c.bundle, explained=c.explained, raised=c.raised, rejected=c.rejected, tokens=tokens, call=call)
 
 
 # --------------------------------------------------------------------------- the judge
@@ -176,10 +228,20 @@ def judge(
         bwd, iid, ms = backward.run(bundle, proposal.address_book, proposal.safe)
         calls.append(f"backward {backward.DEFAULT_MODEL} {ms} ms {iid}")
 
-    # 3-5. canon, compare, decide: code
-    v = verdicting.decide(bundle, expected=fwd, observed=bwd, address_book=proposal.address_book)
-    return _finish(proposal, bundle, fwd, bwd, v, calls, escalate_live and not replay,
-                   recorded_question(proposal.id) if replay and not proposal.amendments else None)
+    # 3. the source check: code labels, the source reader explains the rest, code corroborates
+    sc = source_check(bundle, proposal.id, replay=replay)
+    bundle = sc.bundle
+    if sc.call:
+        calls.append(sc.call)
+
+    # 4-5. canon, compare, decide: code
+    v = verdicting.decide(bundle, expected=fwd, observed=bwd, address_book=proposal.address_book,
+                          raised=sc.raised, explained_slots=sc.explained)
+    res = _finish(proposal, bundle, fwd, bwd, v, calls, escalate_live and not replay,
+                  recorded_question(proposal.id) if replay and not proposal.amendments else None)
+    res.source_check, res.source_raised, res.source_rejected, res.source_tokens = (
+        sc.explained, sc.raised, sc.rejected, sc.tokens)
+    return res
 
 
 def _finish(proposal, bundle, fwd, bwd, v: Verdict, calls, run_escalate: bool,

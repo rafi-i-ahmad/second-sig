@@ -251,9 +251,28 @@ threshold drop is `critical`), 31–34 ASK (a mismatch between words and bytes i
 the table asks). All five refused; whether a *contradiction* should be REJECT where an *omission*
 is ASK is the open design question in `reports/compare/FINDINGS.md`. Reports in `reports/compare/`.
 
-One 429 labelled "monthly spending cap" interrupted the first live run (16 calls that day; our
-account is not shared with other teams). It cleared within the hour and did not recur; the adapter
-now waits and retries 429s. All 18 cases have recorded forward and backward forms.
+**The 429s, understood (24 October, afternoon).** The message says "monthly spending cap" but the
+pattern is a spend-rate window: every small call (one word; 10k-token forward, backward and
+escalation calls) goes through, while a 182k-token `gemini-4-argon` request with thinking high was
+refused five times in a row, each after ~90 s. That is what a per-10-minute spend limit at a low
+tier looks like (Tier 1: $10 per rolling 10 minutes; Tier 2: $50), and retrying inside the window
+makes it worse. Daniel's `investigate.py` saw the same (20/60/120 s retries). Consequences: the
+source reader trims its prompt above 120k tokens (Aave: 182k → 98k); live Argon calls on big
+inputs should be spaced out; the demo runs on recorded forms. **Check the account's tier in AI
+Studio → Billing** and ask Google for Tier 3 if it is lower. All 18 cases have recorded forward and
+backward forms.
+
+### The source reader (24 October, Rafi, branch `source-reader`)
+
+Tightening in `compare.py`: an `info` effect that cites a storage write nobody has labelled is no
+longer explained; it is a question. Code labels first (`layouts.py`: Uniswap V2 pair slots 8–11,
+WETH balances; `evidence/slots.py` for Safe and USDC), then `jobs/leftovers.py` asks Argon to read
+the verified source and claim variable, base slot, key, offset and source lines for each
+remaining write, and `corroborate.py` keeps only claims it can recompute. Aave's eight writes all
+reproduce from (base slot, key, offset): Pool `_reserves[USDC]` base 52 offsets 1, 2, 3, 8, 9;
+`_usersConfig[Safe]` base 53; aToken `_totalSupply` plain slot 54; `_userState[Safe]` base 52. The
+recorded classification lives at `fixtures/outputs/demo_aave.leftovers.json`; without it Aave is
+ASK on replay, with it MATCH. The view shows each explained write with its source `path:line`.
 
 Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
 01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss

@@ -36,9 +36,12 @@ judge/
                       trace.py, decode.py, slots.py feed it; rules.py is the hard floor
   labeller.py         layer 2: spotlight() wraps untrusted text in per-call random tags
   model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call
-  jobs/               layer 3: forward.py, backward.py, escalate.py (work); leftovers, probe (stubs).
+  jobs/               layer 3: forward.py, backward.py, escalate.py, leftovers.py (work); probe (stub, by design).
                       escalate drafts the signer's question for an ASK from the saved comparison and
-                      classifies the gap (omission / contradiction / vague); advisory, never a decision
+                      classifies the gap (omission / contradiction / vague); advisory, never a decision.
+                      leftovers is the source reader: one typed gemini-4-argon call, no tools, that reads the
+                      verified source of the contracts with unlabelled storage writes and claims what each
+                      write is (variable, base slot, key, offset, source lines). Never sees the description
   checker.py          layer 4: citation checks. Backward ids must resolve via bundle.entry(); forward phrases
                       must be in the description. Bad citations are marked, never dropped (fail closed)
   canon.py            layer 4: Resolver + from_forward()/from_backward() -> CanonEffects. Identity is the
@@ -49,6 +52,11 @@ judge/
                       inbound_from_callee, internal_to_callee. Only notable/critical observed items count
   truth.py            ground truth for a case from its calldata (+ the Safe's balance changes for protocol
                       calls); grades each pass on its own. fixtures/truth/<id>.json overrides if present
+  layouts.py          known storage layouts by *address* (Uniswap V2 USDC/WETH pair, WETH9): code labels,
+                      like the Safe and USDC layouts in evidence/slots.py. Never keyed by contract name
+  corroborate.py      checks jobs/leftovers.py's SlotClaims: cited source lines exist and name the variable,
+                      and keccak(key, base_slot)+offset reproduces the slot (slots._map). Only a corroborated
+                      routine_bookkeeping claim labels a write; any other reading raises it to notable
   verdict.py          layer 5: decide(bundle, expected=, observed=, address_book=) -> Verdict. Floor hit ->
                       REJECT (floor recomputed, bundle.floor_hits never trusted); failed rehearsal or a
                       missing form -> ASK; unexplained critical -> REJECT; unexplained notable, expected
@@ -144,7 +152,7 @@ The safety argument rests on these. If a task seems to require breaking one, sto
 1. The model never decides. The verdict is a pure function in `verdict.py` of the evidence bundle plus checked model forms.
 2. Any hard-rule hit forces REJECT, whatever any model output says.
 3. The model never sees or touches a key, and has no tool that writes, signs or sends. Tools available to model calls are read-only and run on throwaway fork snapshots.
-4. The model proposes probes; code runs them and records the results. A probe can raise a slot's suspicion, never lower it. Only the compiler storage layout can lower it.
+4. The model proposes probes; code runs them and records the results. A probe can raise a slot's suspicion, never lower it. Only the compiler storage layout can lower it. In practice today: a storage write no code layout labels is *unexplained* (notable) even if the backward pass calls it `info`; the source reader's claim about it lowers that only after `corroborate.py` has recomputed the slot from the claimed layout and found the cited source lines. An uncorroborated claim changes nothing.
 5. The forward pass never sees the trace. The backward pass never sees the description. Keep them in separate calls with separate inputs. `EvidenceBundle` carries `description`, so never hand the whole bundle to the backward pass: build its input from the bundle without that field.
 6. Every claim in a model form cites a trace entry (or source line). `checker.py` drops any claim whose citation does not resolve, and the item becomes ASK.
 7. Everything an attacker could author is untrusted text: the description, on-chain strings, revert reasons, token and contract names, comments and identifiers in verified source. It reaches the model only through `labeller.py`, wrapped in per-call random delimiters. Never put it in a system instruction.

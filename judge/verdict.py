@@ -135,9 +135,16 @@ def decide(
     expected: ExpectedEffects | None = None,
     observed: Narration | None = None,
     address_book: dict[str, str] | None = None,
+    raised: dict[str, str] | None = None,
+    explained_slots: list[str] | None = None,
 ) -> Verdict:
     """The decision table. Pass ``expected`` + ``observed`` (+ the address book) for the real
-    pipeline, or ``model`` for the one-call judge form. Neither present: ASK."""
+    pipeline, or ``model`` for the one-call judge form. Neither present: ASK. ``raised`` and
+    ``explained_slots`` come from judge/corroborate.py; the bundle passed in should already carry
+    the labels it produced. Labels code knows on its own (judge/layouts.py) are applied here."""
+    from judge import layouts
+
+    bundle = layouts.label_known(bundle)
     hits = rules.evaluate(bundle)
     if hits:
         return floor_verdict(hits)
@@ -155,7 +162,8 @@ def decide(
                         "timed out, or its output failed validation). Without both forms nothing can be approved.",
                         f"no checked {missing} form")
         r = Resolver(bundle, address_book or {})
-        cmp = compare.reconcile(canon.from_forward(expected, bundle.description, r), canon.from_backward(observed, r), r)
+        cmp = compare.reconcile(canon.from_forward(expected, bundle.description, r), canon.from_backward(observed, r), r,
+                                raised=raised, explained_slots=explained_slots)
         return from_compare(cmp)
 
     if model is None:
