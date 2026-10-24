@@ -256,8 +256,66 @@ class ExpectedEffects(BaseModel):
         return self
 
 
+Severity = Literal["info", "notable", "critical"]
+
+class ObservedEffect(BaseModel):
+    """One thing the trace shows happening, in one plain-English sentence."""
+
+    sentence: str = Field(description="One plain-English sentence; parties by address-book name or address.")
+    severity: Severity = Field(
+        description="info: routine bookkeeping. notable: a real effect a signer should know about. "
+        "critical: control of the Safe or its funds changes hands, or code nobody vetted runs with its authority."
+    )
+    cites: list[str] = Field(min_length=1, description="Trace ids this follows from, e.g. ['c3', 's0'].")
+
+
+class ObservedMovement(BaseModel):
+    """One asset moving between two parties, as the trace shows it."""
+
+    asset: str = Field(description="Ticker, e.g. 'ETH', 'USDC'; the token address if it has no symbol.")
+    amount_human: str = Field(description="Amount with unit, decimals applied, e.g. '2,500 USDC'.")
+    amount_base_units: str = Field(description="Decimal integer in base units, copied from the trace.")
+    from_name: str = Field(description="Address-book name, 'Safe' for the Safe, otherwise the checksummed address.")
+    to_name: str = Field(description="Address-book name, 'Safe' for the Safe, otherwise the checksummed address.")
+    cites: list[str] = Field(min_length=1)
+
+
+class ObservedPermissionChange(BaseModel):
+    """A token allowance the trace shows being set."""
+
+    kind: Literal["erc20_approval"] = "erc20_approval"
+    asset: str
+    owner_name: str
+    spender_name: str
+    amount_human: str = Field(description="e.g. '1,000 USDC', or 'unlimited' for 2**256-1.")
+    cites: list[str] = Field(min_length=1)
+
+
+class ObservedSafeConfigChange(BaseModel):
+    """A change to the Safe's own owners or threshold, as the trace shows it."""
+
+    kind: Literal["add_owner", "remove_owner", "swap_owner", "change_threshold"]
+    owner_name: str | None = None
+    threshold_after: int | None = None
+    cites: list[str] = Field(min_length=1)
+
+
 class Narration(BaseModel):
-    """Backward pass: what the trace shows happened. Never sees the description."""
+    """Backward pass: what the trace shows happened. Never sees the description.
+
+    `movements`, `permission_changes` and `safe_config_changes` mirror ExpectedEffects so
+    verdict.py can match them item by item. `effects` covers everything, including what
+    fits none of those lists (storage writes, delegatecalls, upgrades); the leftovers pass
+    classifies whatever no expected item explains. Citations are checked by checker.py,
+    not here, so that one bad citation drops one claim rather than the whole form.
+    """
+
+    reasoning: str = Field(description="Walk the call tree and diffs step by step first.")
+    effects: list[ObservedEffect] = Field(min_length=1)
+    movements: list[ObservedMovement] = Field(default_factory=list)
+    permission_changes: list[ObservedPermissionChange] = Field(default_factory=list)
+    safe_config_changes: list[ObservedSafeConfigChange] = Field(default_factory=list)
+    confidence: Literal["high", "medium", "low"]
 
 
 class Classification(BaseModel):

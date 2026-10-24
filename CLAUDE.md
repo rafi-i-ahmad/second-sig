@@ -27,13 +27,14 @@ contracts/            Foundry project (solc ^0.8.24; lib/forge-std, lib/safe-sma
 judge/
   schemas.py          pydantic models. Filled: EvidenceBundle (+ SafeTx, Call, SlotWrite,
                       BalanceChange, Event, Source, FloorHit), ExpectedEffects (+ Movement,
-                      PermissionChange, SafeConfigChange), Decision, Verdict, Stamp.
-                      Narration, Classification, ProbeHypothesis, HumanQuestion: empty
+                      PermissionChange, SafeConfigChange), Narration (+ ObservedEffect,
+                      ObservedMovement, ObservedPermissionChange, ObservedSafeConfigChange),
+                      Decision, Verdict, Stamp. Classification, ProbeHypothesis, HumanQuestion: empty
   evidence/           layer 1: fork.py rehearses on a snapshot and builds the EvidenceBundle;
                       trace.py, decode.py, slots.py feed it; rules.py is the hard floor
   labeller.py         layer 2: spotlight() wraps untrusted text in per-call random tags
   model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call
-  jobs/               layer 3: forward.py (works); backward, leftovers, probe, escalate (stubs)
+  jobs/               layer 3: forward.py, backward.py (work); leftovers, probe, escalate (stubs)
   checker.py          layer 4  (stub)
   verdict.py          layer 5: decision table  (stub)
   stamp.py            EIP-712 signing with the judge key: make_stamp(bundle), sign(), digest(),
@@ -52,7 +53,7 @@ fixtures/
   bybit/ aave/ auditor/   the three demo scenarios (case.json, with expected_verdict)
   transfer/           first forward-pass dry run
   tornado/ injection/ not built yet
-  outputs/            model outputs: <id>.forward.json, <id>.naive.json
+  outputs/            model outputs: <id>.forward.json, <id>.backward.json, <id>.naive.json
   sources/            Etherscan cache, one file per address
   traces/             callTracer + prestate diff + ERC-20 balances, from run_fixture --save-trace
   bundles/            <id>.bundle.json (EvidenceBundle) + <id>.rehearsal.json (raw traces), from fork.py
@@ -61,7 +62,7 @@ eval/
   run.py              the eval table  (stub)
   naive_baseline.md   naive-judge results and the auditor-miss analysis
 tests/                pytest: schemas, model adapter, evidence, floor rules, stamp, forward cases
-                      (live). Markers: `live` needs --live + GEMINI_API_KEY; `fork` needs --fork + anvil
+                      (live), backward (input checks offline; bundles live). Markers: `live` needs --live + GEMINI_API_KEY; `fork` needs --fork + anvil
 scripts/              smoke_gemini.py, forward_transfer.py: one-off checks
 logs/                 calls.jsonl, verdicts.jsonl (gitignored; used by --replay)
 ```
@@ -74,6 +75,7 @@ Working now:
 uv sync
 uv run pytest                                   # offline tests; live ones skip
 uv run pytest tests/test_forward_cases.py --live -s   # calls Gemini; needs GEMINI_API_KEY
+uv run pytest tests/test_backward.py --live -s        # backward pass on fixtures/bundles/
 uv run pytest tests/test_stamp.py --fork -s            # stamp, attest, execute case 01 through the guard on anvil
 uv run python fixtures/build.py                 # regenerate fixture JSON
 cd contracts && ~/.foundry/bin/forge build && ~/.foundry/bin/forge test -vv
