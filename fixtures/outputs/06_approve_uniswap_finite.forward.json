@@ -1,10 +1,10 @@
 {
   "model": "gemini-3.8-flash",
   "thinking": "low",
-  "interaction_id": "v1_ChdncXJiYXYzakpaX2Ruc0VQNzlhVXlBcxIXZ3FyYmF2M2pKWl9kbnNFUDc5YVV5QXM",
-  "latency_ms": 17120,
+  "interaction_id": "v1_Chd0LW5jYXRXWEtkbmJ4czBQd191RjJBVRIXdC1uY2F0V1hLZG5ieHMwUHdfdUYyQVU",
+  "latency_ms": 7454,
   "expected_effects": {
-    "reasoning": "The proposal description specifies approving the Uniswap router to spend 1,000 USDC. No actual token transfers or Safe configuration changes are requested.",
+    "reasoning": "The description specifies approving the 'Uniswap router' to spend 1,000 USDC. No swap or token movement is being executed in this transaction (it states 'for next week's swap'), so only an ERC20 approval permission change is licensed.",
     "movements": [],
     "permission_changes": [
       {

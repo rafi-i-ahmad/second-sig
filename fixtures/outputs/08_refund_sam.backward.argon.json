@@ -1,0 +1,46 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_ChdSZkRjYXZlcEZmdVd2ZElQX3RtU3dRVRIXUmZEY2F2ZXBGZnVXdmRJUF90bVN3UVU",
+  "latency_ms": 18209,
+  "narration": {
+    "reasoning": "The transaction executes a standard Safe transaction (c0, c1) after verifying two owner signatures via ecrecover (c2, c3). In c1/s0, the Safe's nonce in slot 5 increments from 1 to 2. In c4, the Safe performs a plain ETH transfer of 500,000,000,000,000,000 wei (0.5 ETH) to EOA 0x1C733c205548a061CED714A14925E952e2E64D6E (Sam in the address book), resulting in balance changes b0 and b1. Finally, the Safe emits ExecutionSuccess (e0). No token permissions or Safe configurations are changed.",
+    "effects": [
+      {
+        "sentence": "The Safe transfers 0.5 ETH to Sam.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ]
+      },
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2 and ExecutionSuccess is emitted.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s0",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "0.5 ETH",
+        "amount_base_units": "500000000000000000",
+        "from_name": "Safe",
+        "to_name": "Sam",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

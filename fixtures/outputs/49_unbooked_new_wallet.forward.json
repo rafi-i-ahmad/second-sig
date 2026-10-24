@@ -1,0 +1,18 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdoT25jYXBDWE1Jbjd2ZElQazg3TTZRWRIXaE9uY2FwQ1hNSW43dmRJUGs4N002UVk",
+  "latency_ms": 4567,
+  "expected_effects": {
+    "reasoning": "The description proposes paying Dana 2,500 USDC for October, but explicitly specifies to 'use the new wallet from her last email'. The address book contains an entry for 'Dana', but the text explicitly directs not to use her known entry and instead use an unspecified address from an external email. According to the system instructions, recipients not present in the address book (e.g. from an email) must be left out of the movements list, nothing_else must be set to false, and a question must be raised for the signers.",
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": false,
+    "assumptions": [],
+    "questions_for_human": [
+      "What is the address of Dana's new wallet referred to from her last email?"
+    ],
+    "confidence": "high"
+  }
+}

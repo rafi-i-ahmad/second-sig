@@ -3,10 +3,12 @@
   "description": "Swap 5,000 USDC for ETH on Uniswap",
   "expected_verdict": "MATCH",
   "verdict": {
-    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (3 matched; tiers used: exact, amount_unconstrained, counterparty_via_callee).",
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (5 matched; tiers used: exact, amount_unconstrained, counterparty_via_callee, internal_to_callee).",
     "decision": "MATCH",
     "reasons": [
       "movement: 5,000 USDC Safe -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc [counterparty_via_callee]",
+      "movement: 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router [internal_to_callee]",
+      "movement: 1.761817265430573461 ETH WETH -> Uniswap router [internal_to_callee]",
       "movement: 1.761817265430573461 ETH Uniswap router -> Safe [amount_unconstrained]",
       "permission: allowance USDC Safe -> Uniswap router: 5000000000 [exact]"
     ],
@@ -19,6 +21,20 @@
           "expected": "5,000 USDC Safe -> Uniswap router",
           "observed": "5,000 USDC Safe -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
           "tier": "counterparty_via_callee",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "(inside a call the words license)",
+          "observed": "1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router",
+          "tier": "internal_to_callee",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "(inside a call the words license)",
+          "observed": "1.761817265430573461 ETH WETH -> Uniswap router",
+          "tier": "internal_to_callee",
           "notes": []
         },
         {
@@ -41,18 +57,22 @@
       "observed_unexplained": [],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe incremented its nonce from 1 to 2.",
-        "Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH."
+        "internal movement 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router",
+        "internal movement 1.761817265430573461 ETH WETH -> Uniswap router",
+        "The Safe's nonce incremented from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
       "tiers": [
         "exact",
         "amount_unconstrained",
-        "counterparty_via_callee"
+        "counterparty_via_callee",
+        "internal_to_callee"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -77,6 +97,8 @@
         },
         "amount_base": 1761817265430573461,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1.761817265430573461 ETH (ETH…)",
         "direction": "in",
         "implied": false,
@@ -107,6 +129,8 @@
         },
         "amount_base": 5000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "5000 USDC",
         "direction": "out",
         "implied": false,
@@ -179,6 +203,8 @@
         },
         "amount_base": 5000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "5,000 USDC",
         "direction": "out",
         "implied": false,
@@ -208,6 +234,8 @@
         },
         "amount_base": null,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": null,
         "direction": "in",
         "implied": false,
@@ -277,18 +305,81 @@
         },
         "amount_base": 5000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "5,000 USDC",
         "direction": "out",
         "implied": false,
         "severity": "notable",
         "cites": [
-          "c9",
-          "c10",
-          "e2",
-          "s0",
-          "s1",
           "b2",
-          "b3"
+          "b3",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "via": "address"
+        },
+        "to_party": {
+          "label": "Uniswap router",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address_book"
+        },
+        "amount_base": 1761817265430573461,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1.761817265430573461 WETH",
+        "direction": "third_party",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "b4",
+          "e5"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book"
+        },
+        "to_party": {
+          "label": "Uniswap router",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address_book"
+        },
+        "amount_base": 1761817265430573461,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1.761817265430573461 ETH",
+        "direction": "third_party",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "b0",
+          "e6",
+          "c17"
         ],
         "cited_ok": true,
         "source": "backward"
@@ -312,15 +403,16 @@
         },
         "amount_base": 1761817265430573461,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "1.761817265430573461 ETH",
         "direction": "in",
         "implied": false,
         "severity": "notable",
         "cites": [
-          "c18",
-          "c19",
+          "b1",
           "e7",
-          "b1"
+          "c18"
         ],
         "cited_ok": true,
         "source": "backward"
@@ -359,16 +451,18 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe incremented its nonce from 1 to 2.",
+        "sentence": "The Safe's nonce incremented from 1 to 2.",
         "severity": "info",
         "cites": [
           "s6",
+          "c0",
+          "c1",
           "e0"
         ],
         "cited_ok": true
       },
       {
-        "sentence": "The Safe approved Uniswap router to spend up to 5,000 USDC.",
+        "sentence": "The Safe granted an allowance of 5,000 USDC to Uniswap router.",
         "severity": "notable",
         "cites": [
           "c5",
@@ -378,7 +472,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe transferred 5,000 USDC to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc.",
+        "sentence": "The Safe transferred 5,000 USDC to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc via Uniswap router.",
         "severity": "notable",
         "cites": [
           "c9",
@@ -392,33 +486,25 @@
         "cited_ok": true
       },
       {
-        "sentence": "Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH.",
-        "severity": "info",
+        "sentence": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it and transferred 1.761817265430573461 ETH to the Safe.",
+        "severity": "notable",
         "cites": [
           "c11",
           "c12",
           "c16",
           "c17",
+          "c18",
           "e4",
           "e5",
           "e6",
+          "e7",
+          "b0",
+          "b1",
+          "b4",
           "s2",
           "s3",
           "s4",
-          "s5",
-          "b0",
-          "b4"
-        ],
-        "cited_ok": true
-      },
-      {
-        "sentence": "The Safe received 1.761817265430573461 ETH from Uniswap router.",
-        "severity": "notable",
-        "cites": [
-          "c18",
-          "c19",
-          "e7",
-          "b1"
+          "s5"
         ],
         "cited_ok": true
       }
@@ -447,15 +533,27 @@
       "attribution": "tolerance_rule"
     },
     {
+      "item": "matched by internal_to_callee: 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router",
+      "attribution": "tolerance_rule"
+    },
+    {
+      "item": "matched by internal_to_callee: 1.761817265430573461 ETH WETH -> Uniswap router",
+      "attribution": "tolerance_rule"
+    },
+    {
       "item": "matched by amount_unconstrained: 1.761817265430573461 ETH Uniswap router -> Safe",
       "attribution": "tolerance_rule"
     },
     {
-      "item": "info: The Safe incremented its nonce from 1 to 2.",
+      "item": "info: internal movement 1.761817265430573461 WETH 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> Uniswap router",
       "attribution": "bookkeeping"
     },
     {
-      "item": "info: Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH.",
+      "item": "info: internal movement 1.761817265430573461 ETH WETH -> Uniswap router",
+      "attribution": "bookkeeping"
+    },
+    {
+      "item": "info: The Safe's nonce incremented from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],
@@ -484,7 +582,7 @@
         "id": "s2",
         "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
         "slot": "0x0000000000000000000000000000000000000000000000000000000000000008",
-        "label": null,
+        "label": "UniswapV2Pair(USDC/WETH).reserves (reserve0, reserve1, blockTimestampLast)",
         "before": "0x67b889f70000000001a449398006fcbdca6b000000000000000013f2591d5c3a",
         "after": "0x67b93ab30000000001a430c6448f139a18d6000000000000000013f383234e3a"
       },
@@ -492,7 +590,7 @@
         "id": "s3",
         "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
         "slot": "0x0000000000000000000000000000000000000000000000000000000000000009",
-        "label": null,
+        "label": "UniswapV2Pair(USDC/WETH).price0CumulativeLast",
         "before": "0x0000000000000000000001bcff5d51626bbac3212f1e0c569428e43325bd2ed8",
         "after": "0x0000000000000000000001bd0de932599817d0293b793a5115b88106b879ccf8"
       },
@@ -500,7 +598,7 @@
         "id": "s4",
         "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
         "slot": "0x000000000000000000000000000000000000000000000000000000000000000a",
-        "label": null,
+        "label": "UniswapV2Pair(USDC/WETH).price1CumulativeLast",
         "before": "0x000000000000000000000000000000000000530ebc192fc1b74983845eb95a5e",
         "after": "0x00000000000000000000000000000000000053171f5e17ca9cad40605bb4425e"
       },
@@ -508,7 +606,7 @@
         "id": "s5",
         "contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "slot": "0xb374801ace2c02f5db0425ab5920a2b7ed1d5a00abbcd395fda7530ba1d666c0",
-        "label": null,
+        "label": "WETH.balanceOf[0xB4e1…C9Dc]",
         "before": "0x0000000000000000000000000000000000000000000001a449398006fcbdca6b",
         "after": "0x0000000000000000000000000000000000000000000001a430c6448f139a18d6"
       },

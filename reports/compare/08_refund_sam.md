@@ -28,9 +28,7 @@ Every effect in the trace is accounted for by the description, and everything th
 
 Info (bookkeeping):
 - The Safe's nonce increments from 1 to 2.
-- The Safe emits an ExecutionSuccess event.
 
 ## Attribution
 
 - `bookkeeping`: info: The Safe's nonce increments from 1 to 2.
-- `bookkeeping`: info: The Safe emits an ExecutionSuccess event.

@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdkdW5jYXI3ckw4YmJ4czBQMm92SjhBURIXZHVuY2FyN3JMOGJieHMwUDJvdko4QVE",
+  "latency_ms": 6961,
+  "expected_effects": {
+    "reasoning": "The description states 'Approve Ravi's 100 USDC invoice and pay it.' The word 'Approve' applied to an invoice signifies authorization of the payment rather than granting an ERC-20 token allowance. The action to execute is paying Ravi 100 USDC from the Safe.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "100 USDC",
+        "from_name": "Safe",
+        "to_name": "Ravi",
+        "cites": "Approve Ravi's 100 USDC invoice and pay it."
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

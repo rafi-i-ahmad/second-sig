@@ -27,8 +27,8 @@ Every effect in the trace is accounted for by the description, and everything th
 | allowance USDC Safe -> Uniswap router: 1000000000 | exact |
 
 Info (bookkeeping):
-- The Safe's nonce increments from 1 to 2.
+- The Safe's transaction execution nonce increases from 1 to 2.
 
 ## Attribution
 
-- `bookkeeping`: info: The Safe's nonce increments from 1 to 2.
+- `bookkeeping`: info: The Safe's transaction execution nonce increases from 1 to 2.

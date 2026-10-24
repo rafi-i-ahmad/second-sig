@@ -3,14 +3,63 @@
   "description": "Approve Ravi's 100 USDC invoice and pay it.",
   "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- allowance USDC Safe -> Ravi: 10000000000 (evidence c5, c6, s2, e1)\n- The Safe sets an allowance of 10,000 USDC for Ravi. (evidence c5, c6, s2, e1)",
     "decision": "ASK",
     "reasons": [
-      "no checked model form"
+      "unexplained: allowance USDC Safe -> Ravi: 10000000000"
     ],
     "floor_hits": [],
-    "question": null,
-    "compare": null
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? allowance USDC Safe -> Ravi: 10000000000; The Safe sets an allowance of 10,000 USDC for Ravi.",
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "100 USDC Safe -> Ravi",
+          "observed": "100 USDC Safe -> Ravi",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [
+        {
+          "kind": "permission",
+          "item": "allowance USDC Safe -> Ravi: 10000000000",
+          "severity": "notable",
+          "cites": [
+            "c5",
+            "c6",
+            "s2",
+            "e1"
+          ],
+          "reason": "no expected allowance matches (asset, spender, amount)"
+        },
+        {
+          "kind": "effect",
+          "item": "The Safe sets an allowance of 10,000 USDC for Ravi.",
+          "severity": "notable",
+          "cites": [
+            "c5",
+            "c6",
+            "s2",
+            "e1"
+          ],
+          "reason": "no matched item shares its evidence"
+        }
+      ],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's nonce increments from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
   },
   "truth": {
     "source": "truth",
@@ -83,12 +132,450 @@
     "unsupported": [],
     "notes": []
   },
-  "forward": null,
-  "backward": null,
-  "forward_vs_truth": null,
-  "backward_vs_truth": null,
-  "attribution": [],
-  "residuals": [],
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Ravi",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address_book"
+        },
+        "amount_base": 100000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "100 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Approve Ravi's 100 USDC invoice and pay it."
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Ravi",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address_book"
+        },
+        "amount_base": 100000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "100 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "owner": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "spender": {
+          "label": "Ravi",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address_book"
+        },
+        "new_allowance": 10000000000,
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s2",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s3"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe sets an allowance of 10,000 USDC for Ravi.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s2",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe transfers 100 USDC to Ravi.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e2"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [
+      "permission allowance USDC Safe -> Ravi: 10000000000"
+    ],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [notable]: allowance USDC Safe -> Ravi: 10000000000",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "observed, unexplained [notable]: The Safe sets an allowance of 10,000 USDC for Ravi.",
+      "attribution": "real_finding (same evidence as the item above)"
+    },
+    {
+      "item": "forward vs truth (missing): permission allowance USDC Safe -> Ravi: 10000000000",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "info: The Safe's nonce increments from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "allowance USDC Safe -> Ravi: 10000000000",
+      "kind": "permission",
+      "severity": "notable",
+      "reason": "no expected allowance matches (asset, spender, amount)",
+      "evidence": [
+        {
+          "id": "c5",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0x095ea7b30000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000002540be400",
+          "selector": "0x095ea7b3",
+          "function": "approve(address,uint256)",
+          "args": [
+            {
+              "name": "spender",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "10000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c6",
+          "parent": "c5",
+          "depth": 4,
+          "kind": "DELEGATECALL",
+          "from_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "to_address": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0x095ea7b30000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000002540be400",
+          "selector": "0x095ea7b3",
+          "function": "approve(address,uint256)",
+          "args": [
+            {
+              "name": "spender",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "10000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s2",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x775a8989dc47f629b145f7378d3145eb690ce716903bc51289f46bd1d0567927",
+          "label": "USDC.allowance[0xDFEC…aE47][0x2C81…53D3]",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "0x00000000000000000000000000000000000000000000000000000002540be400",
+          "writers": [
+            {
+              "id": "c5",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "approve(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c6",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "approve(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c7",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c8",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "call_id": "c6",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+          "name": "Approval",
+          "args": [
+            {
+              "name": "owner",
+              "type": "address",
+              "value": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "name": "spender",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "10000000000"
+            }
+          ],
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae47",
+            "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000000000002540be400"
+        }
+      ]
+    },
+    {
+      "item": "The Safe sets an allowance of 10,000 USDC for Ravi.",
+      "kind": "effect",
+      "severity": "notable",
+      "reason": "no matched item shares its evidence",
+      "evidence": [
+        {
+          "id": "c5",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0x095ea7b30000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000002540be400",
+          "selector": "0x095ea7b3",
+          "function": "approve(address,uint256)",
+          "args": [
+            {
+              "name": "spender",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "10000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c6",
+          "parent": "c5",
+          "depth": 4,
+          "kind": "DELEGATECALL",
+          "from_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "to_address": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0x095ea7b30000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000002540be400",
+          "selector": "0x095ea7b3",
+          "function": "approve(address,uint256)",
+          "args": [
+            {
+              "name": "spender",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "10000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s2",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x775a8989dc47f629b145f7378d3145eb690ce716903bc51289f46bd1d0567927",
+          "label": "USDC.allowance[0xDFEC…aE47][0x2C81…53D3]",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "0x00000000000000000000000000000000000000000000000000000002540be400",
+          "writers": [
+            {
+              "id": "c5",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "approve(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c6",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "approve(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c7",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c8",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "call_id": "c6",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+          "name": "Approval",
+          "args": [
+            {
+              "name": "owner",
+              "type": "address",
+              "value": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            },
+            {
+              "name": "spender",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "10000000000"
+            }
+          ],
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae47",
+            "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000000000002540be400"
+        }
+      ]
+    }
+  ],
   "bundle": {
     "safe_tx_hash": "0xa953dc79b7966eab86758246d36b7e7ba0ee1bf68c7f40f890efe997efa1f10a",
     "fork_block": 21895241,

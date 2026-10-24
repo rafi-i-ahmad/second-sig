@@ -1,0 +1,49 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdrLWZjYW9iWE1ibUprZFVQeXN6QjJRdxIXay1mY2FvYlhNYm1Ka2RVUHlzekIyUXc",
+  "latency_ms": 6413,
+  "narration": {
+    "reasoning": "The transaction executes a standard Safe transaction (c0, c1) calling USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) to transfer 1,000,000 base units (1 USDC) to Dana (0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315). In the Safe's storage, the nonce increments from 1 to 2. In USDC's storage, Safe's balance decreases by 1,000,000 and Dana's balance increases by 1,000,000. Transfer and ExecutionSuccess events are emitted.",
+    "effects": [
+      {
+        "sentence": "The Safe transferred 1 USDC to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe's nonce increased from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1 USDC",
+        "amount_base_units": "1000000",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

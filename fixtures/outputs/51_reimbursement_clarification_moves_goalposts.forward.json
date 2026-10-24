@@ -1,0 +1,26 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdpZW5jYXRLeEd0dVh2ZElQNDVDcjRBSRIXaWVuY2F0S3hHdHVYdmRJUDQ1Q3I0QUk",
+  "latency_ms": 9203,
+  "expected_effects": {
+    "reasoning": "The proposal specifies paying 2,500 USDC to Dana for an invoice, which clearly fixes the asset, amount, sender, and recipient. It also mentions including Ravi's reimbursement, but specifies neither the asset nor the amount for Ravi. Therefore, Dana's payment is listed under movements, Ravi's reimbursement is omitted from movements, nothing_else is set to false, and a clarifying question is raised.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana's 2,500 USDC October invoice"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": false,
+    "assumptions": [],
+    "questions_for_human": [
+      "What is the asset and amount for Ravi's reimbursement mentioned in the description?"
+    ],
+    "confidence": "high"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdWT25jYXVIYkpQanN4TjhQMUxPYmlRVRIXVk9uY2F1SGJKUGpzeE44UDFMT2JpUVU",
+  "latency_ms": 4762,
+  "expected_effects": {
+    "reasoning": "The description specifies setting/reducing Maya's allowance of USDC to 100 USDC. This represents an ERC20 token approval granted by the Safe to Maya for 100 USDC.",
+    "movements": [],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Maya",
+        "amount_human": "100 USDC",
+        "cites": "Reduce Maya's USDC allowance to 100 USDC."
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

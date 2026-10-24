@@ -1,21 +1,23 @@
 {
   "model": "gemini-3.8-flash",
   "thinking": "low",
-  "interaction_id": "v1_ChdNb2JjYXVXRkVQTG14TjhQbjVDVzhRURIXTW9iY2F1V0ZFUExteE44UG41Q1c4UVE",
-  "latency_ms": 8740,
+  "interaction_id": "v1_ChdMZWZjYXFuNE1QRzFrZFVQbGJldmdBSRIXTGVmY2FxbjRNUEcxa2RVUGxiZXZnQUk",
+  "latency_ms": 10154,
   "narration": {
-    "reasoning": "The transaction executes a MultiSendCallOnly call from the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47). First, the Safe approves Uniswap router to spend 5,000 USDC. Second, the Safe calls swapExactTokensForETH on Uniswap router, swapping 5,000 USDC for approximately 1.7618 ETH (which was withdrawn from WETH and sent to the Safe). All intermediate transfers and pool sync updates occur via Uniswap V2 pair (0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc). The Safe's nonce increments from 1 to 2.",
+    "reasoning": "The transaction executes a MultiSendCallOnly operation from the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47). First, it approves Uniswap router (0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) to spend 5,000 USDC (5,000,000,000 base units). Next, it calls Uniswap router's swapExactTokensForETH to swap 5,000 USDC for a minimum of 1.5 ETH with recipient as the Safe. USDC is transferred from the Safe to Uniswap V2 USDC/WETH pair (0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc), which swaps it for 1.761817265430573461 WETH sent to the router, where it is unwrapped to native ETH and transferred to the Safe.",
     "effects": [
       {
-        "sentence": "The Safe incremented its nonce from 1 to 2.",
+        "sentence": "The Safe's nonce incremented from 1 to 2.",
         "severity": "info",
         "cites": [
           "s6",
+          "c0",
+          "c1",
           "e0"
         ]
       },
       {
-        "sentence": "The Safe approved Uniswap router to spend up to 5,000 USDC.",
+        "sentence": "The Safe granted an allowance of 5,000 USDC to Uniswap router.",
         "severity": "notable",
         "cites": [
           "c5",
@@ -24,7 +26,7 @@
         ]
       },
       {
-        "sentence": "The Safe transferred 5,000 USDC to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc.",
+        "sentence": "The Safe transferred 5,000 USDC to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc via Uniswap router.",
         "severity": "notable",
         "cites": [
           "c9",
@@ -37,32 +39,25 @@
         ]
       },
       {
-        "sentence": "Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH.",
-        "severity": "info",
+        "sentence": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it and transferred 1.761817265430573461 ETH to the Safe.",
+        "severity": "notable",
         "cites": [
           "c11",
           "c12",
           "c16",
           "c17",
+          "c18",
           "e4",
           "e5",
           "e6",
+          "e7",
+          "b0",
+          "b1",
+          "b4",
           "s2",
           "s3",
           "s4",
-          "s5",
-          "b0",
-          "b4"
-        ]
-      },
-      {
-        "sentence": "The Safe received 1.761817265430573461 ETH from Uniswap router.",
-        "severity": "notable",
-        "cites": [
-          "c18",
-          "c19",
-          "e7",
-          "b1"
+          "s5"
         ]
       }
     ],
@@ -74,13 +69,32 @@
         "from_name": "Safe",
         "to_name": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
         "cites": [
-          "c9",
-          "c10",
-          "e2",
-          "s0",
-          "s1",
           "b2",
-          "b3"
+          "b3",
+          "e2"
+        ]
+      },
+      {
+        "asset": "WETH",
+        "amount_human": "1.761817265430573461 WETH",
+        "amount_base_units": "1761817265430573461",
+        "from_name": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "to_name": "Uniswap router",
+        "cites": [
+          "b4",
+          "e5"
+        ]
+      },
+      {
+        "asset": "ETH",
+        "amount_human": "1.761817265430573461 ETH",
+        "amount_base_units": "1761817265430573461",
+        "from_name": "WETH",
+        "to_name": "Uniswap router",
+        "cites": [
+          "b0",
+          "e6",
+          "c17"
         ]
       },
       {
@@ -90,10 +104,9 @@
         "from_name": "Uniswap router",
         "to_name": "Safe",
         "cites": [
-          "c18",
-          "c19",
+          "b1",
           "e7",
-          "b1"
+          "c18"
         ]
       }
     ],

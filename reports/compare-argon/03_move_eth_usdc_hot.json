@@ -1,0 +1,367 @@
+{
+  "id": "03_move_eth_usdc_hot",
+  "description": "Move 20 ETH and 10,000 USDC to the hot wallet",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (2 matched; tiers used: exact).",
+    "decision": "MATCH",
+    "reasons": [
+      "movement: 20 ETH Safe -> hot wallet [exact]",
+      "movement: 10,000 USDC Safe -> hot wallet [exact]"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "20 ETH Safe -> hot wallet",
+          "observed": "20 ETH Safe -> hot wallet",
+          "tier": "exact",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "10,000 USDC Safe -> hot wallet",
+          "observed": "10,000 USDC Safe -> hot wallet",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "Safe increments its transaction nonce from 1 to 2 and emits ExecutionSuccess."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "hot wallet",
+          "address": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+          "via": "address"
+        },
+        "amount_base": 20000000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "20 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:hot wallet (plain ETH transfer, empty calldata)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "hot wallet",
+          "address": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+          "via": "address"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "hot wallet",
+          "address": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+          "via": "address_book"
+        },
+        "amount_base": 20000000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "20 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Move 20 ETH and 10,000 USDC to the hot wallet"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "hot wallet",
+          "address": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+          "via": "address_book"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Move 20 ETH and 10,000 USDC to the hot wallet"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "hot wallet",
+          "address": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+          "via": "address_book"
+        },
+        "amount_base": 20000000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "20 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "hot wallet",
+          "address": "0x5e65FC384fA4BeF1CD524A77857B3693bC26E15b",
+          "via": "address_book"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c6",
+          "c7",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "Safe transfers 20 ETH to hot wallet via MultiSendCallOnly v1.4.1.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe transfers 10,000 USDC to hot wallet via MultiSendCallOnly v1.4.1.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c6",
+          "c7",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe increments its transaction nonce from 1 to 2 and emits ExecutionSuccess.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "s2",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: Safe increments its transaction nonce from 1 to 2 and emits ExecutionSuccess.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0xf030213b8ae32fcb3476d1b2a2e336dc46748866f5c1b9083f9d7f24188db691",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x06a676d896753d541c6c81022105e683c0638d9bf98cde0b3d4bf2471ba87f0a",
+        "label": "USDC.balanceOf[0x5e65…E15b]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x00000000000000000000000000000000000000000000000000000002540be400"
+      },
+      {
+        "id": "s1",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x2af6e45109ed6c3f87addc9868ad92048225ec319f059ae1d594169e71fbbeb6",
+        "label": "USDC.balanceOf[0xDFEC…aE47]",
+        "before": "0x00000000000000000000000000000000000000000000000000000002540be400",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "id": "s2",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

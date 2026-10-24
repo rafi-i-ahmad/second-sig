@@ -3,11 +3,11 @@
   "description": "Deposit 10,000 USDC into Aave v3",
   "expected_verdict": "MATCH",
   "verdict": {
-    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (3 matched; tiers used: exact, counterparty_via_callee, inbound_from_callee).",
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (3 matched; tiers used: exact, counterparty_via_callee).",
     "decision": "MATCH",
     "reasons": [
-      "movement: 10,000 USDC Safe -> 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c [counterparty_via_callee]",
-      "movement: 10,000 aEthUSDC zero address -> Safe [inbound_from_callee]",
+      "movement: 10,000 USDC Safe -> aUSDC [counterparty_via_callee]",
+      "movement: 10,000 aEthUSDC zero address -> Safe [counterparty_via_callee]",
       "permission: allowance USDC Safe -> Aave v3 Pool: 10000000000 [exact]"
     ],
     "floor_hits": [],
@@ -17,18 +17,16 @@
         {
           "kind": "movement",
           "expected": "10,000 USDC Safe -> Aave v3 Pool",
-          "observed": "10,000 USDC Safe -> 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "observed": "10,000 USDC Safe -> aUSDC",
           "tier": "counterparty_via_callee",
           "notes": []
         },
         {
           "kind": "movement",
-          "expected": "(received from inside a call the words license)",
+          "expected": "10,000 aUSDC Aave v3 Pool -> Safe",
           "observed": "10,000 aEthUSDC zero address -> Safe",
-          "tier": "inbound_from_callee",
-          "notes": [
-            "receiving an asset cannot drain the Safe"
-          ]
+          "tier": "counterparty_via_callee",
+          "notes": []
         },
         {
           "kind": "permission",
@@ -43,18 +41,28 @@
       "observed_unexplained": [],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe increases its nonce from 1 to 2.",
-        "Aave v3 Pool updates reserve accounting data and interest rates for USDC."
+        "The Safe's nonce increments from 1 to 2.",
+        "Aave v3 Pool updates reserve accounting and interest rates for USDC and records collateral usage for the Safe."
       ],
       "uncited": [],
       "unsupported": [],
       "tiers": [
         "exact",
-        "counterparty_via_callee",
-        "inbound_from_callee"
+        "counterparty_via_callee"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [
+        "s0 InitializableImmutableAdminUpgradeabilityProxy._usersConfig[0xDFEC…aE47]: Enables USDC (reserve ID 3) as collateral in the Safe's Aave user configuration bitmap. (PoolStorage.sol:24, DataTypes.sol:111)",
+        "s1 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+1: Updates the liquidityIndex and currentLiquidityRate for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:46, DataTypes.sol:48)",
+        "s2 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+2: Updates the variableBorrowIndex and currentVariableBorrowRate for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:50, DataTypes.sol:52)",
+        "s3 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+3: Updates the lastUpdateTimestamp for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:56)",
+        "s4 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+8: Updates the accruedToTreasury balance for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:70)",
+        "s5 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+9: Increases the virtualUnderlyingBalance of the USDC reserve by the supplied 10,000 USDC. (PoolStorage.sol:21, DataTypes.sol:76)",
+        "s6 InitializableImmutableAdminUpgradeabilityProxy._totalSupply: Increases the scaled total supply of aEthUSDC by the newly minted scaled amount. (IncentivizedERC20.sol:57)",
+        "s7 InitializableImmutableAdminUpgradeabilityProxy._userState[0xDFEC…aE47]: Records the Safe's scaled aEthUSDC balance and last liquidity index in _userState. (IncentivizedERC20.sol:52, IncentivizedERC20.sol:48, IncentivizedERC20.sol:49)"
+      ],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -62,7 +70,7 @@
     "movements": [
       {
         "asset": {
-          "label": "aEthUSDC (0x98C2…)",
+          "label": "aUSDC",
           "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
           "via": "address",
           "decimals": 6
@@ -79,7 +87,9 @@
         },
         "amount_base": 10000000000,
         "amount_max_base": null,
-        "amount_human": "10000 aEthUSDC (0x98C2…)",
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10000 aUSDC",
         "direction": "in",
         "implied": false,
         "severity": null,
@@ -109,6 +119,8 @@
         },
         "amount_base": 10000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "10000 USDC",
         "direction": "out",
         "implied": false,
@@ -181,8 +193,41 @@
         },
         "amount_base": 10000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "10,000 USDC",
         "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Deposit 10,000 USDC into Aave v3"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "asset": {
+          "label": "aUSDC",
+          "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address_book"
+        },
+        "to_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 aUSDC",
+        "direction": "in",
         "implied": false,
         "severity": null,
         "cites": [
@@ -244,12 +289,14 @@
           "via": "safe"
         },
         "to_party": {
-          "label": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "label": "aUSDC",
           "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
           "via": "address"
         },
         "amount_base": 10000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "10,000 USDC",
         "direction": "out",
         "implied": false,
@@ -259,7 +306,9 @@
           "b2",
           "e5",
           "s8",
-          "s9"
+          "s9",
+          "c15",
+          "c16"
         ],
         "cited_ok": true,
         "source": "backward"
@@ -283,6 +332,8 @@
         },
         "amount_base": 10000000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "10,000 aEthUSDC",
         "direction": "in",
         "implied": false,
@@ -291,7 +342,10 @@
           "b0",
           "e6",
           "e7",
-          "s7"
+          "s6",
+          "s7",
+          "c17",
+          "c18"
         ],
         "cited_ok": true,
         "source": "backward"
@@ -330,16 +384,17 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "The Safe increases its nonce from 1 to 2.",
+        "sentence": "The Safe's nonce increments from 1 to 2.",
         "severity": "info",
         "cites": [
           "s10",
-          "c0"
+          "c0",
+          "e0"
         ],
         "cited_ok": true
       },
       {
-        "sentence": "The Safe approves Aave v3 Pool to spend up to 10,000 USDC.",
+        "sentence": "The Safe approves Aave v3 Pool to spend 10,000 USDC.",
         "severity": "notable",
         "cites": [
           "c5",
@@ -349,7 +404,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe transfers 10,000 USDC to 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c.",
+        "sentence": "10,000 USDC is transferred from the Safe to 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c.",
         "severity": "notable",
         "cites": [
           "c15",
@@ -363,11 +418,12 @@
         "cited_ok": true
       },
       {
-        "sentence": "Aave v3 Pool mints 10,000 aEthUSDC (0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c) to the Safe.",
+        "sentence": "10,000 aEthUSDC is minted to the Safe.",
         "severity": "notable",
         "cites": [
           "c17",
           "c18",
+          "s6",
           "s7",
           "b0",
           "e6",
@@ -376,7 +432,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "Aave v3 Pool updates reserve accounting data and interest rates for USDC.",
+        "sentence": "Aave v3 Pool updates reserve accounting and interest rates for USDC and records collateral usage for the Safe.",
         "severity": "info",
         "cites": [
           "s0",
@@ -385,10 +441,12 @@
           "s3",
           "s4",
           "s5",
-          "s6",
           "e2",
           "e3",
-          "e4"
+          "e4",
+          "c7",
+          "c8",
+          "c9"
         ],
         "cited_ok": true
       }
@@ -400,9 +458,7 @@
     "notes": []
   },
   "forward_vs_truth": {
-    "missing": [
-      "movement 10000 aEthUSDC (0x98C2…) Aave v3 Pool -> Safe"
-    ],
+    "missing": [],
     "extra": [],
     "wrong_amount": [],
     "wrong_party": []
@@ -415,19 +471,19 @@
   },
   "attribution": [
     {
-      "item": "matched by counterparty_via_callee: 10,000 USDC Safe -> 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+      "item": "matched by counterparty_via_callee: 10,000 USDC Safe -> aUSDC",
       "attribution": "tolerance_rule"
     },
     {
-      "item": "matched by inbound_from_callee: 10,000 aEthUSDC zero address -> Safe",
+      "item": "matched by counterparty_via_callee: 10,000 aEthUSDC zero address -> Safe",
       "attribution": "tolerance_rule"
     },
     {
-      "item": "info: The Safe increases its nonce from 1 to 2.",
+      "item": "info: The Safe's nonce increments from 1 to 2.",
       "attribution": "bookkeeping"
     },
     {
-      "item": "info: Aave v3 Pool updates reserve accounting data and interest rates for USDC.",
+      "item": "info: Aave v3 Pool updates reserve accounting and interest rates for USDC and records collateral usage for the Safe.",
       "attribution": "bookkeeping"
     }
   ],
@@ -440,7 +496,7 @@
         "id": "s0",
         "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         "slot": "0x8b77e06472d23652ce052e752c60284ffeeccbfb24647f7b94d940dd37ff8552",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._usersConfig[0xDFEC…aE47]",
         "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "after": "0x0000000000000000000000000000000000000000000000000000000000000080"
       },
@@ -448,7 +504,7 @@
         "id": "s1",
         "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf21",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+1",
         "before": "0x00000000002269b7c55752fed64c80e500000000039f6d6c4fc72a6eb2a26e1e",
         "after": "0x00000000002269aaf4b2cadba77a6d0800000000039f6db43c0c89930d4818f3"
       },
@@ -456,7 +512,7 @@
         "id": "s2",
         "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf22",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+2",
         "before": "0x000000000039261ddfa1abe5b8c2e8f20000000003bddbea114310b025ddcc40",
         "after": "0x00000000003926133b946fe1de7623320000000003bddc656d7d0437faf27df8"
       },
@@ -464,7 +520,7 @@
         "id": "s3",
         "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf23",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+3",
         "before": "0x00000000000000000000030067b88a0f00000000000000000000000000000000",
         "after": "0x00000000000000000000030067b88d9000000000000000000000000000000000"
       },
@@ -472,7 +528,7 @@
         "id": "s4",
         "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf28",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+8",
         "before": "0x000000000000000000000000000000000000000000000000000000092afc17e6",
         "after": "0x000000000000000000000000000000000000000000000000000000093f012b2c"
       },
@@ -480,7 +536,7 @@
         "id": "s5",
         "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
         "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf29",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+9",
         "before": "0x000000000000000000035e0bfe63b78800000000000000000000000000000000",
         "after": "0x000000000000000000035e0e526f9b8800000000000000000000000000000000"
       },
@@ -488,7 +544,7 @@
         "id": "s6",
         "contract": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
         "slot": "0x0000000000000000000000000000000000000000000000000000000000000036",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._totalSupply",
         "before": "0x00000000000000000000000000000000000000000000000000091351808e5908",
         "after": "0x00000000000000000000000000000000000000000000000000091353942ca80e"
       },
@@ -496,7 +552,7 @@
         "id": "s7",
         "contract": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
         "slot": "0x80ec0b624341bbd162a7fd5235b912a5d63656b8cb8ec12243db3ea110f4eabf",
-        "label": null,
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._userState[0xDFEC…aE47]",
         "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "after": "0x00000000039f6db43c0c89930d4818f3000000000000000000000002139e4f06"
       },

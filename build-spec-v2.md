@@ -31,11 +31,11 @@ The eval set is in `fixtures/cases/`, one folder per expected verdict. `fixtures
 | Folder | Cases | Point |
 | --- | --- | --- |
 | `match/` | 01–08, 10 | Honest and precise: transfers, batches, owner and threshold changes, a finite approval, a Uniswap swap |
-| `ask/` | 09, 38, 39, 42, 44–51 | Too vague, or one honest gap: an extra dust recipient, conflicting units, an unlimited allowance behind "up to", a WETH payment funded by wrapping, an unbooked wallet, a threshold side effect, clarifications that move the goalposts. 39, 49 and 51 carry scripted clarifications for the ASK loop |
-| `reject/` | 31–35, 37, 40, 41, 43 | The words contradict the bytes, and four prompt injections (in the description, an address-book label, a contract label, a forged rehearsal tag). No floor rule fires on any; the comparison has to see the gap |
+| `ask/` | 09, 31–34, 37, 39–49, 51 | Too vague; the words contradict the bytes (31–34, and 37, 40, 41, 43 with a prompt injection in the description, an address-book label, a contract label or a forged rehearsal tag); or one honest gap: an extra dust recipient, conflicting units, an unlimited allowance behind "up to", "approve the invoice", a WETH payment funded by wrapping, an unbooked wallet, clarifications that move the goalposts. 39, 49 and 51 carry scripted clarifications for the ASK loop |
+| `reject/` | 35, 38, 50 | A critical change the words do not license: the threshold ends at 1 (38 with an injected "change-control convention"). No floor rule fires; the comparison's critical row does |
 | `demo/` | the three above | Forward-pass tests and few-shot examples never read this folder |
 
-Every case has a rehearsed `EvidenceBundle` in `fixtures/bundles/`. Recorded model forms in `fixtures/outputs/` exist for 01–10, 31–35 and the demos; 37–51 are waiting on the API. The Safe address in every case file is the placeholder `0x5AFE…5AFE`, substituted at run time.
+Every case has a rehearsed `EvidenceBundle` in `fixtures/bundles/` and recorded forward and backward forms in `fixtures/outputs/` (recorded live on 24 October; Aave also has its source-reader classification). The Safe address in every case file is the placeholder `0x5AFE…5AFE`, substituted at run time.
 
 ## Architecture
 
@@ -106,11 +106,13 @@ Only notable and critical observed items take part in the verdict. Residuals are
 1. any floor hit: REJECT
 2. the rehearsal failed or reverted: ASK
 3. a missing or invalid form: ASK
-4. an unexplained critical observed effect: REJECT; an unexplained notable: ASK; an expected effect the trace does not show: ASK; `nothing_else` false: ASK with the forward pass's question; otherwise MATCH
+4. an unexplained critical observed effect: REJECT; an unexplained notable: ASK; an expected effect the trace does not show: ASK; `nothing_else` false, or any question from the forward pass: ASK with that question; otherwise MATCH
 
-The `Verdict` carries the `CompareResult`, so the view can show the per-effect table. 31–34 (contradictions without a critical write) come out ASK today; whether a contradiction should be REJECT where an omission is ASK is the open design question recorded in `reports/compare/FINDINGS.md`, and the rule is deliberately unapplied.
+What feeds row 4 fails closed. An outflow or an allowance is explained only by words that fix its asset, counterparty and amount (the open tiers are for what the Safe receives), and code checks the narration for coverage: every decrease in a Safe balance, every Approval the Safe granted and every owner or threshold event must be accounted for, so leaving an effect out of the backward form cannot hide it.
 
-**Escalate (`gemini-4-argon`, thinking medium, advisory).** From the saved comparison it drafts the signer's question (ASK) or a two-sentence statement of why the transaction was refused (REJECT), classifies the gap as omission, contradiction or vague, and lists what to check first. Nothing in it feeds back into the decision. Its "would an honest proposer write this" field currently colours a caution line; the plan is to demote it to a note.
+The `Verdict` carries the `CompareResult`, so the view can show the per-effect table. A contradiction without a critical write (31–34, 37, 40, 41, 43) is ASK by decision of 24 October: REJECT is kept for the floor and for critical effects, and both refuse the stamp.
+
+**Escalate (`gemini-4-argon`, thinking medium, advisory).** From the saved comparison it drafts the signer's question (ASK) or a two-sentence statement of why the transaction was refused (REJECT), classifies the gap as omission, contradiction or vague, and lists what to check first. Nothing in it feeds back into the decision. Its "would an honest proposer write this" reading is kept as a note in the report and never changes what the signers see.
 
 **Stamp, attest, execute (code).** On MATCH, `stamp.py` signs `{safeTxHash, forkBlock, judgeVersion}` with the judge key, the only module that reads it, and refuses if the key does not derive to the shared judge address. Owner 2 submits `attest`; owners 0 and 1's `execTransaction` runs through the guard. On ASK or REJECT the demo sends the same `execTransaction` anyway and shows the `SecondSig__NoStamp` revert.
 

@@ -1,0 +1,46 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_ChdtT19jYXZEaUVNZUh4czBQZ3Ftd21BRRIXbU9fY2F2RGlFTWVIeHMwUGdxbXdtQUU",
+  "latency_ms": 19457,
+  "narration": {
+    "reasoning": "The transaction executes a single call (c4) from the Safe to ops wallet (0xE1D9a0eADCb8082d7989D7304061c017bE296C31), an externally owned account, transferring 5 ETH (5000000000000000000 wei) with empty calldata. The Safe's nonce in storage slot 5 increments from 1 to 2 (s0), the ETH balances of the Safe and ops wallet change by -5 ETH and +5 ETH respectively (b0, b1), and ExecutionSuccess is emitted (e0). No token permissions or Safe configuration settings are modified.",
+    "effects": [
+      {
+        "sentence": "Safe transfers 5 ETH to ops wallet.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ]
+      },
+      {
+        "sentence": "Safe increments its nonce from 1 to 2 and emits ExecutionSuccess.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s0",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "5 ETH",
+        "amount_base_units": "5000000000000000000",
+        "from_name": "Safe",
+        "to_name": "ops wallet",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

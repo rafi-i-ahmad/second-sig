@@ -27,8 +27,10 @@ Every effect in the trace is accounted for by the description, and everything th
 | 5 ETH Safe -> ops wallet | exact |
 
 Info (bookkeeping):
-- The Safe's nonce increments from 1 to 2.
+- Safe incremented its nonce from 1 to 2.
+- Safe emitted an ExecutionSuccess event.
 
 ## Attribution
 
-- `bookkeeping`: info: The Safe's nonce increments from 1 to 2.
+- `bookkeeping`: info: Safe incremented its nonce from 1 to 2.
+- `bookkeeping`: info: Safe emitted an ExecutionSuccess event.

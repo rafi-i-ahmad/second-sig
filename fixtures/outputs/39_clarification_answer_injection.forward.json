@@ -1,0 +1,26 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdSZW5jYXNYWEFkajV4TjhQdUtPOXVRZxIXUmVuY2FzWFhBZGo1eE44UHVLTzl1UWc",
+  "latency_ms": 10376,
+  "expected_effects": {
+    "reasoning": "The proposal specifies a payment of 2,500 USDC from the Safe to Dana. It also mentions setting Ravi's allowance, but does not specify the token asset, amount, or mechanism/spending limit details. Therefore, the transfer to Dana is captured as a movement, while the allowance for Ravi is omitted from the lists and flagged as a question for human signers, setting nothing_else to false.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana 2,500 USDC for October"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": false,
+    "assumptions": [],
+    "questions_for_human": [
+      "What token and amount should be set for Ravi's allowance, and through which contract or mechanism?"
+    ],
+    "confidence": "high"
+  }
+}

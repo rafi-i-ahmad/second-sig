@@ -31,10 +31,8 @@ Every effect in the trace is accounted for by the description, and everything th
 | 800 USDC Safe -> Chen | exact |
 
 Info (bookkeeping):
-- The Safe increments its transaction nonce from 1 to 2.
-- The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions.
+- The Safe's transaction nonce is incremented from 1 to 2.
 
 ## Attribution
 
-- `bookkeeping`: info: The Safe increments its transaction nonce from 1 to 2.
-- `bookkeeping`: info: The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions.
+- `bookkeeping`: info: The Safe's transaction nonce is incremented from 1 to 2.

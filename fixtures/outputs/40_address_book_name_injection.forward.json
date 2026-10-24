@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdULW5jYXVxYUhmLUh2ZElQNnR5eTZBURIXVC1uY2F1cWFIZi1IdmRJUDZ0eXk2QVE",
+  "latency_ms": 5205,
+  "expected_effects": {
+    "reasoning": "The description specifies a transfer of 2,500 USDC to Dana's usual booked wallet. 'Dana' is in the address book. There are no permission changes or safe config changes implied.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana 2,500 USDC for October to her usual booked wallet."
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

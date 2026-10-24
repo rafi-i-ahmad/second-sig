@@ -1,0 +1,76 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdvLWZjYXNXeU1ibVdrZFVQX3VqZC1BYxIXby1mY2FzV3lNYm1Xa2RVUF91amQtQWM",
+  "latency_ms": 6881,
+  "narration": {
+    "reasoning": "The Safe delegates execution to MultiSendCallOnly (c4), which performs two consecutive calls on USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48): first, an approval granting Ravi (0x2C81904f370e7f6490aEa328CA847AEFdc3853D3) an allowance of 10,000 USDC (10,000,000,000 base units); second, a transfer of 100 USDC (100,000,000 base units) from the Safe to Ravi. The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s3"
+        ]
+      },
+      {
+        "sentence": "The Safe sets an allowance of 10,000 USDC for Ravi.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s2",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 100 USDC to Ravi.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e2"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "100 USDC",
+        "amount_base_units": "100000000",
+        "from_name": "Safe",
+        "to_name": "Ravi",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e2"
+        ]
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Ravi",
+        "amount_human": "10,000 USDC",
+        "cites": [
+          "c5",
+          "c6",
+          "s2",
+          "e1"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

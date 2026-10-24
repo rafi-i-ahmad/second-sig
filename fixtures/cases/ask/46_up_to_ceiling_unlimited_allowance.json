@@ -67,7 +67,15 @@
         "to_name": "Safe"
       }
     ],
-    "permission_changes": [],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap",
+        "amount_human": "up to 1,000 USDC"
+      }
+    ],
     "safe_config_changes": [],
     "nothing_else": true,
     "expect_question": false

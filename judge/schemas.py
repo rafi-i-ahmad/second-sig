@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # --------------------------------------------------------------------------- evidence (layer 1)
@@ -186,6 +186,12 @@ class EvidenceBundle(BaseModel):
         return self
 
 
+def _always_erc20_approval(value: object) -> str:
+    """`kind` has one legal value. Flash kept writing something else and paying for a schema
+    retry each time; the field carries no information, so any reply is read as the one value."""
+    return "erc20_approval"
+
+
 class Movement(BaseModel):
     """One asset moving between two named parties, as the description implies it."""
 
@@ -207,6 +213,8 @@ class PermissionChange(BaseModel):
     spender_name: str = Field(description="Spender by address-book name.")
     amount_human: str = Field(description="e.g. '1,000 USDC' or 'unlimited'.")
     cites: str
+
+    _kind = field_validator("kind", mode="before")(lambda cls, v: _always_erc20_approval(v))
 
 
 class SafeConfigChange(BaseModel):
@@ -289,6 +297,8 @@ class ObservedPermissionChange(BaseModel):
     spender_name: str
     amount_human: str = Field(description="e.g. '1,000 USDC', or 'unlimited' for 2**256-1.")
     cites: list[str] = Field(min_length=1)
+
+    _kind = field_validator("kind", mode="before")(lambda cls, v: _always_erc20_approval(v))
 
 
 class ObservedSafeConfigChange(BaseModel):
@@ -519,6 +529,9 @@ class CompareResult(BaseModel):
     questions: list[str] = Field(default_factory=list)
     explained_slots: list[str] = Field(
         default_factory=list, description="Storage writes labelled from the source and corroborated by code."
+    )
+    ignored_labels: list[str] = Field(
+        default_factory=list, description="Addresses whose address-book label was not a plain name and was ignored."
     )
 
 

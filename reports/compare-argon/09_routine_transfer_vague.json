@@ -1,0 +1,315 @@
+{
+  "id": "09_routine_transfer_vague",
+  "description": "Routine transfer",
+  "expected_verdict": "ASK",
+  "verdict": {
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (evidence c4, b0, b1)\n- The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (evidence c4, b0, b1)",
+    "decision": "ASK",
+    "reasons": [
+      "unexplained: 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31"
+    ],
+    "floor_hits": [],
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31; The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+    "compare": {
+      "matched": [],
+      "observed_unexplained": [
+        {
+          "kind": "movement",
+          "item": "1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "severity": "notable",
+          "cites": [
+            "c4",
+            "b0",
+            "b1"
+          ],
+          "reason": "no expected movement matches (asset, route, amount)"
+        },
+        {
+          "kind": "effect",
+          "item": "The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+          "severity": "notable",
+          "cites": [
+            "c4",
+            "b0",
+            "b1"
+          ],
+          "reason": "no matched item shares its evidence"
+        }
+      ],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe increments its transaction nonce from 1 to 2 and logs successful execution."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [],
+      "nothing_else": false,
+      "questions": [
+        "What asset, amount, and recipient are intended for the 'Routine transfer'?"
+      ],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "via": "address"
+        },
+        "amount_base": 1000000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:ops wallet (plain ETH transfer, empty calldata)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": false,
+    "questions": [
+      "What asset, amount, and recipient are intended for the 'Routine transfer'?"
+    ],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "via": "address"
+        },
+        "amount_base": 1000000000000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe increments its transaction nonce from 1 to 2 and logs successful execution.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s0",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [
+      "movement 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31"
+    ],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [notable]: 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "observed, unexplained [notable]: The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+      "attribution": "real_finding (same evidence as the item above)"
+    },
+    {
+      "item": "forward vs truth (missing): movement 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "info: The Safe increments its transaction nonce from 1 to 2 and logs successful execution.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+      "kind": "movement",
+      "severity": "notable",
+      "reason": "no expected movement matches (asset, route, amount)",
+      "evidence": [
+        {
+          "id": "c4",
+          "parent": "c1",
+          "depth": 2,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "storage_context": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "value": 1000000000000000000,
+          "input": "0x",
+          "selector": null,
+          "function": null,
+          "args": [],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "b0",
+          "holder": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 1000000000000000000000,
+          "after": 999000000000000000000,
+          "delta": -1000000000000000000
+        },
+        {
+          "id": "b1",
+          "holder": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 0,
+          "after": 1000000000000000000,
+          "delta": 1000000000000000000
+        }
+      ]
+    },
+    {
+      "item": "The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+      "kind": "effect",
+      "severity": "notable",
+      "reason": "no matched item shares its evidence",
+      "evidence": [
+        {
+          "id": "c4",
+          "parent": "c1",
+          "depth": 2,
+          "kind": "CALL",
+          "from_address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "to_address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "storage_context": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "value": 1000000000000000000,
+          "input": "0x",
+          "selector": null,
+          "function": null,
+          "args": [],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "b0",
+          "holder": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 1000000000000000000000,
+          "after": 999000000000000000000,
+          "delta": -1000000000000000000
+        },
+        {
+          "id": "b1",
+          "holder": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "asset": "ETH",
+          "symbol": "ETH",
+          "decimals": 18,
+          "before": 0,
+          "after": 1000000000000000000,
+          "delta": 1000000000000000000
+        }
+      ]
+    }
+  ],
+  "bundle": {
+    "safe_tx_hash": "0x1f9507687796386d41e9bf3591f53d0e9791b9bfcfbbe488cc079c66c1564e24",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

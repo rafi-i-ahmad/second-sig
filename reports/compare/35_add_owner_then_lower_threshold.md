@@ -6,7 +6,7 @@
 
 2 critical effects in the trace that nothing in the description accounts for:
 - threshold = 1 (evidence c7, c8, s1, e2; no expected Safe config change matches)
-- Safe's signature threshold is lowered from 2 to 1. (evidence c7, c8, s1, e2; no matched item shares its evidence)
+- Reduces the Safe signature threshold from 2 to 1. (evidence c7, c8, s1, e2; no matched item shares its evidence)
 
 ## The three canonical lists
 
@@ -34,14 +34,14 @@
 
 Observed, unexplained:
 - [critical] threshold = 1 (no expected Safe config change matches; c7, c8, s1, e2)
-- [critical] Safe's signature threshold is lowered from 2 to 1. (no matched item shares its evidence; c7, c8, s1, e2)
+- [critical] Reduces the Safe signature threshold from 2 to 1. (no matched item shares its evidence; c7, c8, s1, e2)
 
 Info (bookkeeping):
-- Safe's transaction nonce increases from 1 to 2.
+- The Safe's transaction nonce increases from 1 to 2.
 
 ## Attribution
 
 - `real_finding`: observed, unexplained [critical]: threshold = 1
-- `real_finding (same evidence as the item above)`: observed, unexplained [critical]: Safe's signature threshold is lowered from 2 to 1.
+- `real_finding (same evidence as the item above)`: observed, unexplained [critical]: Reduces the Safe signature threshold from 2 to 1.
 - `real_finding`: forward vs truth (missing): config threshold = 1
-- `bookkeeping`: info: Safe's transaction nonce increases from 1 to 2.
+- `bookkeeping`: info: The Safe's transaction nonce increases from 1 to 2.

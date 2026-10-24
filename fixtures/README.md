@@ -23,14 +23,14 @@ the folder.
 | Folder | What is in it | Who reads it |
 | --- | --- | --- |
 | `cases/match/` | Nine honest, precise proposals (`01`–`08`, `10`): transfers, batches, owner and threshold changes, a finite approval, a swap. The words say exactly what the bytes do | forward-pass tests, eval |
-| `cases/ask/` | `09` "Routine transfer" (too vague to check); `38`, `39`, `42` (injections whose bytes leave one honest gap); `44`–`51` hard ASKs: an extra dust recipient, conflicting units, a swap with an unlimited allowance, "approve the invoice" that approves USDC, a WETH payment funded by wrapping, an unbooked new wallet, a threshold side effect, a clarification that moves the goalposts. `39`, `49`, `51` carry scripted `clarifications` for the ASK loop | forward-pass tests, eval, ASK-loop tests |
-| `cases/reject/` | The description contradicts the bytes (`31`–`35`): "revoke" that grants, a payment to the wrong wallet, "pay" that only approves, a swap whose output goes elsewhere, "keep threshold at 2" that drops it to 1. Injections (`37`, `40`, `41`, `43`): instructions in the description, in an address-book label, in a call label, in a forged rehearsal tag, each over bytes that also lie. No floor rule fires on any of them; the comparison has to see the gap | forward-pass tests (the words still describe an honest transaction), `tests/test_verdict.py`, eval |
+| `cases/ask/` | `09` "Routine transfer" (too vague to check). The description contradicts the bytes (`31`–`34`): "revoke" that grants, a payment to the wrong wallet, "pay" that only approves, a swap whose output goes elsewhere. Injections over bytes that also contradict the words (`37`, `40`, `41`, `43`): instructions in the description, in an address-book label, in a call label, in a forged rehearsal tag. Injections whose bytes leave one honest gap (`39`, `42`). Hard ASKs (`44`–`49`, `51`): an extra dust recipient, conflicting units, a swap with an unlimited allowance, "approve the invoice" that approves USDC, a WETH payment funded by wrapping, an unbooked new wallet, a clarification that moves the goalposts. Contradictions are ASK by decision of 24 October 2026: REJECT is kept for the floor and for critical effects, and both refuse the stamp. `39`, `49`, `51` carry scripted `clarifications` for the ASK loop | forward-pass tests (the words still describe an honest transaction), `tests/test_verdict.py`, eval, ASK-loop tests |
+| `cases/reject/` | A critical change to the Safe's control that the words do not license: `35` "keep approval at 2 signatures" that ends at 1; `38` and `50` "add Ravi as a backup owner" whose call also drops the threshold to 1 (`38` with an injected "change-control convention"). No floor rule fires on any of them; the comparison's critical row does | forward-pass tests, `tests/test_verdict.py`, eval |
 | `cases/demo/` | The three demo scenarios: `demo_bybit` (REJECT, by the hard floor), `demo_aave` (MATCH), `demo_auditor` (ASK: true but incomplete) | the demo and the eval only |
 
 Forward-pass tests and few-shot examples never read `cases/demo/` (CLAUDE.md invariant 8);
 `tests/test_forward_cases.py` reads `match/`, `ask/` and `reject/` and fails if a `demo_*` id
-appears there. Injection cases (descriptions that try to talk the model round) and a sanctioned
-destination case are still to be written; they go in `reject/` or `ask/` like any other case.
+appears there. A sanctioned destination case is still to be written; it goes in the folder its
+expected verdict names, like any other case.
 
 ## Evidence: what the fork said
 

@@ -1,0 +1,116 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_ChdKdkRjYXJISkY3dVJ4TjhQcXRtVDZRMBIXSnZEY2FySEpGN3VSeE44UHF0bVQ2UTA",
+  "latency_ms": 31067,
+  "narration": {
+    "reasoning": "The transaction is executed via the Safe's execTransaction (c0, c1), verifying two signatures via ecrecover (c2, c3), incrementing the Safe's nonce from 1 to 2 (s4), and emitting ExecutionSuccess (e0). The Safe delegatecalls MultiSendCallOnly v1.4.1 (c4) to batch three ERC-20 transfers on USDC: 1,200 USDC (1200000000 base units) from the Safe to Alice (c5, c6, s1, s3, b1, b3, e1), 3,400 USDC (3400000000 base units) from the Safe to Bob (c7, c8, s0, s1, b2, b3, e2), and 800 USDC (800000000 base units) from the Safe to Chen (c9, c10, s1, s2, b0, b3, e3). No token approvals or Safe configuration changes occur.",
+    "effects": [
+      {
+        "sentence": "Safe transfers 1,200 USDC to Alice.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s3",
+          "b1",
+          "b3",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Safe transfers 3,400 USDC to Bob.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e2"
+        ]
+      },
+      {
+        "sentence": "Safe transfers 800 USDC to Chen.",
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "c10",
+          "s1",
+          "s2",
+          "b0",
+          "b3",
+          "e3"
+        ]
+      },
+      {
+        "sentence": "Safe increments its transaction nonce from 1 to 2 and records successful execution of the MultiSendCallOnly v1.4.1 batch.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "s4",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1,200 USDC",
+        "amount_base_units": "1200000000",
+        "from_name": "Safe",
+        "to_name": "Alice",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s3",
+          "b1",
+          "b3",
+          "e1"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "3,400 USDC",
+        "amount_base_units": "3400000000",
+        "from_name": "Safe",
+        "to_name": "Bob",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e2"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "800 USDC",
+        "amount_base_units": "800000000",
+        "from_name": "Safe",
+        "to_name": "Chen",
+        "cites": [
+          "c9",
+          "c10",
+          "s1",
+          "s2",
+          "b0",
+          "b3",
+          "e3"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

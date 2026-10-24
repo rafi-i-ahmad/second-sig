@@ -27,8 +27,8 @@ Every effect in the trace is accounted for by the description, and everything th
 | threshold = 3 | exact |
 
 Info (bookkeeping):
-- The Safe's transaction nonce increases from 1 to 2.
+- The Safe incremented its nonce from 1 to 2.
 
 ## Attribution
 
-- `bookkeeping`: info: The Safe's transaction nonce increases from 1 to 2.
+- `bookkeeping`: info: The Safe incremented its nonce from 1 to 2.

@@ -1,0 +1,81 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_Chd2dWZjYXJEM0xMV3lrZFVQbi11bnlRWRIXdnVmY2FyRDNMTFd5a2RVUG4tdW55UVk",
+  "latency_ms": 7957,
+  "narration": {
+    "reasoning": "The relayer (c0) calls execTransaction on the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47), which delegates to its singleton (c1). The Safe delegates to MultiSendCallOnly (c4), which performs two ERC20 transfer calls on the USDC contract: 2,500 USDC to Dana (0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315) and 200 USDC to Ravi (0x2C81904f370e7f6490aEa328CA847AEFdc3853D3). The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe increments its transaction nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s3"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 2,500 USDC to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 200 USDC to Ravi.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "200 USDC",
+        "amount_base_units": "200000000",
+        "from_name": "Safe",
+        "to_name": "Ravi",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

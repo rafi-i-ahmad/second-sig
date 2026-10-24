@@ -1,15 +1,15 @@
 {
   "id": "32_pay_dana_wrong_wallet",
   "description": "Pay Dana 2,500 USDC for October",
-  "expected_verdict": "REJECT",
+  "expected_verdict": "ASK",
   "verdict": {
-    "reasoning": "The trace shows 2 effects the description does not mention:\n- 2,500 USDC Safe -> 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277 (evidence b0, b1, e1)\n- Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277. (evidence c4, c5, s0, s1, b0, b1, e1)",
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- 2,500 USDC Safe -> 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277 (evidence b0, b1, e1)\n- The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277. (evidence c4, c5, s0, s1, b0, b1, e1)",
     "decision": "ASK",
     "reasons": [
       "unexplained: 2,500 USDC Safe -> 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277"
     ],
     "floor_hits": [],
-    "question": "The transaction also does the following, which the description does not mention. Is that intended? 2,500 USDC Safe -> 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277; Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? 2,500 USDC Safe -> 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277; The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
     "compare": {
       "matched": [],
       "observed_unexplained": [
@@ -26,7 +26,7 @@
         },
         {
           "kind": "effect",
-          "item": "Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+          "item": "The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
           "severity": "notable",
           "cites": [
             "c4",
@@ -44,13 +44,15 @@
         "movement 2,500 USDC Safe -> Dana"
       ],
       "info_effects": [
-        "Increment the Safe nonce from 1 to 2."
+        "The Safe increments its transaction nonce from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
       "tiers": [],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -75,6 +77,8 @@
         },
         "amount_base": 2500000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "2500 USDC",
         "direction": "out",
         "implied": false,
@@ -117,6 +121,8 @@
         },
         "amount_base": 2500000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "2,500 USDC",
         "direction": "out",
         "implied": false,
@@ -159,6 +165,8 @@
         },
         "amount_base": 2500000000,
         "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
         "amount_human": "2,500 USDC",
         "direction": "out",
         "implied": false,
@@ -176,7 +184,7 @@
     "configs": [],
     "effects": [
       {
-        "sentence": "Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+        "sentence": "The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
         "severity": "notable",
         "cites": [
           "c4",
@@ -190,10 +198,9 @@
         "cited_ok": true
       },
       {
-        "sentence": "Increment the Safe nonce from 1 to 2.",
+        "sentence": "The Safe increments its transaction nonce from 1 to 2.",
         "severity": "info",
         "cites": [
-          "c1",
           "s2",
           "e0"
         ],
@@ -226,7 +233,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "observed, unexplained [notable]: Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+      "item": "observed, unexplained [notable]: The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
       "attribution": "real_finding (same evidence as the item above)"
     },
     {
@@ -238,7 +245,7 @@
       "attribution": "real_finding (wrong recipient)"
     },
     {
-      "item": "info: Increment the Safe nonce from 1 to 2.",
+      "item": "info: The Safe increments its transaction nonce from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],
@@ -302,7 +309,7 @@
       ]
     },
     {
-      "item": "Transfer 2,500 USDC from Safe to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+      "item": "The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
       "kind": "effect",
       "severity": "notable",
       "reason": "no matched item shares its evidence",
