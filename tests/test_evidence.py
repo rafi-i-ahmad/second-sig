@@ -25,8 +25,8 @@ MAX = "0x" + "ff" * 32
 
 
 def load(case: str) -> tuple[Rehearsal, EvidenceBundle]:
-    r = Rehearsal.model_validate_json((BUNDLES / f"{case}.rehearsal.json").read_text())
-    b = EvidenceBundle.model_validate_json((BUNDLES / f"{case}.bundle.json").read_text())
+    r = Rehearsal.model_validate_json((BUNDLES / f"{case}.rehearsal.json").read_text(encoding="utf-8"))
+    b = EvidenceBundle.model_validate_json((BUNDLES / f"{case}.bundle.json").read_text(encoding="utf-8"))
     return r, b
 
 

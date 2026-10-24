@@ -1,12 +1,17 @@
 # Working notes
 
-Operational facts for the fork and the test Safe. Updated 23 October 2026.
+Operational facts for the fork and the test Safe. Updated 24 October 2026.
 
 ## Schema changes (for Daniel)
 
 - 23 October, Rafi: `judge/schemas.py` `Verdict` now has `reasoning: str` as its first field
   (required), and `Decision.APPROVE` is renamed `Decision.MATCH`, to match the build spec and the
   UI. `EvidenceBundle` and `Stamp` are unchanged.
+- 24 October, Daniel, accepted by Rafi: `EvidenceBundle` filled in (`safe_tx`, `execution_success`,
+  `call_tree`, `storage_diff`, `balance_diff`, `events`, `sources`, `floor_hits`), with citation ids
+  `c*`/`s*`/`b*`/`e*` and `bundle.entry(id)` for `checker.py`. New supporting models: `SafeTx`,
+  `DecodedArg`, `Call`, `SlotWrite`, `BalanceChange`, `Event`, `Source`, `FloorRule`, `FloorHit`.
+  `Stamp` unchanged; its `judgeVersion` is the bytes32 hex of `keccak256("second-sig/v1")`.
 
 ## Fork
 
@@ -133,8 +138,10 @@ On the fork, through the real Safe with two owner signatures:
 | --- | --- |
 | 01 "Send 5 ETH to the ops wallet" | `ExecutionSuccess`, 5 ETH moved, nonce 0 to 1; call tree is proxy, delegatecall to singleton, two ecrecover staticcalls, one CALL with 5 ETH and empty data. Rerun after the refactor at nonce 1, same result. |
 
-Not yet run on the fork: cases 02 to 10, the three demo scenarios. Nothing has been run through the
-guard, which is not deployed.
+Rehearsed with `judge.evidence.fork` (24 October, Daniel): 01, Bybit, Aave and auditor, bundles in
+`fixtures/bundles/`. Floor hits: Bybit trips rules 1, 2 and 3; the other three trip none. Not yet
+rehearsed: cases 02 to 10. The guard is set on the fork, but no stamped transaction has been
+executed through it yet (only in the Foundry tests); `judge/stamp.py` is still a stub.
 
 Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
 01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss

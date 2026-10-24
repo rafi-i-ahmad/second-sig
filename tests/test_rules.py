@@ -70,7 +70,7 @@ def test_slot_constants_match_safe_source() -> None:
 
 
 def test_bybit_trips_rules_1_2_3() -> None:
-    b = EvidenceBundle.model_validate_json(EXAMPLE.read_text()).model_copy(update={"floor_hits": []})
+    b = EvidenceBundle.model_validate_json(EXAMPLE.read_text(encoding="utf-8")).model_copy(update={"floor_hits": []})
     hits = rules.evaluate(b)
     assert sorted((h.rule, tuple(h.cites)) for h in hits) == [
         ("delegatecall_not_allowlisted", ("c4",)),

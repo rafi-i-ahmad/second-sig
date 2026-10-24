@@ -1,4 +1,4 @@
-"""EvidenceBundle: the example bundle validates, and the validator catches broken citations."""
+"""Schemas: the example bundle validates, the validator catches broken citations, Stamp and Verdict hold their shape."""
 
 from __future__ import annotations
 
@@ -8,14 +8,14 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from judge.schemas import EvidenceBundle, SlotWrite
+from judge.schemas import Decision, EvidenceBundle, SlotWrite, Stamp, Verdict
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "fixtures" / "examples" / "bybit.bundle.json"
 
 
 @pytest.fixture
 def raw() -> dict:
-    return json.loads(EXAMPLE.read_text())
+    return json.loads(EXAMPLE.read_text(encoding="utf-8"))
 
 
 def test_bybit_example_validates(raw: dict) -> None:
@@ -65,3 +65,14 @@ def test_event_must_point_at_a_call(raw: dict) -> None:
     raw["events"][0]["call_id"] = "c99"
     with pytest.raises(ValidationError, match="unknown call"):
         EvidenceBundle.model_validate(raw)
+
+
+def test_stamp_roundtrip() -> None:
+    s = Stamp(safeTxHash="0x" + "00" * 32, forkBlock=21895238, judgeVersion="0x" + "cf" * 32)
+    assert Stamp.model_validate(s.model_dump()) == s
+
+
+def test_verdict_decision_enum() -> None:
+    v = Verdict(reasoning="delegatecall to an unverified contract", decision=Decision.REJECT)
+    assert v.decision == "REJECT"
+    assert list(Verdict.model_fields)[0] == "reasoning"
