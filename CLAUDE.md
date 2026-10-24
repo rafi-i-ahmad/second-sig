@@ -75,6 +75,9 @@ cli/
   secondsig.py        judge CASE [--replay] [--chain]; answer CASE TEXT --owner N; demo bybit|aave|auditor
                       [--live]; execute CASE; reset. (propose, sign, override, describe: not built)
   view.py             three-panel terminal view (rich): the words, the bytes, the verdict
+web/                  the demo page. server.py: FastAPI over judge/pipeline.py (judge(..., emit=) streams the stages
+                      as SSE), execute through the guard, reset by evm_snapshot/evm_revert. static/: plain HTML/CSS/JS,
+                      no build, no CDN (works offline). Replay by default; a floor REJECT shows recorded forms as reference
 sepolia/              watcher.py, attacker.py  (stubs)
 fixtures/
   build.py            generates every case JSON; edit the Python, not the JSON
@@ -135,6 +138,7 @@ uv run secondsig demo bybit                      # REJECT; the guard reverts the
 uv run secondsig judge fixtures/cases/demo/demo_auditor.json --replay [--chain]
 uv run secondsig answer fixtures/cases/demo/demo_auditor.json "Yes, the auditor invoices monthly" --owner 1 [--chain]
 uv run secondsig reset                           # anvil_reset + Safe + guard; clears logs/proposals/
+uv run uvicorn web.server:app --port 8000        # the demo page at http://localhost:8000 (anvil must be up)
 ```
 
 The demos execute for real on the fork, so a MATCH advances the Safe's nonce and the recorded bundles (nonce 1) stop matching the chain. `secondsig reset` puts it back. Not built: `propose`, `sign`, `override`, `describe`; `eval` points at `scripts/compare_benign.py`. `anvil --load-state fixtures/anvil-state.json` needs a dump that doesn't exist yet.

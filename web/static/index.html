@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second Sig</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand"><span class="logo">S</span>Second Sig</div>
+      <span class="env-pill">Mainnet fork</span>
+      <div class="nav-spacer"></div>
+      <label class="switch" title="Off: recorded model outputs, no model call">
+        <input type="checkbox" id="live"><span class="track"></span><span id="mode-label">Replay</span>
+      </label>
+      <button class="btn" id="reset">Reset fork</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <h1>Treasury vault</h1>
+      <nav class="segmented" id="tabs"></nav>
+    </div>
+
+    <section class="summary">
+      <div class="stat"><div class="stat-label">ETH</div><div class="stat-value" id="bal-eth">—</div></div>
+      <div class="stat"><div class="stat-label">USDC</div><div class="stat-value" id="bal-usdc">—</div></div>
+      <div class="stat"><div class="stat-label">aUSDC</div><div class="stat-value" id="bal-ausdc">—</div></div>
+      <div class="stat stat-wide">
+        <div class="stat-label">Safe v1.4.1 · 2 of 3</div>
+        <div class="stat-meta"><span id="safe-addr" class="mono">—</span><span class="pill success" id="guard-pill">Guard active</span></div>
+      </div>
+    </section>
+
+    <section class="panel proposal">
+      <div class="proposal-main">
+        <div class="eyebrow">Pending transaction</div>
+        <div class="description" id="description">—</div>
+      </div>
+      <dl class="proposal-meta">
+        <dt>Calls</dt><dd class="mono" id="bytes-summary">—</dd>
+        <dt>Signatures</dt><dd id="signers"></dd>
+      </dl>
+      <button class="btn primary" id="judge">Run check</button>
+    </section>
+
+    <div class="stepper" id="stepper"></div>
+
+    <section class="cards">
+      <article class="panel card">
+        <header class="card-head"><h2>Stated intent</h2></header>
+        <div class="card-body" id="told"><div class="empty">—</div></div>
+      </article>
+
+      <article class="panel card">
+        <header class="card-head"><h2>Simulated effects</h2></header>
+        <div class="card-body" id="does"><div class="empty">—</div></div>
+        <div class="floor" id="floor"></div>
+      </article>
+
+      <article class="panel card">
+        <header class="card-head"><h2>Decision</h2></header>
+        <div class="card-body" id="verdict"><div class="empty">—</div></div>
+        <dl class="stamp" id="stamp"></dl>
+        <div id="answer-box" class="answer hidden">
+          <div class="answer-row">
+            <select id="answer-owner"></select>
+            <input id="answer-text" type="text" placeholder="Reply to the question">
+            <button class="btn" id="answer-send">Send</button>
+          </div>
+        </div>
+        <button class="btn primary wide" id="execute" disabled>Execute</button>
+        <div class="result" id="result"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

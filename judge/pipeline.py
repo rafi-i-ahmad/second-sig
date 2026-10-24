@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from eth_utils import to_checksum_address
 from pydantic import BaseModel, Field
@@ -209,21 +209,27 @@ def rehearse(case: dict[str, Any], w3: Web3) -> EvidenceBundle:
 
 def judge(
     proposal: Proposal, bundle: EvidenceBundle, *, replay: bool, backward_form: Narration | None = None,
-    escalate_live: bool = True,
+    escalate_live: bool = True, emit: Callable[[str, Any], None] | None = None,
 ) -> JudgeResult:
     """One pass through the table. ``replay`` uses recorded forms and makes no model call for a
-    description that has one; an amended description always needs one forward call."""
+    description that has one; an amended description always needs one forward call. ``emit(event,
+    payload)``, if given, hears each stage as it finishes (the web demo streams these); it observes
+    and never changes the outcome."""
+    emit = emit or (lambda event, payload: None)
     calls: list[str] = []
     description = proposal.effective_description()
     bundle = bundle.model_copy(update={"description": description})
 
     # 1. the floor, before any model
+    emit("stage", "floor")
     v = verdicting.decide(bundle)
+    emit("floor", v.floor_hits)
     if v.decision == Decision.REJECT and v.floor_hits:
         return _finish(proposal, bundle, None, None, v, calls, escalate_live and not replay,
                        recorded_question(proposal.id) if replay and not proposal.amendments else None)
 
     # 2. forward (words) and backward (bytes), separate inputs
+    emit("stage", "forward")
     fwd = None
     key = _sha(description)
     if key in proposal.forward_forms:
@@ -237,19 +243,24 @@ def judge(
         if not proposal.amendments:
             _record(proposal.id, "forward", forward.DEFAULT_MODEL, forward.DEFAULT_THINKING, iid, ms,
                     "expected_effects", fwd)
+    emit("forward", fwd)
+    emit("stage", "backward")
     bwd = backward_form or (recorded_backward(proposal.id) if replay else None)
     if bwd is None:
         bwd, iid, ms = backward.run(bundle, proposal.address_book, proposal.safe)
         calls.append(f"backward {backward.DEFAULT_MODEL} {ms} ms {iid}")
         _record(proposal.id, "backward", backward.DEFAULT_MODEL, backward.DEFAULT_THINKING, iid, ms, "narration", bwd)
+    emit("backward", bwd)
 
     # 3. the source check: code labels, the source reader explains the rest, code corroborates
+    emit("stage", "source")
     sc = source_check(bundle, proposal.id, replay=replay)
     bundle = sc.bundle
     if sc.call:
         calls.append(sc.call)
 
     # 4-5. canon, compare, decide: code
+    emit("stage", "verdict")
     v = verdicting.decide(bundle, expected=fwd, observed=bwd, address_book=proposal.address_book,
                           raised=sc.raised, explained_slots=sc.explained)
     res = _finish(proposal, bundle, fwd, bwd, v, calls, escalate_live and not replay,
@@ -289,7 +300,8 @@ def _finish(proposal, bundle, fwd, bwd, v: Verdict, calls, run_escalate: bool,
 
 
 def answer(proposal: Proposal, owner: str, text: str, bundle: EvidenceBundle, w3: Web3 | None, *,
-           backward_form: Narration | None, replay: bool) -> JudgeResult:
+           backward_form: Narration | None, replay: bool,
+           emit: Callable[[str, Any], None] | None = None) -> JudgeResult:
     """An owner answers the question. Their words become an amendment; the judge runs again on the
     same bytes. Only a current owner may amend; the check is on-chain when a fork is available."""
     owner = to_checksum_address(owner)
@@ -298,7 +310,7 @@ def answer(proposal: Proposal, owner: str, text: str, bundle: EvidenceBundle, w3
         if not safe.functions.isOwner(owner).call():
             raise PermissionError(f"{owner} is not an owner of the Safe; only owners may answer")
     proposal.amendments.append(Amendment(owner=owner, text=text.strip(), at=datetime.now(timezone.utc).isoformat()))
-    res = judge(proposal, bundle, replay=replay, backward_form=backward_form)
+    res = judge(proposal, bundle, replay=replay, backward_form=backward_form, emit=emit)
     proposal.save()
     return res
 
