@@ -4,7 +4,7 @@ NOTE! Do NOT get too hung up on the spec it is okay to deviate from it somewhat.
 
 An extra signer for Safe multisigs. It rehearses a proposed transaction on a fork, compares what the bytes actually do with what the description says, and signs a stamp only on a match. A guard contract on the Safe refuses every transaction that has no valid stamp for its exact hash, unless every owner has approved an override and the delay has passed.
 
-Hackathon build: two people, about 2.5 days, Encode London. `Second Sig build spec v2.md` (plus the UI and demo docs next to it) is a rough guide, not the source of truth: where it disagrees with this file, this file wins. This file holds what an agent working in the repo must not get wrong. `NOTES.md` holds the live operational state (fork, test Safe, what has run, schema changes); read it before touching the fork.
+Hackathon build: two people, about 2.5 days, Encode London. `build-spec-v2.md` (plus the UI and demo docs next to it) is a rough guide, not the source of truth: where it disagrees with this file, this file wins. This file holds what an agent working in the repo must not get wrong. `NOTES.md` holds the live operational state (fork, test Safe, what has run, schema changes); read it before touching the fork.
 
 ## Who owns what
 
