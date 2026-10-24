@@ -327,7 +327,21 @@ class ProbeHypothesis(BaseModel):
 
 
 class HumanQuestion(BaseModel):
-    """An item the judge could not resolve and must surface to a human."""
+    """Escalation (jobs/escalate.py): the question a signer should be asked when the table says
+    ASK. Advisory text for humans; it never feeds back into the decision (invariant 1)."""
+
+    reasoning: str = Field(description="Work through what the words promise against what the trace shows.")
+    gap_kind: Literal["omission", "contradiction", "vague_description", "none"] = Field(
+        description="omission: the words leave out something the bytes do. contradiction: the words say "
+        "one thing and the bytes do a different thing of the same kind. vague_description: the words fix "
+        "nothing to check against. none: no gap."
+    )
+    would_an_honest_proposer_write_this: Literal["yes", "unlikely", "no"] = Field(
+        description="Could someone acting in good faith have written this description for these bytes?"
+    )
+    question: str = Field(description="One or two plain sentences a treasurer can answer, naming amounts and parties.")
+    what_to_check: list[str] = Field(default_factory=list, description="Concrete things the signer should verify first.")
+    confidence: Literal["high", "medium", "low"]
 
 
 # --------------------------------------------------------------------------- canonical form (layer 4)

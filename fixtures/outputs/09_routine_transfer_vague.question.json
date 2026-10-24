@@ -1,0 +1,18 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "medium",
+  "interaction_id": "v1_ChdQWkhjYXYydktxS0l2ZElQbzl6UTJBURIXUFpIY2F2MnZLcUtJdmRJUG85elEyQVE",
+  "latency_ms": 8935,
+  "verdict": "ASK",
+  "question": {
+    "reasoning": "The proposer described the transaction merely as a 'Routine transfer', specifying no asset, amount, or recipient. The trace shows a transfer of 1 ETH from the Safe to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. Because the description fixes no details that can be checked against the trace, this is a vague description.",
+    "gap_kind": "vague_description",
+    "would_an_honest_proposer_write_this": "yes",
+    "question": "Did you intend for this routine transfer to send 1 ETH from the Safe to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31?",
+    "what_to_check": [
+      "Verify that 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 is the intended recipient address.",
+      "Confirm that 1 ETH is the exact amount and asset expected for this transfer."
+    ],
+    "confidence": "high"
+  }
+}

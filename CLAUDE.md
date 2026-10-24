@@ -36,7 +36,9 @@ judge/
                       trace.py, decode.py, slots.py feed it; rules.py is the hard floor
   labeller.py         layer 2: spotlight() wraps untrusted text in per-call random tags
   model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call
-  jobs/               layer 3: forward.py, backward.py (work); leftovers, probe, escalate (stubs)
+  jobs/               layer 3: forward.py, backward.py, escalate.py (work); leftovers, probe (stubs).
+                      escalate drafts the signer's question for an ASK from the saved comparison and
+                      classifies the gap (omission / contradiction / vague); advisory, never a decision
   checker.py          layer 4: citation checks. Backward ids must resolve via bundle.entry(); forward phrases
                       must be in the description. Bad citations are marked, never dropped (fail closed)
   canon.py            layer 4: Resolver + from_forward()/from_backward() -> CanonEffects. Identity is the
@@ -108,7 +110,8 @@ uv run python contracts/setup.py [--guard]      # deploy or find the test Safe; 
 uv run python -m judge.evidence.fork <case.json> [--out fixtures/bundles]   # rehearse, write the bundle
 uv run python -m judge.verdict fixtures/bundles/<id>.bundle.json           # decision table on a saved bundle
 uv run python scripts/compare_benign.py [--live] [--include-reject]        # end-to-end verdicts by replay + reports
-uv run python -m judge.run_fixture fixtures/cases/01_send_eth_ops.json [--save-trace]
+uv run python -m judge.run_fixture fixtures/cases/match/01_send_eth_ops.json [--save-trace]
+uv run python scripts/ask_questions.py <id>...     # escalation step on saved reports -> reports/compare/QUESTIONS.md
 uv run python -m judge.stages.judge <case.json>... [--dump-prompt out.txt --no-call]
 uv sync --group investigate && uv run python scripts/investigate.py <id> [--slots | --cites s0 s3 | --residuals r.json]   # default: reports/compare/<id>.json
 ```
