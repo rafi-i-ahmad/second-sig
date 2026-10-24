@@ -2,12 +2,16 @@
 
     rehearse ─▶ floor ─▶ forward ‖ backward ─▶ canon/compare ─▶ verdict ─▶ escalate ─▶ stamp ─▶ attest ─▶ execute
                  │                                                  │                      (MATCH only)
-                 └── REJECT ────────────────────────────────────────┘
+                 └── REJECT (forward still runs, for display) ──────┘
+
+A floor hit decides REJECT before any model (invariant 2). The forward pass still reads the words
+so the signer sees what was claimed next to what the floor found; its form never reaches the table.
 
 A Proposal is the description plus any amendments owners have added in answer to an ASK. The
 effective description is the original followed by each amendment, attributed to the owner who
 wrote it. An amendment is untrusted text like the description itself: it reaches the forward
-pass through the spotlighter and nothing else (invariant 7). Owners never flip a verdict; they
+pass through the spotlighter and nothing else (invariant 7), in its own tags after the
+description, with the owner's address outside them. Owners never flip a verdict; they
 change the words and the judge runs again on the same bytes (invariant 1). The bytes never
 change, so the rehearsal and the backward pass are reused and only the forward pass re-runs.
 
@@ -225,24 +229,21 @@ def judge(
     v = verdicting.decide(bundle)
     emit("floor", v.floor_hits)
     if v.decision == Decision.REJECT and v.floor_hits:
-        return _finish(proposal, bundle, None, None, v, calls, escalate_live and not replay,
-                       recorded_question(proposal.id) if replay and not proposal.amendments else None)
+        # The verdict is final here. The words are still read, for the signer, never for the table.
+        fwd = None
+        if description.strip():
+            emit("stage", "forward")
+            try:
+                fwd = _forward(proposal, description, replay, calls)
+                emit("forward", fwd)
+            except Exception as exc:  # noqa: BLE001 - display only; the floor's REJECT stands
+                calls.append(f"forward unavailable: {type(exc).__name__}")
+        return _finish(proposal, bundle, fwd, None, v, calls, escalate_live and not replay,
+                       recorded_question(proposal.id) if replay and not proposal.amendments else None, emit)
 
     # 2. forward (words) and backward (bytes), separate inputs
     emit("stage", "forward")
-    fwd = None
-    key = _sha(description)
-    if key in proposal.forward_forms:
-        fwd = ExpectedEffects.model_validate(proposal.forward_forms[key])
-    elif replay and not proposal.amendments:
-        fwd = recorded_forward(proposal.id)
-    if fwd is None:
-        fwd, iid, ms = forward.run(description, proposal.address_book, proposal.safe)
-        calls.append(f"forward {forward.DEFAULT_MODEL} {ms} ms {iid}")
-        proposal.forward_forms[key] = fwd.model_dump(mode="json")
-        if not proposal.amendments:
-            _record(proposal.id, "forward", forward.DEFAULT_MODEL, forward.DEFAULT_THINKING, iid, ms,
-                    "expected_effects", fwd)
+    fwd = _forward(proposal, description, replay, calls)
     emit("forward", fwd)
     emit("stage", "backward")
     bwd = backward_form or (recorded_backward(proposal.id) if replay else None)
@@ -264,14 +265,35 @@ def judge(
     v = verdicting.decide(bundle, expected=fwd, observed=bwd, address_book=proposal.address_book,
                           raised=sc.raised, explained_slots=sc.explained)
     res = _finish(proposal, bundle, fwd, bwd, v, calls, escalate_live and not replay,
-                  recorded_question(proposal.id) if replay and not proposal.amendments else None)
+                  recorded_question(proposal.id) if replay and not proposal.amendments else None, emit)
     res.source_check, res.source_raised, res.source_rejected, res.source_tokens = (
         sc.explained, sc.raised, sc.rejected, sc.tokens)
     return res
 
 
+def _forward(proposal: Proposal, description: str, replay: bool, calls: list[str]) -> ExpectedEffects:
+    """The forward form for this description: the proposal's stored form, the recorded one on replay,
+    else one forward call (stored, and recorded for replay when the description is the original)."""
+    key = _sha(description)
+    if key in proposal.forward_forms:
+        return ExpectedEffects.model_validate(proposal.forward_forms[key])
+    if replay and not proposal.amendments and (fwd := recorded_forward(proposal.id)) is not None:
+        return fwd
+    # The answers go in their own tags, attributed by code: joined into the description, an
+    # "Owner 0x…: yes" line reads like reviewer chatter and the forward pass raises a question on it.
+    fwd, iid, ms = forward.run(proposal.description, proposal.address_book, proposal.safe,
+                               amendments=[(a.owner, a.text) for a in proposal.amendments])
+    calls.append(f"forward {forward.DEFAULT_MODEL} {ms} ms {iid}")
+    proposal.forward_forms[key] = fwd.model_dump(mode="json")
+    if not proposal.amendments:
+        _record(proposal.id, "forward", forward.DEFAULT_MODEL, forward.DEFAULT_THINKING, iid, ms,
+                "expected_effects", fwd)
+    return fwd
+
+
 def _finish(proposal, bundle, fwd, bwd, v: Verdict, calls, run_escalate: bool,
-            recorded: HumanQuestion | None = None) -> JudgeResult:
+            recorded: HumanQuestion | None = None,
+            emit: Callable[[str, Any], None] = lambda event, payload: None) -> JudgeResult:
     res = JudgeResult(proposal=proposal, bundle=bundle, forward=fwd, backward=bwd, verdict=v, calls=calls)
     if v.decision == Decision.MATCH:
         # 7. the stamp: code, the judge key, nothing else
@@ -286,6 +308,7 @@ def _finish(proposal, bundle, fwd, bwd, v: Verdict, calls, run_escalate: bool,
             r = Resolver(bundle, proposal.address_book)
             exp = canon.from_forward(fwd, bundle.description, r) if fwd else None
             obs = canon.from_backward(bwd, r) if bwd else None
+            emit("stage", "escalate")
             try:
                 q, iid, ms = escalate.run(bundle.description, proposal.address_book, proposal.safe, v, exp, obs)
                 res.question = q

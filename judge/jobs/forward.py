@@ -67,13 +67,18 @@ Do not invent names or addresses that are not in the address book. Every item mu
 the phrase it follows from. Reply with JSON matching the schema and nothing else."""
 
 
-def build_user_turn(description: str, address_book: dict[str, str], safe: dict[str, Any]) -> str:
-    """The user turn: trusted context first, then the spotlighted address book and description."""
+def build_user_turn(
+    description: str, address_book: dict[str, str], safe: dict[str, Any],
+    amendments: list[tuple[str, str]] | None = None,
+) -> str:
+    """The user turn: trusted context first, then the spotlighted address book and description,
+    then each owner's answer to an ASK in its own tags. The owner address is set by our tooling and
+    sits outside the tags; the answer's words are untrusted like the description."""
     book, _ = plain_address_book(address_book)
     names = spotlight(json.dumps(book, indent=2))
     lit = spotlight(description)
     context = {"safe": {k: v for k, v in safe.items() if k != "note"}}
-    return (
+    turn = (
         "Trusted context from our tooling:\n"
         f"{json.dumps(context, indent=2)}\n\n"
         "The address book maps names to addresses; the names were typed by whoever keeps it. "
@@ -81,8 +86,19 @@ def build_user_turn(description: str, address_book: dict[str, str], safe: dict[s
         f"{names.text}\n\n"
         f"{lit.preamble('proposal description')}\n\n"
         f"{lit.text}\n\n"
-        "Produce the expected effects."
     )
+    if amendments:
+        turn += (
+            "Trusted context from our tooling: the signers were asked a question about this proposal, and Safe "
+            "owners answered. Our tooling attributes each answer below to the owner who gave it. The answers are "
+            "part of the description: read the description and the answers together, in order, as one statement "
+            "of what is licensed. An answer adds effects or corrects ones stated before it; it replaces nothing it "
+            "does not name. An answer that only agrees, with no asset, amount or party, names no effect.\n\n"
+        )
+        for i, (owner, text) in enumerate(amendments, 1):
+            ans = spotlight(text)
+            turn += f"Answer {i}, from Safe owner {owner}. {ans.preamble('answer')}\n\n{ans.text}\n\n"
+    return turn + "Produce the expected effects."
 
 
 def run(
@@ -92,9 +108,11 @@ def run(
     *,
     model: str = DEFAULT_MODEL,
     thinking: m.ThinkingLevel = DEFAULT_THINKING,
+    amendments: list[tuple[str, str]] | None = None,
 ) -> tuple[ExpectedEffects, str, int]:
-    """One forward-pass call. Returns (form, interaction id, latency in ms)."""
-    user = build_user_turn(description, address_book, safe)
+    """One forward-pass call. ``amendments`` are (owner address, answer) pairs, in order.
+    Returns (form, interaction id, latency in ms)."""
+    user = build_user_turn(description, address_book, safe, amendments)
     t0 = time.perf_counter()
     form, interaction_id = m.complete(model, SYSTEM, user, ExpectedEffects, thinking)
     return form, interaction_id, int((time.perf_counter() - t0) * 1000)

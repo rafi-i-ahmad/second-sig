@@ -56,9 +56,39 @@ export function renderStepper(active, finished = false) {
 }
 
 export function onStage(name) {
+  clearBusy();
+  if (BUSY[name]) setBusy(BUSY[name]);
   if (name === "done") { renderStepper(null, true); return; }
   const i = STEPS.findIndex(([k]) => k === name);
   if (i >= 0) { reached = i; renderStepper(name); }
+}
+
+// --------------------------------------------------------------------------- model running
+
+// The stages that may call a model, and the card each one fills. With replay no model runs, and
+// the indicator says so (invariant 11: never present a recorded form as a live call).
+const BUSY = { forward: "told", backward: "does", source: "does", escalate: "verdict" };
+let live = false;
+
+function setBusy(cardBodyId) {
+  const head = $(cardBodyId)?.closest(".card")?.querySelector(".card-head");
+  if (!head) return;
+  const dots = el("span", { class: "dots" }, el("i"), el("i"), el("i"));
+  head.querySelector("h2").after(el("span", { class: "busy" }, dots, live ? "Model running" : "Replaying"));
+}
+
+export function clearBusy(cardBodyId) {
+  const root = cardBodyId ? $(cardBodyId)?.closest(".card") : document;
+  root?.querySelectorAll(".card-head .busy").forEach((b) => b.remove());
+}
+
+// A card still waiting when the run ends got no form (the floor decided, or there were no words)
+function settle() {
+  clearBusy();
+  for (const id of ["told", "does", "verdict"]) {
+    const body = $(id);
+    if (body && body.querySelector(":scope > .skeleton")) fill(body, el("div", { class: "empty" }, "—"));
+  }
 }
 
 // --------------------------------------------------------------------------- the stream
@@ -69,17 +99,19 @@ let source = null;
 export function listen(jobId, handlers) {
   if (source) source.close();
   source = new EventSource(`/api/jobs/${jobId}/events`);
+  source.addEventListener("mode", (ev) => { live = JSON.parse(ev.data).live; });
   for (const [name, fn] of Object.entries(handlers)) {
     if (name === "end") continue;
     source.addEventListener(name, (ev) => fn(JSON.parse(ev.data)));
   }
   source.addEventListener("end", () => {
     source.close(); source = null;
+    settle();
     if (handlers.end) handlers.end();
   });
 }
 
-export function stopListening() { if (source) { source.close(); source = null; } }
+export function stopListening() { if (source) { source.close(); source = null; } clearBusy(); }
 
 // --------------------------------------------------------------------------- cards
 
@@ -92,7 +124,7 @@ export function renderFloor(hits) {
     el("div", { class: "floor-title" }, el("span", { class: "pill danger" }, `${hits.length} policy violations`)),
     ...hits.map((h) => el("div", { class: "hit" }, tidy(h.reason))),
   );
-  fill($("told"), el("div", { class: "empty" }, "—"));
+  // The backward pass does not run after a floor hit; the forward pass still reads the words
   fill($("does"), el("div", { class: "empty" }, "—"));
 }
 
@@ -103,6 +135,7 @@ export function renderForward(f) {
   // A question from reading the words makes the decision ASK even when every effect matches
   const extra = f.questions.map((q) => el("div", { class: "row" }, dot("notable"),
     el("span", { class: "text" }, el("span", { class: "detail" }, "Open question in the words"), tidy(q))));
+  clearBusy("told");
   fill($("told"), rows, extra);
 }
 
@@ -117,6 +150,7 @@ export function renderBackward(b) {
         toggle),
       raw);
   });
+  clearBusy("does");
   fill($("does"), rows);
 }
 
@@ -153,6 +187,7 @@ export function renderVerdict(v) {
     parts.push(el("div", { class: "source" }, `${s.unlabelled.length} unverified state changes`));
   }
   parts.push(renderCalls(v.calls || []));
+  clearBusy("verdict");
   fill($("verdict"), parts);
   if (note.scrollHeight <= note.clientHeight) more.remove();
   $("stamp").replaceChildren();
@@ -190,5 +225,6 @@ export function showError(e, onReplay) {
   if (e.replay_available && onReplay) {
     parts.push(el("button", { class: "link", onclick: onReplay }, "Replay from log"));
   }
+  clearBusy();
   fill($("verdict"), parts);
 }

@@ -2,7 +2,7 @@
 
     uv run secondsig judge fixtures/cases/demo/demo_aave.json --replay           # verdict from recorded forms
     uv run secondsig judge fixtures/cases/demo/demo_aave.json --replay --chain   # + stamp, attest, execute on anvil
-    uv run secondsig answer fixtures/cases/demo/demo_auditor.json --owner 1 "Yes, the auditor invoices monthly"
+    uv run secondsig answer fixtures/cases/demo/demo_auditor.json --owner 1 "Yes, grant the auditor an unlimited USDC allowance for monthly invoicing."
     uv run secondsig demo aave|auditor|bybit [--live]                             # the three scenarios, on the chain
     uv run secondsig execute fixtures/cases/demo/demo_bybit.json                  # try the bytes against the guard
 

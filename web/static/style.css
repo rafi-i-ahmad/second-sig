@@ -97,7 +97,8 @@ h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -.02em; }
 .step { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .step .ring { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--border-hi); background: var(--surface); }
 .step.active { color: var(--accent); font-weight: 600; }
-.step.active .ring { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 91, 255, .15); }
+.step.active .ring { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 91, 255, .15); animation: ring 1.2s ease-in-out infinite; }
+@keyframes ring { 50% { box-shadow: 0 0 0 5px rgba(99, 91, 255, .05); } }
 .step.done { color: var(--text-2); }
 .step.done .ring { background: var(--accent); border-color: var(--accent); }
 .step.skipped { opacity: .5; }
@@ -113,6 +114,12 @@ h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -.02em; }
 .tag { font-size: 11px; color: var(--text-3); font-weight: 500; }
 .card-body { display: flex; flex-direction: column; padding: 0 20px; flex: 1; }
 .card > .btn.wide, .card > .result, .card > .stamp, .card > .answer, .card > .floor { margin-left: 20px; margin-right: 20px; width: auto; }
+.card-head .busy { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; color: var(--accent); }
+.card-head .busy + .tag { margin-left: 12px; }
+.dots { display: inline-flex; gap: 3px; }
+.dots i { width: 4px; height: 4px; border-radius: 50%; background: currentColor; animation: dot 1s ease-in-out infinite; }
+.dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
 .fade { animation: fade 150ms ease-out; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -133,7 +140,9 @@ pre.raw {
 }
 .footer-note { color: var(--text-3); font-size: 12px; margin-top: 8px; }
 
-.skeleton { height: 12px; background: linear-gradient(90deg, #EEF1F5, #F6F8FA, #EEF1F5); border-radius: 4px; margin: 12px 0; }
+.skeleton { height: 12px; background: linear-gradient(90deg, #EEF1F5 25%, #F6F8FA 50%, #EEF1F5 75%) 0 0 / 200% 100%; border-radius: 4px; margin: 12px 0; animation: shimmer 1.4s linear infinite; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton, .dots i, .step.active .ring { animation: none; } }
 .skeleton:nth-child(2) { width: 75%; } .skeleton:nth-child(3) { width: 55%; }
 
 /* pills */

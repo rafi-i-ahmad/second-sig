@@ -82,7 +82,8 @@ cli/
   view.py             three-panel terminal view (rich): the words, the bytes, the verdict
 web/                  the demo page. server.py: FastAPI over judge/pipeline.py (judge(..., emit=) streams the stages
                       as SSE), execute through the guard, reset by evm_snapshot/evm_revert. static/: plain HTML/CSS/JS,
-                      no build, no CDN (works offline). Replay by default; a floor REJECT shows recorded forms as reference.
+                      no build, no CDN (works offline). Replay by default; a floor REJECT still runs the forward pass
+                      (display only) and shows the recorded backward form as reference.
                       display.py: display forms + SSE jobs, shared. sepolia.py + static/safe-app/: the Safe{Wallet} panel
                       (a custom Safe App at /safe-app; reads only, holds no owner key). static/render.js: shared cards
 sepolia/              the Safe{Wallet} demo on Sepolia (NOTES.md, "Sepolia"). chain.py: Sepolia + the 8546 fork, the
@@ -148,10 +149,11 @@ uv sync --group investigate && uv run python scripts/investigate.py <id> [--slot
 ```
 
 ```
+uv run python scripts/demo.py [--reset] [--no-sepolia]   # everything: both anvils, forge build, Safe + guard, web page on :8000
 uv run secondsig demo aave                       # replay forms, then stamp, attest, execute on anvil
 uv run secondsig demo bybit                      # REJECT; the guard reverts the two-signature execution
 uv run secondsig judge fixtures/cases/demo/demo_auditor.json --replay [--chain]
-uv run secondsig answer fixtures/cases/demo/demo_auditor.json "Yes, the auditor invoices monthly" --owner 1 [--chain]
+uv run secondsig answer fixtures/cases/demo/demo_auditor.json "Yes, grant the auditor an unlimited USDC allowance for monthly invoicing." --owner 1 [--chain]
 uv run secondsig reset                           # anvil_reset + Safe + guard; clears logs/proposals/
 uv run uvicorn web.server:app --port 8000        # the demo page at http://localhost:8000 (anvil must be up)
 uv run python -m sepolia.setup [create-safe|fund|deploy-guard|propose-guard|...]   # Sepolia Safe + guard

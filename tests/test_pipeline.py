@@ -63,9 +63,22 @@ def test_match_carries_a_stamp_and_nothing_else_does() -> None:
     assert replay("demo_auditor").stamp is None and replay("demo_bybit").stamp is None
 
 
-def test_bybit_never_runs_a_pass() -> None:
+def test_bybit_reads_the_words_but_never_runs_the_backward_pass() -> None:
+    """A floor hit decides; the forward form is for the signer to read, never for the table."""
     res = replay("demo_bybit")
-    assert res.forward is None and res.backward is None and res.verdict.floor_hits
+    assert res.forward is not None and res.backward is None and res.verdict.floor_hits
+    assert res.verdict.decision == Decision.REJECT and res.verdict.compare is None
+
+
+def test_a_failed_forward_pass_cannot_lift_a_floor_reject(monkeypatch) -> None:
+    def broken(*_, **__):
+        raise RuntimeError("model down")
+
+    monkeypatch.setattr(pipeline, "recorded_forward", lambda _cid: None)
+    monkeypatch.setattr(forward, "run", broken)
+    res = replay("demo_bybit")
+    assert res.verdict.decision == Decision.REJECT and res.forward is None and res.stamp is None
+    assert res.calls == ["forward unavailable: RuntimeError"]
 
 
 def test_ask_note_is_the_question_when_escalation_is_off() -> None:
@@ -82,8 +95,8 @@ def test_an_owners_answer_amends_the_words_and_the_judge_reruns(monkeypatch) -> 
     cid = "demo_auditor"
     seen: dict = {}
 
-    def fake_forward(description, address_book, safe, **_):
-        seen["description"] = description
+    def fake_forward(description, address_book, safe, amendments=None, **_):
+        seen["description"], seen["amendments"] = description, amendments
         form = ExpectedEffects(
             reasoning="", confidence="high", nothing_else=True,
             movements=[{"asset": "USDC", "amount_human": "100 USDC", "from_name": "Safe", "to_name": "auditor",
@@ -104,8 +117,10 @@ def test_an_owners_answer_amends_the_words_and_the_judge_reruns(monkeypatch) -> 
                              bundle, None, backward_form=pipeline.recorded_backward(cid), replay=True)
     assert second.verdict.decision == Decision.MATCH, second.verdict.reasoning
     assert second.stamp is not None
-    assert seen["description"].startswith("Pay our auditor 100 USDC\nOwner 0x7099")
-    assert "unlimited" in seen["description"]
+    # the answer reaches the forward pass on its own, attributed, not joined into the description
+    assert seen["description"] == "Pay our auditor 100 USDC"
+    assert seen["amendments"] == [(owner, "Yes, grant the auditor an unlimited USDC allowance for monthly invoicing.")]
+    assert second.bundle.description.startswith("Pay our auditor 100 USDC\nOwner 0x7099")
     assert second.calls and second.calls[0].startswith("forward")
     # the amendment and the form it produced are on the record, so the next replay needs no call
     saved = pipeline.Proposal.model_validate_json((pipeline.PROPOSALS / f"{cid}.json").read_text(encoding="utf-8"))

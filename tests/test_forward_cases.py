@@ -150,6 +150,22 @@ def test_address_book_is_spotlit_and_a_label_that_is_not_a_name_is_dropped() -> 
     assert '"Dana"' in book_block and '"Dana"' not in user.split("<untrusted_")[0]
 
 
+def test_an_owners_answer_gets_its_own_tags_and_the_owner_stays_outside() -> None:
+    """An answer to an ASK is untrusted text in its own tags; the owner address, which our tooling
+    sets, is outside them. A turn with no answers says nothing about answers."""
+    book, safe = {"auditor": "0x46F43A4Cb3c2cD27c36f07cfd691E8a22Dd60A4C"}, {"version": "1.4.1"}
+    owner = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+    plain = forward.build_user_turn("Pay our auditor 100 USDC", book, safe)
+    assert "Answer 1" not in plain and "owners answered" not in plain
+    user = forward.build_user_turn("Pay our auditor 100 USDC", book, safe,
+                                   [(owner, "Yes, grant the auditor an unlimited USDC allowance.")])
+    tags = re.findall(r"<untrusted_([0-9a-f]{12})>", user)
+    assert len(set(tags)) == 3, "address book, description and the answer, each in its own tags"
+    answer_block = user.split(f"<untrusted_{tags[-1]}>")[2].split(f"</untrusted_{tags[-1]}>")[0]
+    assert "unlimited USDC allowance" in answer_block and owner not in answer_block
+    assert f"from Safe owner {owner}." in user.split(f"<untrusted_{tags[-1]}>")[0]
+
+
 @pytest.mark.live
 @pytest.mark.parametrize("case_path", CASE_FILES, ids=[p.stem for p in CASE_FILES])
 def test_forward_case(case_path: Path) -> None:

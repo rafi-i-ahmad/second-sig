@@ -40,7 +40,7 @@ from judge import pipeline
 from judge.run_fixture import ensure_usdc
 from judge.schemas import Decision, EvidenceBundle
 from web import sepolia
-from web.display import JOBS, Job, _amount, _short, book_names, relay, show_backward, show_forward, show_verdict
+from web.display import JOBS, Job, _amount, _short, book_names, relay, show_backward, show_verdict
 
 STATIC = Path(__file__).resolve().parent / "static"
 REPLAY_PACE_S = 0.7
@@ -166,12 +166,11 @@ def _run(job: Job, scenario: str, live: bool, answer: dict[str, Any] | None = No
             job.push("amendments", [a.model_dump() for a in proposal.amendments])
         demo.results[scenario] = res
         if res.verdict.floor_hits and not live:
-            # The floor decided before any model ran. For the audience, show the recorded forms as
-            # reference only; they did not and could not change the verdict.
+            # The floor decided before the backward pass ran (the forward pass still reads the words,
+            # pipeline.judge). For the audience, show the recorded backward form as reference only;
+            # it did not and could not change the verdict.
             b = res.bundle
-            note = "Recorded form, shown for reference: the floor decided before any model ran."
-            if (f := pipeline.recorded_forward(case["id"])) is not None:
-                job.push("forward", show_forward(f, b, book) | {"note": note})
+            note = "Recorded form, shown for reference: the floor decided before the backward pass ran."
             if (w := pipeline.recorded_backward(case["id"])) is not None:
                 job.push("backward", show_backward(w, b, book) | {"note": note})
         if pace:
