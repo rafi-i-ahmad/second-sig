@@ -4,7 +4,7 @@ NOTE! Do NOT get too hung up on the spec it is okay to deviate from it somewhat.
 
 An extra signer for Safe multisigs. It rehearses a proposed transaction on a fork, compares what the bytes actually do with what the description says, and signs a stamp only on a match. A guard contract on the Safe refuses every transaction that has no valid stamp for its exact hash, unless every owner has approved an override and the delay has passed.
 
-Hackathon build: two people, about 2.5 days, Encode London. `build-spec-v2.md` (plus the UI and demo docs next to it) is a rough guide, not the source of truth: where it disagrees with this file, this file wins. This file holds what an agent working in the repo must not get wrong. `NOTES.md` holds the live operational state (fork, test Safe, what has run, schema changes); read it before touching the fork.
+Hackathon build: two people, about 2.5 days, Encode London. `build-spec-v2.md`, `ui-spec.md` and `demo-and-pitch.md` were rewritten on 24 October to describe the repo as built (the 22 October plan is gone); where any doc disagrees with this file or the code, this file wins. This file holds what an agent working in the repo must not get wrong. `NOTES.md` holds the live operational state (fork, test Safe, what has run, schema changes); read it before touching the fork.
 
 ## Who owns what
 
@@ -34,8 +34,10 @@ judge/
                       Decision, Verdict, Stamp. Classification, ProbeHypothesis, HumanQuestion: empty
   evidence/           layer 1: fork.py rehearses on a snapshot and builds the EvidenceBundle;
                       trace.py, decode.py, slots.py feed it; rules.py is the hard floor
-  labeller.py         layer 2: spotlight() wraps untrusted text in per-call random tags
-  model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call
+  labeller.py         layer 2: spotlight() wraps untrusted text in per-call random tags; plain_address_book()
+                      drops address-book labels that are not plain names (the book is untrusted too)
+  model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call with
+                      token usage and an estimated cost; refuses calls past GEMINI_SPEND_CAP_USD
   jobs/               layer 3: forward.py, backward.py, escalate.py, leftovers.py (work); probe (stub, by design).
                       escalate drafts the signer's question for an ASK from the saved comparison and
                       classifies the gap (omission / contradiction / vague); advisory, never a decision.
@@ -48,8 +50,11 @@ judge/
                       address: labels via address book, assets via address book or cited evidence; chain
                       symbols and contract names are display only
   compare.py          layer 4: reconcile(expected, observed, resolver) -> CompareResult. Tiers: exact,
-                      amount_unconstrained, counterparty_via_callee, party/asset_unresolved,
-                      inbound_from_callee, internal_to_callee. Only notable/critical observed items count
+                      amount_bounded, amount_unconstrained, counterparty_via_callee, party/asset_unresolved,
+                      inbound_from_callee, internal_to_callee. Only notable/critical observed items count.
+                      An outflow or allowance needs a known asset, party and amount (the open tiers are for
+                      what the Safe receives). Coverage: Safe balance decreases, Approvals the Safe granted
+                      and its owner/threshold events must all be accounted for by the narration
   truth.py            ground truth for a case from its calldata (+ the Safe's balance changes for protocol
                       calls); grades each pass on its own. fixtures/truth/<id>.json overrides if present
   layouts.py          known storage layouts by *address* (Uniswap V2 USDC/WETH pair, WETH9): code labels,
@@ -90,15 +95,18 @@ fixtures/
   README.md           what every folder here is for; read it before adding a fixture
   cases/              every proposal, one folder per expected verdict, every file has expected_verdict
     match/            honest and precise (01-08, 10)
-    ask/              too vague to act on (09)
-    reject/           description contradicts the bytes (31-35); floor-clean, so the model's job
+    ask/              too vague (09); the words contradict the bytes (31-34, and 37, 40, 41, 43 with an
+                      injection); one honest gap (39, 42, 44-49, 51). Contradictions are ASK by decision of
+                      24 October: REJECT is kept for the floor and critical effects; both refuse the stamp
+    reject/           a critical change the words do not license: the threshold drops to 1 (35, 38, 50)
     demo/             demo_bybit (REJECT), demo_aave (MATCH), demo_auditor (ASK). Forward-pass tests and
                       few-shot examples never read this folder (invariant 8)
-  outputs/            model outputs: <id>.forward.json, <id>.backward.json, <id>.naive.json
+  outputs/            model outputs: <id>.forward.json, <id>.backward.json, <id>.question.json (escalation),
+                      demo_aave.leftovers.json (source reader), <id>.backward.argon.json (ablation), <id>.naive.json
   sources/            Etherscan cache, one file per address
   traces/             older raw traces from run_fixture --save-trace; only the naive baseline still reads them
   bundles/            <id>.bundle.json (EvidenceBundle) + <id>.rehearsal.json (raw traces), from fork.py.
-                      All 18 cases (01-10, the three demos, mismatch 31-35) as of 24 October
+                      All 33 cases as of 24 October
   examples/           bybit.bundle.json, the hand-checked example the schema tests validate
 eval/
   run.py              the eval table  (stub)
@@ -131,7 +139,8 @@ cd contracts && ~/.foundry/bin/forge build && ~/.foundry/bin/forge test -vv
 uv run python contracts/setup.py [--guard]      # deploy or find the test Safe; --guard also sets the guard
 uv run python -m judge.evidence.fork <case.json> [--out fixtures/bundles]   # rehearse, write the bundle
 uv run python -m judge.verdict fixtures/bundles/<id>.bundle.json           # decision table on a saved bundle
-uv run python scripts/compare_benign.py [--live] [--include-reject]        # end-to-end verdicts by replay + reports
+uv run python scripts/compare_benign.py [--live] [--include-reject] [--only a,b]   # end-to-end verdicts by replay + reports
+uv run python scripts/spend.py [--since ISO]    # estimated Gemini spend from logs/calls.jsonl (set GEMINI_SPEND_CAP_USD before live runs)
 uv run python -m judge.run_fixture fixtures/cases/match/01_send_eth_ops.json [--save-trace]
 uv run python scripts/ask_questions.py <id>...     # escalation step on saved reports -> reports/compare/QUESTIONS.md
 uv run python -m judge.stages.judge <case.json>... [--dump-prompt out.txt --no-call]

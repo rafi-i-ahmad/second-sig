@@ -305,6 +305,54 @@ def test_get_client_without_key_raises(monkeypatch: pytest.MonkeyPatch) -> None:
         m.get_client()
 
 
+# --------------------------------------------------------------------------- spend
+
+
+def _with_usage(text: str, **tokens: int) -> SimpleNamespace:
+    usage = SimpleNamespace(total_input_tokens=tokens.get("input"), total_output_tokens=tokens.get("output"),
+                            total_thought_tokens=tokens.get("thought"), total_cached_tokens=tokens.get("cached"))
+    return SimpleNamespace(id="int-u", output_text=text, steps=None, usage=usage)
+
+
+def test_usage_and_estimate_are_logged(log_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    reply = _with_usage('{"colour": "red", "count": 1, "tags": []}', input=10_000, output=500, thought=1_500)
+    monkeypatch.setattr(m, "get_client", lambda: SimpleNamespace(interactions=SimpleNamespace(create=lambda **k: reply)))
+    m.complete("gemini-4-argon", "sys", "user", ThreeField)
+    (line,) = read_log(log_path)
+    assert line["usage"] == {"input": 10_000, "output": 500, "thought": 1_500, "cached": 0}
+    # Argon: $2/M in, $10/M out; thought tokens are billed as output
+    assert line["est_usd"] == pytest.approx((10_000 * 2 + 2_000 * 10) / 1e6)
+
+
+def test_a_reply_without_usage_logs_none(use_client, log_path: Path) -> None:
+    use_client('{"colour": "red", "count": 1, "tags": []}')
+    m.complete("fake-model", "sys", "user", ThreeField)
+    (line,) = read_log(log_path)
+    assert line["usage"] is None and line["est_usd"] is None
+
+
+def test_spend_cap_refuses_before_any_call(use_client, log_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    log_path.write_text(json.dumps({"ts": "2026-10-24T18:00:00+00:00", "est_usd": 5.0}) + "\n", encoding="utf-8")
+    inter = use_client('{"colour": "red", "count": 1, "tags": []}')
+    monkeypatch.setenv("GEMINI_SPEND_CAP_USD", "5")
+    monkeypatch.setenv("GEMINI_SPEND_SINCE", "2026-10-24T17:00:00+00:00")
+    with pytest.raises(m.ModelUnavailable, match="spend cap"):
+        m.complete("fake-model", "sys", "user", ThreeField)
+    assert inter.calls == []
+    assert read_log(log_path)[-1]["status"] == "unavailable"
+
+
+def test_spend_before_the_window_does_not_count(use_client, log_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    log_path.write_text(json.dumps({"ts": "2026-10-24T09:00:00+00:00", "est_usd": 50.0}) + "\n", encoding="utf-8")
+    inter = use_client('{"colour": "red", "count": 1, "tags": []}')
+    monkeypatch.setenv("GEMINI_SPEND_CAP_USD", "5")
+    monkeypatch.setenv("GEMINI_SPEND_SINCE", "2026-10-24T17:00:00Z")
+    m.complete("fake-model", "sys", "user", ThreeField)
+    assert len(inter.calls) == 1
+    assert m.spent_since("2026-10-24T17:00:00Z", log_path) == 0.0
+    assert m.spent_since(None, log_path) == 50.0
+
+
 # --------------------------------------------------------------------------- live tests
 
 FLASH = "gemini-3.8-flash"

@@ -20,7 +20,8 @@ BENIGN_CASES = [
     "06_approve_uniswap_finite", "07_pay_three_contractors", "08_refund_sam", "09_routine_transfer_vague",
     "10_swap_usdc_eth_uniswap", "demo_aave", "demo_auditor",
 ]
-# Floor-clean but the description contradicts the bytes: expected REJECT, from the model, not the floor.
+# Floor-clean but the description contradicts the bytes. The comparison refuses them, not the floor:
+# 31-34 ASK (a contradiction; decision of 24 October 2026), 35 REJECT (a critical threshold drop).
 MISMATCH_CASES = [
     "31_revoke_ravi_usdc", "32_pay_dana_wrong_wallet", "33_pay_ravi_but_approve", "34_uniswap_output_diverted",
     "35_add_owner_then_lower_threshold",

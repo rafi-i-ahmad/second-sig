@@ -33,17 +33,10 @@
     }
   ],
   "intent": {
-    "movements": [
-      {
-        "asset": "USDC",
-        "amount_human": "2,500 USDC",
-        "from_name": "Safe",
-        "to_name": "Dana"
-      }
-    ],
+    "movements": [],
     "permission_changes": [],
     "safe_config_changes": [],
-    "nothing_else": true,
+    "nothing_else": false,
     "expect_question": true
   },
   "expected_verdict": "ASK",

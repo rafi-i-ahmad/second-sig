@@ -27,8 +27,8 @@ Every effect in the trace is accounted for by the description, and everything th
 | 2,500 USDC Safe -> Dana | exact |
 
 Info (bookkeeping):
-- Safe nonce incremented from 1 to 2.
+- The Safe's transaction nonce increased from 1 to 2.
 
 ## Attribution
 
-- `bookkeeping`: info: Safe nonce incremented from 1 to 2.
+- `bookkeeping`: info: The Safe's transaction nonce increased from 1 to 2.

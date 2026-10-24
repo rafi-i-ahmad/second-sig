@@ -1,0 +1,87 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_Chd6dTNjYXBlTkl2V0l2ZElQbjUtU3VBSRIXenUzY2FwZU5JdldJdmRJUG41LVN1QUk",
+  "latency_ms": 32719,
+  "narration": {
+    "reasoning": "1. Call c0/c1 executes a Safe transaction (nonce 1 -> 2 in s3, emitting ExecutionSuccess in e0 after signature checks c2/c3).\n2. Call c4 is a DELEGATECALL from the Safe to MultiSendCallOnly v1.4.1 (0x9641d764fc13c8B624c04430C7356C1C7C8102e2), which batches two standard CALLs.\n3. In c5/c6, the Safe calls USDC.transfer to send 2,500,000,000 base units (2,500 USDC) to Dana (0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315), updating balances in s1, s2, b1, b2 and emitting Transfer event e1.\n4. In c7/c8, the Safe calls USDC.transfer to send 200,000,000 base units (200 USDC) to Ravi (0x2C81904f370e7f6490aEa328CA847AEFdc3853D3), updating balances in s0, s1, b0, b2 and emitting Transfer event e2.\n5. No token approvals or Safe configuration changes occurred.",
+    "effects": [
+      {
+        "sentence": "Safe transfers 2,500 USDC to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Safe transfers 200 USDC to Ravi.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ]
+      },
+      {
+        "sentence": "Safe increments its transaction nonce from 1 to 2 and executes the batched calls via MultiSendCallOnly v1.4.1.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "s3",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "200 USDC",
+        "amount_base_units": "200000000",
+        "from_name": "Safe",
+        "to_name": "Ravi",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

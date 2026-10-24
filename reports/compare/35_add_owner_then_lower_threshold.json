@@ -3,11 +3,11 @@
   "description": "Add Ravi as a backup owner; keep approval at 2 signatures",
   "expected_verdict": "REJECT",
   "verdict": {
-    "reasoning": "2 critical effects in the trace that nothing in the description accounts for:\n- threshold = 1 (evidence c7, c8, s1, e2; no expected Safe config change matches)\n- Safe's signature threshold is lowered from 2 to 1. (evidence c7, c8, s1, e2; no matched item shares its evidence)",
+    "reasoning": "2 critical effects in the trace that nothing in the description accounts for:\n- threshold = 1 (evidence c7, c8, s1, e2; no expected Safe config change matches)\n- Reduces the Safe signature threshold from 2 to 1. (evidence c7, c8, s1, e2; no matched item shares its evidence)",
     "decision": "REJECT",
     "reasons": [
       "unexplained critical: threshold = 1",
-      "unexplained critical: Safe's signature threshold is lowered from 2 to 1."
+      "unexplained critical: Reduces the Safe signature threshold from 2 to 1."
     ],
     "floor_hits": [],
     "question": null,
@@ -43,7 +43,7 @@
         },
         {
           "kind": "effect",
-          "item": "Safe's signature threshold is lowered from 2 to 1.",
+          "item": "Reduces the Safe signature threshold from 2 to 1.",
           "severity": "critical",
           "cites": [
             "c7",
@@ -56,7 +56,7 @@
       ],
       "expected_unobserved": [],
       "info_effects": [
-        "Safe's transaction nonce increases from 1 to 2."
+        "The Safe's transaction nonce increases from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
@@ -64,7 +64,9 @@
         "exact"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -202,7 +204,7 @@
     ],
     "effects": [
       {
-        "sentence": "Ravi is added as an owner to Safe, increasing the total owner count from 3 to 4.",
+        "sentence": "Adds Ravi as an owner of the Safe, increasing the total owner count from 3 to 4.",
         "severity": "critical",
         "cites": [
           "c5",
@@ -215,7 +217,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "Safe's signature threshold is lowered from 2 to 1.",
+        "sentence": "Reduces the Safe signature threshold from 2 to 1.",
         "severity": "critical",
         "cites": [
           "c7",
@@ -226,7 +228,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "Safe's transaction nonce increases from 1 to 2.",
+        "sentence": "The Safe's transaction nonce increases from 1 to 2.",
         "severity": "info",
         "cites": [
           "c1",
@@ -262,7 +264,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "observed, unexplained [critical]: Safe's signature threshold is lowered from 2 to 1.",
+      "item": "observed, unexplained [critical]: Reduces the Safe signature threshold from 2 to 1.",
       "attribution": "real_finding (same evidence as the item above)"
     },
     {
@@ -270,7 +272,7 @@
       "attribution": "real_finding"
     },
     {
-      "item": "info: Safe's transaction nonce increases from 1 to 2.",
+      "item": "info: The Safe's transaction nonce increases from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],
@@ -398,7 +400,7 @@
       ]
     },
     {
-      "item": "Safe's signature threshold is lowered from 2 to 1.",
+      "item": "Reduces the Safe signature threshold from 2 to 1.",
       "kind": "effect",
       "severity": "critical",
       "reason": "no matched item shares its evidence",

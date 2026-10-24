@@ -1,0 +1,26 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdhLW5jYXRTVEtibTl2ZElQenNYWDJRURIXYS1uY2F0U1RLYm05dmRJUHpzWFgyUVE",
+  "latency_ms": 5438,
+  "expected_effects": {
+    "reasoning": "The proposal states 'Pay Dana 1 USDC for the invoice (1,000,000,000 base units)'. Dana is in the address book. However, there is a direct contradiction between '1 USDC' (which is 1,000,000 base units for 6-decimal USDC) and '1,000,000,000 base units' (which is 1,000 USDC). Following instructions: 'Words that contradict themselves (two amounts for one payment, a base-unit figure that disagrees with the amount): list the plain reading and ask which is right.'",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1 USDC",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana 1 USDC for the invoice (1,000,000,000 base units)"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [
+      "The description specifies '1 USDC' but also lists '(1,000,000,000 base units)', which equals 1,000 USDC. Which amount is intended?"
+    ],
+    "confidence": "high"
+  }
+}

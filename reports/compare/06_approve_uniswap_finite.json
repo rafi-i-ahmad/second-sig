@@ -23,7 +23,7 @@
       "observed_unexplained": [],
       "expected_unobserved": [],
       "info_effects": [
-        "The Safe's nonce increments from 1 to 2."
+        "The Safe's transaction execution nonce increases from 1 to 2."
       ],
       "uncited": [],
       "unsupported": [],
@@ -31,7 +31,9 @@
         "exact"
       ],
       "nothing_else": true,
-      "questions": []
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
     }
   },
   "truth": {
@@ -160,7 +162,7 @@
         "cited_ok": true
       },
       {
-        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "sentence": "The Safe's transaction execution nonce increases from 1 to 2.",
         "severity": "info",
         "cites": [
           "s1",
@@ -189,7 +191,7 @@
   },
   "attribution": [
     {
-      "item": "info: The Safe's nonce increments from 1 to 2.",
+      "item": "info: The Safe's transaction execution nonce increases from 1 to 2.",
       "attribution": "bookkeeping"
     }
   ],

@@ -7,7 +7,13 @@ reading of the gap (omission, contradiction, vague). That reading is advisory, f
 the signer; verdict.py has already decided and nothing here feeds back into it (invariant 1).
 
 Everything derived from model forms or from the description is untrusted and goes inside the
-spotlight tags (invariant 7); the address book and Safe facts are ours and go outside.
+spotlight tags (invariant 7), and so does the address book, whose names are typed by whoever keeps
+it (labeller.plain_address_book drops any label that is not a plain name). The Safe facts and the
+decision are ours and go outside.
+
+The signers see the gap label and the question (ASK) or the statement (REJECT). The model's
+honesty reading stays in the record as a note and never changes the text: a caution built from a
+model's guess about motives would add weight the evidence has not earned.
 """
 
 from __future__ import annotations
@@ -17,7 +23,7 @@ import time
 from typing import Any
 
 from judge import model as m
-from judge.labeller import spotlight
+from judge.labeller import plain_address_book, spotlight
 from judge.schemas import CanonEffects, CompareResult, HumanQuestion, Verdict
 from judge.canon import render_config, render_movement, render_permission
 
@@ -75,11 +81,11 @@ def build_user_turn(
     cmp: CompareResult = verdict.compare or CompareResult()
     trusted = {
         "safe": {k: v for k, v in safe.items() if k not in ("note",)},
-        "address_book": address_book,
         "decision_already_made": verdict.decision.value,
         "decision_reasons": verdict.reasons,
     }
     untrusted = {
+        "address_book": plain_address_book(address_book)[0],
         "description": description,
         "what_the_words_promise": _lists(expected),
         "what_the_trace_shows": _lists(observed),
@@ -102,17 +108,6 @@ def build_user_turn(
     )
 
 
-CAUTION = {
-    "no": (
-        "Caution: the words and the bytes disagree in a way an honest proposer is unlikely to have "
-        "written. Treat this proposal as suspect, and do not sign on the proposer's say-so alone."
-    ),
-    "unlikely": (
-        "Note: the gap between the words and the bytes is one a careful proposer would not normally "
-        "leave. Check the answer independently before signing."
-    ),
-    "yes": "",
-}
 GAP_LABEL = {
     "omission": "The description leaves out something the transaction does.",
     "contradiction": "The description says one thing and the transaction does another.",
@@ -123,11 +118,10 @@ GAP_LABEL = {
 
 def compose(form: HumanQuestion, decision: str) -> str:
     """The text the signers see. REJECT: the statement, no question. ASK: the model's reading of
-    the gap, the honesty caution where it applies, then the question."""
+    the gap, then the question. The honesty reading is not part of it (see the module docstring)."""
     if decision == "REJECT":
         return (form.statement or form.question or "").strip()
-    parts = [GAP_LABEL.get(form.gap_kind, ""), CAUTION.get(form.would_an_honest_proposer_write_this, ""),
-             form.question or ""]
+    parts = [GAP_LABEL.get(form.gap_kind, ""), form.question or ""]
     return " ".join(p for p in parts if p).strip()
 
 

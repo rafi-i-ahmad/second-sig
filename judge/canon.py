@@ -8,7 +8,8 @@ Resolution rules (deterministic, no model):
   their address; a 0x address resolves to itself; the zero address is kept as "zero"; a
   label that only a contract name in bundle.sources matches resolves via "sources"; anything
   else stays unresolved. Identity is the address. Chain-read symbols and contract names are
-  display only and never decide a match.
+  display only and never decide a match. An address-book entry whose label is not a plain name
+  (labeller.plain_address_book) is ignored, so its address only ever resolves as itself.
 - Assets: 'ETH' is ether; an address-book name or a 0x address resolves directly; a backward
   item can resolve through the evidence it cites (a balance entry's asset, a Transfer or
   Approval event's emitting contract), which is address data, not a symbol; otherwise the
@@ -28,6 +29,7 @@ from typing import Any
 from eth_utils import is_address, to_checksum_address
 
 from judge import checker
+from judge.labeller import plain_address_book
 from judge.schemas import (
     Asset, BalanceChange, CanonConfig, CanonEffect, CanonEffects, CanonMovement, CanonPermission, Direction,
     Event, EvidenceBundle, ExpectedEffects, Narration, Party, Severity,
@@ -65,6 +67,8 @@ class Resolver:
     """Address book + bundle, read-only. One per case."""
 
     def __init__(self, bundle: EvidenceBundle, address_book: dict[str, str]) -> None:
+        address_book, dropped = plain_address_book(address_book)
+        self.ignored_labels = [to_checksum_address(a) for a in dropped]
         self.bundle = bundle
         self.safe = to_checksum_address(bundle.safe_address)
         self.book = {_norm_label(k): to_checksum_address(v) for k, v in address_book.items()}

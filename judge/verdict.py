@@ -12,7 +12,9 @@ model, no key. The order is fixed and nothing later in the table can soften an e
    - an observed effect nothing expected explains, severity critical: REJECT
    - an observed effect nothing expected explains, severity notable: ASK
    - an expected effect the trace does not show: ASK
-   - the words leave room for more (nothing_else is false): ASK, with the forward pass's question
+   - the words leave room for more (nothing_else is false), or the forward pass raised a question
+     the signers must settle (words that contradict themselves, a wallet the book does not hold):
+     ASK, with the forward pass's question
    - otherwise MATCH
    Items matched only by a weaker tier (party or asset the address book lacks) count as
    explained here and are flagged in the CompareResult for the report.
@@ -120,6 +122,9 @@ def from_compare(cmp: CompareResult) -> Verdict:
         q = cmp.questions[0] if cmp.questions else "The description leaves open what the transaction may do."
         return _ask("The description does not pin the transaction down: the forward pass could not rule out other "
                     "effects.", "description leaves room", q, cmp)
+    if cmp.questions:
+        return _ask("Everything matched, but reading the description raised a question the signers must settle "
+                    "before anything is approved.", "the description raises a question", cmp.questions[0], cmp)
     tiers = ", ".join(cmp.tiers) if cmp.tiers else "exact"
     return Verdict(
         reasoning=f"Every effect in the trace is accounted for by the description, and everything the description "
@@ -164,7 +169,10 @@ def decide(
         r = Resolver(bundle, address_book or {})
         cmp = compare.reconcile(canon.from_forward(expected, bundle.description, r), canon.from_backward(observed, r), r,
                                 raised=raised, explained_slots=explained_slots)
-        return from_compare(cmp)
+        v = from_compare(cmp)
+        if cmp.ignored_labels:
+            v.reasons.append("address-book label ignored (not a plain name) for " + ", ".join(cmp.ignored_labels))
+        return v
 
     if model is None:
         return _ask(

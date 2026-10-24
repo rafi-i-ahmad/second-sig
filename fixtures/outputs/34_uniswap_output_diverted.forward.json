@@ -1,10 +1,10 @@
 {
   "model": "gemini-3.8-flash",
   "thinking": "low",
-  "interaction_id": "v1_ChdYNDNjYXFUM0dxLWp2ZElQakl1eGtRVRIXWDQzY2FxVDNHcS1qdmRJUGpJdXhrUVU",
-  "latency_ms": 8353,
+  "interaction_id": "v1_ChdOLW5jYXZXeEZwdUp2ZElQdzhuSDhBURIXTi1uY2F2V3hGcHVKdmRJUHc4bkg4QVE",
+  "latency_ms": 5900,
   "expected_effects": {
-    "reasoning": "The description specifies a swap on Uniswap: purchasing exactly 1,000 USDC in exchange for native ETH, capped at a maximum expenditure of 1 ETH. This entails outgoing ETH (up to 1 ETH) from the Safe to Uniswap, and an incoming transfer of 1,000 USDC from Uniswap to the Safe. Native ETH does not require an ERC-20 approval.",
+    "reasoning": "The proposal asks to buy 1,000 USDC on Uniswap while spending at most 1 ETH. This describes a token swap: Safe sends up to 1 ETH to Uniswap, and receives 1,000 USDC from Uniswap. Native ETH sent in a call does not require an ERC-20 approval, though if WETH were used an approval would be needed. Since ETH is specified ('spending at most 1 ETH'), no ERC-20 permission change is strictly required for native ETH.",
     "movements": [
       {
         "asset": "ETH",
@@ -25,7 +25,7 @@
     "safe_config_changes": [],
     "nothing_else": true,
     "assumptions": [
-      "Native ETH is being spent directly via msg.value rather than wrapped WETH requiring an approval."
+      "Native ETH is being spent directly to Uniswap Router via value in the transaction; if WETH is used instead, an approval of at most 1 WETH to Uniswap would be required."
     ],
     "questions_for_human": [],
     "confidence": "high"

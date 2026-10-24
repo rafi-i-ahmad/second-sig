@@ -6,9 +6,9 @@
 
 The trace shows 2 effects the description does not mention:
 - 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (evidence c4, b0, b1)
-- The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (evidence c4, b0, b1)
+- The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (evidence c4, b0, b1)
 
-**Question for the signers:** The transaction also does the following, which the description does not mention. Is that intended? 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31; The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.
+**Question for the signers:** The transaction also does the following, which the description does not mention. Is that intended? 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31; The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.
 
 ## The three canonical lists
 
@@ -32,14 +32,16 @@ The trace shows 2 effects the description does not mention:
 
 Observed, unexplained:
 - [notable] 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (no expected movement matches (asset, route, amount); c4, b0, b1)
-- [notable] The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (no matched item shares its evidence; c4, b0, b1)
+- [notable] The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31. (no matched item shares its evidence; c4, b0, b1)
 
 Info (bookkeeping):
-- The Safe's nonce incremented from 1 to 2.
+- The Safe's transaction nonce increments from 1 to 2.
+- The Safe records the successful execution of the transaction.
 
 ## Attribution
 
 - `real_finding`: observed, unexplained [notable]: 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31
-- `real_finding (same evidence as the item above)`: observed, unexplained [notable]: The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.
+- `real_finding (same evidence as the item above)`: observed, unexplained [notable]: The Safe transfers 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.
 - `real_finding`: forward vs truth (missing): movement 1 ETH Safe -> 0xE1D9a0eADCb8082d7989D7304061c017bE296C31
-- `bookkeeping`: info: The Safe's nonce incremented from 1 to 2.
+- `bookkeeping`: info: The Safe's transaction nonce increments from 1 to 2.
+- `bookkeeping`: info: The Safe records the successful execution of the transaction.

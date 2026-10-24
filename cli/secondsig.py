@@ -39,9 +39,11 @@ def _case(path: Path) -> dict:
 
 def _fork():
     from contracts.setup import OWNERS, connect, ensure_guard, ensure_safe
+    from judge.run_fixture import ensure_usdc
     w3 = connect()
     safe = ensure_safe(w3, quiet=True)
     guard = ensure_guard(w3, safe)
+    ensure_usdc(w3, safe.address)  # the recorded bundles assume 10,000 USDC in the Safe, as the web demo does
     return w3, safe, guard, OWNERS
 
 
@@ -158,12 +160,14 @@ def demo(
 def reset() -> None:
     """Rewind anvil to the fork block and rebuild the Safe and the guard. Clears proposal records."""
     from contracts.setup import FORK_BLOCK, connect, ensure_guard, ensure_safe, rpc
+    from judge.run_fixture import ensure_usdc
     import os
     w3 = connect()
     url = os.environ.get("MAINNET_RPC") or "https://eth.drpc.org"
     rpc(w3, "anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": FORK_BLOCK}}])
     safe = ensure_safe(w3)
     ensure_guard(w3, safe)
+    ensure_usdc(w3, safe.address)
     for p in pipeline.PROPOSALS.glob("*.json"):
         p.unlink()
 

@@ -1,0 +1,55 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_Chc5dXZjYXJPU0xPam14TjhQcGV1RXVRNBIXOXV2Y2FyT1NMT2pteE44UHBldUV1UTQ",
+  "latency_ms": 24943,
+  "narration": {
+    "reasoning": "The transaction is executed via `execTransaction` on the Safe (c0, c1), verifying two signatures via `ecrecover` (c2, c3). The Safe increments its nonce from 1 to 2 (s2) and emits `ExecutionSuccess` (e0). During execution, the Safe calls `transfer` on USDC (c4, c5) to send 2,500,000,000 base units (2,500 USDC, with 6 decimals) from the Safe to `0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277` (not in the address book). This updates the USDC balance slots of the Safe and the recipient (s0, s1), changes their token balances by -2,500 USDC and +2,500 USDC respectively (b0, b1), and emits a `Transfer` event (e1). No permissions or Safe configurations are changed.",
+    "effects": [
+      {
+        "sentence": "The Safe transfers 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe increments its nonce from 1 to 2 and records successful execution of the transaction.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

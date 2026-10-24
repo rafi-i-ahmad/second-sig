@@ -1,0 +1,54 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdYT2ZjYW9TcUJ2cUtrZFVQdHVYdG1RZxIXWE9mY2FvU3FCdnFLa2RVUHR1WHRtUWc",
+  "latency_ms": 5426,
+  "narration": {
+    "reasoning": "The transaction executes an ERC-20 transfer of 25,000,000 base units (25 USDC) from the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47) to Dana (0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315). The call tree shows the Safe executing a call to the USDC contract, which delegates to its implementation FiatTokenV2_2. USDC balances and storage slots are updated accordingly, and the Safe nonce increases from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe transfers 25 USDC to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe's transaction nonce increases from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2",
+          "c1",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "25 USDC",
+        "amount_base_units": "25000000",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

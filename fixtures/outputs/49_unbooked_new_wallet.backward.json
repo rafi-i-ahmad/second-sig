@@ -1,0 +1,52 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChZzZWZjYW92Zkh1bUU3TThQdDR6Y0dREhZzZWZjYW92Zkh1bUU3TThQdDR6Y0dR",
+  "latency_ms": 6334,
+  "narration": {
+    "reasoning": "The transaction calls USDC.transfer from the Safe to transfer 2,500 USDC (2,500,000,000 base units) to 0x2CE0D5f39587f090b1bb39122517A8554D0e447c. The Safe's nonce increments from 1 to 2. The recipient is not in the address book (Dana is 0x4716..., not 0x2CE0...).",
+    "effects": [
+      {
+        "sentence": "The Safe's transaction nonce is incremented from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 2,500 USDC to 0x2CE0D5f39587f090b1bb39122517A8554D0e447c.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "0x2CE0D5f39587f090b1bb39122517A8554D0e447c",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

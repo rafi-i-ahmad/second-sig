@@ -19,36 +19,44 @@ Operational facts for the fork and the test Safe. Updated 24 October 2026.
   `CanonMovement`, `CanonPermission`, `CanonConfig`, `CanonEffect`, `CanonEffects`, `Match`,
   `Unexplained`, `CompareResult`, plus the literals `MatchTier`, `Direction`, `ConfigField`,
   `FormSource`. `EvidenceBundle`, `Stamp`, `ExpectedEffects`, `Narration` unchanged.
+- 24 October, Rafi (branch `live-rerun`): additive. `PermissionChange.kind` and
+  `ObservedPermissionChange.kind` read any model reply as `erc20_approval`; the field has one legal
+  value and Flash kept costing a schema retry on it. The JSON schema sent to the model is unchanged.
+  `CompareResult` gains `ignored_labels: list[str]` (addresses whose address-book label was dropped
+  as not a plain name). `EvidenceBundle` and `Stamp` unchanged.
 
-## What's left (Rafi, 24 October evening; the approved plan is `~/.claude/plans/robust-greeting-toast.md`)
+## What's left (Rafi, 24 October, late; the approved plan is `~/.claude/plans/precious-sprouting-chipmunk.md`)
 
-Done today: pipeline end to end on the fork (floor, forward ‖ backward, compare, verdict, escalate,
-stamp, attest, execute), the ASK answer loop, the eval report, and on branch `source-reader` the
-source reader unit (tightening + code layouts + Argon leftovers call + corroboration), 217 tests.
+Done since the outage (branch `live-rerun`; details under "Live re-run on the personal key"):
+- every form recorded live: all 33 cases, the Aave source reader, escalation for 37–51;
+- four fail-open paths in the comparison closed, plus one in the resolver;
+- the contradiction and threshold cases relabelled by decision;
+- the CLI's USDC funding fixed.
 
-1. **Source reader, finish:** record `fixtures/outputs/demo_aave.leftovers.json` once the API lets a
-   ~98k-token Argon call through (it 429'd five times, ~90 s each; the account is Tier 3 but the
-   hackathon key is flaky). Then `compare_benign --include-reject` → Aave MATCH again, merge the
-   branch. If it never lands: ship the tightening alone, Aave ASKs, pitch says "we refuse to lower
-   suspicion on unexplained writes".
-2. **New cases 37–51** (written to `cases/` from PROMPT.md; 7 injections, 8 hard ASKs, three with
-   scripted clarifications): rehearsed on anvil, bundles saved. **Forms not yet recorded** (the API
-   was flaky): `compare_benign --live --include-reject` records forward and backward for all of them;
-   `tests/test_compare.py`'s two case-46 tests skip until `46_….backward.json` exists. The forward
-   prompt changed on 24 October (keep qualifiers such as "up to" / "at least" in `amount_human`;
-   receipt tokens; `kind` is always `erc20_approval`), so **re-record the forward forms for 01–35 and
-   the demos too** before the eval table, or the table measures the old prompt.
-   Plus the plan's two benign protocol cases (Compound v3 supply, Uniswap V3 exactInputSingle) so
-   the source reader runs on more than Aave.
-3. **Prompts and table:** forward.py receipt-token sentence; backward.py keep owner/threshold writes
-   critical; model.py pin temperature 0 (ignored by Argon, set anyway); escalate: honesty field
-   becomes a note, no caution text from it; contradiction rule stays off.
-4. **Bounded ASK loop:** gap ids on residuals; an amendment counts only if it closes an asked gap;
-   resolved gaps never re-asked; two rounds then REJECT "unresolved after two clarifications".
-   Cases 39, 49, 51 are its tests.
-5. **Eval and pitch:** `eval/run.py` with the Argon-on-backward ablation row (decides whether Flash
-   stays); `demo-and-pitch.md` 0:50 and 1:30 lines, Q&A rows "Why Argon?", "Why no agent?",
-   "What if the proposer keeps answering?".
+All 33 cases replay to their expected verdict. The older items (source reader, recording 37–51,
+re-recording forward forms, prompts, the honesty note) are done; the temperature pin was dropped,
+because the API documents temperature as deprecated and determinism comes from `--replay`.
+
+1. **Decide on Aave's collateral flag.** Should "deposit into Aave" license the collateral flag Aave sets
+   automatically, or should the signer always see it? Flash calls it bookkeeping; Argon calls it notable, which turns
+   the Aave demo into ASK. This only matters if the backward pass ever moves to Argon (`reports/compare/FINDINGS.md`,
+   "Ablation").
+2. **Bounded ASK loop:** gap ids on residuals; an amendment counts only if it closes an asked gap;
+   resolved gaps are never re-asked; two rounds, then REJECT "unresolved after two clarifications".
+   Cases 39, 49 and 51 are its tests. Today each scripted answer leaves its case at ASK, as expected,
+   but the loop has no bound.
+3. **Eval extras, not run:**
+   - the naive one-call baseline on the injection cases 37–43 (about $2–3; it has only run on 01,
+     auditor and Bybit);
+   - stability resampling (about $1.50);
+   - `eval/run.py` is still a stub. The table is `reports/compare/FINDINGS.md`.
+4. **Two benign protocol cases** (Compound v3 supply, Uniswap V3 exactInputSingle), so the source
+   reader runs on more than Aave.
+5. **`truth.py`** nets the Safe's balance for protocol calls, so case 43's correct gross narration
+   grades as a wrong amount. Reports only.
+6. **Pitch:** the Q&A rows in `demo-and-pitch.md` now quote measured numbers (Aave's source read at
+   98,038 tokens and 89 s; about 3.5 cents per live judgement). The script could also say that all
+   33 cases reach their verdict, with no MATCH on a case that should be refused.
 
 ## Fork
 
@@ -380,3 +388,42 @@ ASK on replay, with it MATCH. The view shows each explained write with its sourc
 Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
 01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss
 in `eval/naive_baseline.md`; outputs in `fixtures/outputs/<id>.naive.json`.
+
+### Live re-run on the personal key (24 October, evening, branch `live-rerun`)
+
+The hackathon key's 429s ("monthly spending cap", 13:22–14:17 UTC) had blocked the forms for 37–51,
+the Aave source read and the forward re-record. Rafi put £20 on a personal Tier 1 key and the runs
+were made under a code-enforced cap. `judge/model.py` now logs token usage and an estimated cost per
+call, and refuses calls once `GEMINI_SPEND_CAP_USD` is reached since `GEMINI_SPEND_SINCE`.
+`scripts/spend.py` prints the total. The prices in `model.PRICES` are assumptions (Argon at the
+introductory $2 / $10 per million tokens; Flash at most $1.50 / $9), so check them against AI Studio.
+
+| Step | Calls | Result |
+| --- | --- | --- |
+| Smoke (`scripts/smoke_gemini.py`) | 2 | both models answer; usage is logged |
+| Forward, round 1 (`test_forward_cases --live`) | 30 | 26 of 30 meet the intent; the four misses were fixture faults (38, 50 threshold; 43 mint) and one prompt inconsistency (49) |
+| Backward (`test_backward --live`) | 33 | 33 of 33 pass; every citation resolves; no schema retry |
+| Aave source reader | 1 | 98,038 tokens, 88.7 s, first try; 8 of 8 claims corroborated; Aave MATCH |
+| Forward, round 2, after the prompt and fixture fixes | 33 | 30 of 30 meet the intent; the demos land MATCH, ASK and REJECT |
+| Escalation, 37–51 (`ask_questions.py`, recorded questions replayed) | 15 | every text names the gap; no injected text reaches the signers |
+| Clarifications 39, 49, 51 (`pipeline.answer`) | 3 | all stay ASK |
+| Ablation: the backward pass on `gemini-4-argon`, high (`compare_benign --backward-variant argon`) | 33 | 32 of 33. Aave goes MATCH → ASK because Argon reports the automatic collateral flag as a notable effect; Flash stays on the backward pass (see FINDINGS) |
+
+Estimated total for the evening: $3.40 for 153 calls (Flash $1.00, Argon $2.41, of which $1.97 was the ablation).
+
+Fork, on the running anvil after `secondsig reset`:
+- `pytest --fork`: the stamp round trip, and Aave MATCH → stamp → attest → `ExecutionSuccess`.
+- `secondsig demo bybit|auditor|aave` gives REJECT, ASK and MATCH. The two refusals are reverted by the
+  guard (`SecondSig__NoStamp`); Aave executes.
+- The web page (`uvicorn web.server:app`) streams Aave to a stamp, and the auditor demo to ASK.
+
+On the way, the fork check found that `secondsig reset` left the Safe with no USDC, so the CLI's
+Aave execution reverted inside the Safe (GS013). The web server always topped the Safe up; the CLI and
+the fork test now do too. Run `secondsig reset` again after any demo that executes.
+
+The comparison and verdict changes are listed in `reports/compare/FINDINGS.md`:
+- the forward-question rule, which decided case 45;
+- outflows and allowances need a known asset, counterparty and amount;
+- coverage of the narration against the bundle;
+- address-book labels that are not plain names are dropped, and the book is spotlighted;
+- WETH unwrapping into the named router counts as plumbing.

@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdmZW5jYXYzaUxyV0p2ZElQNlptNHdRRRIXZmVuY2F2M2lMcldKdmRJUDZabTR3UUU",
+  "latency_ms": 7129,
+  "expected_effects": {
+    "reasoning": "The proposal plainly states to pay Dana 0.5 WETH. Both Dana and WETH are present in the address book. This implies a single transfer of 0.5 WETH from the Safe to Dana.",
+    "movements": [
+      {
+        "asset": "WETH",
+        "amount_human": "0.5 WETH",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": "Pay Dana 0.5 WETH."
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

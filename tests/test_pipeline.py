@@ -145,9 +145,11 @@ def test_effective_description_attributes_each_amendment() -> None:
 @pytest.mark.fork
 def test_aave_match_stamps_attests_and_executes_on_the_fork() -> None:
     from contracts.setup import OWNERS, connect, ensure_guard, ensure_safe, rpc
+    from judge.run_fixture import ensure_usdc
     w3 = connect()
     safe = ensure_safe(w3, quiet=True)
     guard = ensure_guard(w3, safe)
+    ensure_usdc(w3, safe.address)  # the recorded bundle deposits 10,000 USDC; a fresh fork holds none
     res = replay("demo_aave")
     assert res.verdict.decision == Decision.MATCH
     assert res.bundle.safe_tx.nonce == safe.functions.nonce().call(), "fork nonce moved; reset the fork to replay"

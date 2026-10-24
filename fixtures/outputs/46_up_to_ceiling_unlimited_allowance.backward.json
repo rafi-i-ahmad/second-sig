@@ -1,0 +1,113 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdtdWZjYXRfMkRhZnFrZFVQdXVhSmtBZxIXbXVmY2F0XzJEYWZxa2RVUHV1YUprQWc",
+  "latency_ms": 9491,
+  "narration": {
+    "reasoning": "The transaction executes a MultiSendCallOnly call from Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47). First, the Safe approves Uniswap (0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) for unlimited USDC. Second, the Safe calls swapExactTokensForTokens on Uniswap, swapping 1,000 USDC (1,000,000,000 base units) for 0.352427523272240659 WETH (352427523272240659 base units) via the Uniswap V2 pair (0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc). The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe incremented its transaction nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s8",
+          "e0"
+        ]
+      },
+      {
+        "sentence": "The Safe granted an unlimited USDC allowance to Uniswap.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s2",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe transferred 1,000 USDC to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc in exchange for 0.352427523272240659 WETH via Uniswap.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c9",
+          "c10",
+          "c11",
+          "c12",
+          "s0",
+          "s1",
+          "s6",
+          "s7",
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "e2",
+          "e4",
+          "e5"
+        ]
+      },
+      {
+        "sentence": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc updated its reserves and cumulative price accounting.",
+        "severity": "info",
+        "cites": [
+          "s3",
+          "s4",
+          "s5",
+          "e3"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1,000 USDC",
+        "amount_base_units": "1000000000",
+        "from_name": "Safe",
+        "to_name": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "cites": [
+          "c9",
+          "c10",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e2"
+        ]
+      },
+      {
+        "asset": "WETH",
+        "amount_human": "0.352427523272240659 WETH",
+        "amount_base_units": "352427523272240659",
+        "from_name": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "to_name": "Safe",
+        "cites": [
+          "c11",
+          "c12",
+          "s6",
+          "s7",
+          "b2",
+          "b3",
+          "e4",
+          "e5"
+        ]
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap",
+        "amount_human": "unlimited",
+        "cites": [
+          "c5",
+          "c6",
+          "s2",
+          "e1"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_ChdmT3pjYXJMYUlLSzR2ZElQdi1hdi1RRRIXZk96Y2FyTGFJS0s0dmRJUHYtYXYtUUU",
+  "latency_ms": 34822,
+  "narration": {
+    "reasoning": "The transaction is executed on the Safe via `execTransaction` (c0, c1), which increments the Safe's nonce from 1 to 2 (s3) and emits `ExecutionSuccess` (e0). Inside the transaction, the Safe delegatecalls `MultiSendCallOnly v1.4.1` (c4) to batch two ERC-20 transfers on `USDC`: first, transferring 8,000 USDC (8,000,000,000 base units) from the Safe to `Acme` (c5, c6, s1, s2, b1, b2, e1); second, transferring 1 USDC (1,000,000 base units) from the Safe to `0x2C81904f370e7f6490aEa328CA847AEFdc3853D3` (c7, c8, s0, s1, b0, b2, e2). No token allowances or Safe configuration settings are changed.",
+    "effects": [
+      {
+        "sentence": "Safe transfers 8,000 USDC to Acme.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Safe transfers 1 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ]
+      },
+      {
+        "sentence": "Safe increments its nonce from 1 to 2 and logs successful execution.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "s3",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "8,000 USDC",
+        "amount_base_units": "8000000000",
+        "from_name": "Safe",
+        "to_name": "Acme",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s2",
+          "b1",
+          "b2",
+          "e1"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "1 USDC",
+        "amount_base_units": "1000000",
+        "from_name": "Safe",
+        "to_name": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b0",
+          "b2",
+          "e2"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

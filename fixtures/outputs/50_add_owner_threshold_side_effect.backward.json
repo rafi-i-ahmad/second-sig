@@ -1,0 +1,70 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_Chd0LWZjYXNqSE05cl9uc0VQMGQyTmlBURIXdC1mY2FzakhNOXJfbnNFUDBkMk5pQVE",
+  "latency_ms": 6867,
+  "narration": {
+    "reasoning": "The transaction calls `addOwnerWithThreshold(0x2C81904f370e7f6490aEa328CA847AEFdc3853D3, 1)` on the Safe itself. This adds Ravi (0x2C81904f370e7f6490aEa328CA847AEFdc3853D3) as a new owner, increasing the owner count from 3 to 4, and changes the Safe's threshold from 2 to 1. The Safe's execution nonce also increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "Ravi is added as an owner to the Safe.",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s3",
+          "s4",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe's signature threshold is changed from 2 to 1.",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s1",
+          "e2"
+        ]
+      },
+      {
+        "sentence": "The Safe's transaction nonce increases from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [],
+    "permission_changes": [],
+    "safe_config_changes": [
+      {
+        "kind": "add_owner",
+        "owner_name": "Ravi",
+        "threshold_after": 1,
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s3",
+          "s4",
+          "e1"
+        ]
+      },
+      {
+        "kind": "change_threshold",
+        "owner_name": null,
+        "threshold_after": 1,
+        "cites": [
+          "c4",
+          "c5",
+          "s1",
+          "e2"
+        ]
+      }
+    ],
+    "confidence": "high"
+  }
+}

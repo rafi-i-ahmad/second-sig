@@ -1,0 +1,178 @@
+{
+  "id": "05_raise_threshold",
+  "description": "Raise the signing threshold to 3 of 4",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (1 matched; tiers used: exact).",
+    "decision": "MATCH",
+    "reasons": [
+      "config: threshold = 3 [exact]"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": {
+      "matched": [
+        {
+          "kind": "config",
+          "expected": "threshold = 3",
+          "observed": "threshold = 3",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's transaction nonce is incremented from 1 to 2 and execution succeeds."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "3",
+        "severity": null,
+        "cites": [
+          "call:Safe (itself) changeThreshold(uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "3",
+        "severity": null,
+        "cites": [
+          "Raise the signing threshold to 3 of 4"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "3",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "effects": [
+      {
+        "sentence": "The Safe's signing threshold is changed from 2 to 3.",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's transaction nonce is incremented from 1 to 2 and execution succeeds.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "s1",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: The Safe's transaction nonce is incremented from 1 to 2 and execution succeeds.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0xd36caa3015f26274ffe9b8a97642f134a4c9ad7e41faa3637f185fc1ce35d8e7",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "label": "Safe.threshold",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000003"
+      },
+      {
+        "id": "s1",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

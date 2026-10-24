@@ -24,6 +24,16 @@ Tiers, best first. Each match records the weakest rule it needed:
   the Safe to receive. Bookkeeping, logged, never a finding on its own. A licensed call that
   delivers the Safe's purchase to someone else is not internal and stays unexplained.
 
+What leaves the Safe must be pinned down by the words. An outbound movement is explained only
+by an expected one with a known asset, a known recipient and an amount or a bound, so the
+weaker tiers (amount_unconstrained, party_unresolved, asset_unresolved) apply to what the Safe
+receives, never to what it sends: "pay Dana's new wallet", "send 1,000 USDT" with no USDT in the
+book, or "pay Dana" with no amount explain nothing and the signers are asked. Likewise an
+allowance is explained only by an expected one with a known token, a known spender and an amount.
+"Known" means the address book, the Safe, or an address written in the words: a counterparty the
+resolver found only through a contract name in verified source (which its deployer chose) can
+explain what the Safe receives, never what it sends or allows.
+
 Only notable and critical observed items take part in the verdict. Info effects go to the
 log, with one exception: an info effect that cites a storage write no code layout and no
 corroborated source claim has labelled is *not* explained. A model calling an unknown write
@@ -32,16 +42,30 @@ unexplained at notable until judge/corroborate.py labels it. ``raised`` carries 
 source reader read as control or asset changes; those are unexplained whatever the backward
 pass said. An observed item whose citations do not resolve is never explained (fail closed).
 An expected item whose phrase is not in the description explains nothing.
+
+Coverage: the backward pass may add detail but cannot leave anything out. Code checks the
+narration against the bundle: every net decrease of a Safe balance must equal the net of the
+listed movements in that asset, every Approval the Safe granted needs a listed allowance for that
+token and spender, and every owner or threshold change the Safe announced needs a listed config
+change with that value. A gap is unexplained: notable, or critical for the Safe's configuration.
+A forged event can only add something to account for, never take anything away.
 """
 
 from __future__ import annotations
+
+from decimal import Decimal
+
+from eth_utils import to_checksum_address
 
 from judge.canon import (
     Resolver, render_config, render_movement, render_permission,
 )
 from judge.schemas import (
-    CanonConfig, CanonEffects, CanonMovement, CanonPermission, CompareResult, Match, MatchTier, Unexplained,
+    CanonConfig, CanonEffects, CanonMovement, CanonPermission, CompareResult, Event, Match, MatchTier, Unexplained,
 )
+
+# Tiers that leave something open: fine for what the Safe receives, never for what it sends.
+_OPEN_TIERS: set[MatchTier] = {"amount_unconstrained", "party_unresolved", "asset_unresolved"}
 
 TIER_RANK: dict[MatchTier, int] = {
     "exact": 0, "amount_bounded": 1, "amount_unconstrained": 2, "counterparty_via_callee": 3, "party_unresolved": 4,
@@ -116,6 +140,10 @@ def match_movement(exp: CanonMovement, obs: CanonMovement, r: Resolver) -> Match
     t = _party_tier(exp.to_party, obs.to_party, obs.cites, r)
     if f is None or t is None:
         return None
+    if obs.direction == "out" and (_OPEN_TIERS & {a, amt, f, t} or exp.to_party.via == "sources"):
+        # an outflow the words leave open (asset, recipient or amount) explains nothing, and nor does
+        # a recipient known only by the name its own deployer gave it in verified source
+        return None
     tier = _worst(a, amt, f, t)
     notes = []
     if exp.implied:
@@ -124,6 +152,8 @@ def match_movement(exp: CanonMovement, obs: CanonMovement, r: Resolver) -> Match
 
 
 def match_permission(exp: CanonPermission, obs: CanonPermission, r: Resolver) -> Match | None:
+    if exp.new_allowance is None or not exp.asset.resolved or not exp.spender.resolved or exp.spender.via == "sources":
+        return None  # "set Ravi's allowance", or a spender known only by its contract name: explains nothing
     a = _asset_tier(exp, obs)
     if a is None:
         return None
@@ -131,15 +161,11 @@ def match_permission(exp: CanonPermission, obs: CanonPermission, r: Resolver) ->
     s = _party_tier(exp.spender, obs.spender, obs.cites, r)
     if o is None or s is None or s == "counterparty_via_callee":
         return None  # an allowance to a different spender is never explained by the call path
-    if exp.new_allowance is None:
-        amt: MatchTier = "amount_unconstrained"
-    elif exp.new_allowance == obs.new_allowance:
-        amt = "exact"
-    else:
+    if exp.new_allowance != obs.new_allowance:
         return None
     notes = ["expected item was implied by the words, not stated"] if exp.implied else []
     return Match(kind="permission", expected=render_permission(exp), observed=render_permission(obs),
-                 tier=_worst(a, o, s, amt), notes=notes)
+                 tier=_worst(a, o, s, "exact"), notes=notes)
 
 
 def match_config(exp: CanonConfig, obs: CanonConfig) -> Match | None:
@@ -288,20 +314,85 @@ def reconcile(expected: CanonEffects, observed: CanonEffects, r: Resolver, raise
                 kind="effect", item=e.sentence, severity=e.severity, cites=e.cites,
                 reason="no matched item shares its evidence"))
 
+    res.observed_unexplained += _coverage(observed, r)
+    res.ignored_labels = list(r.ignored_labels)
     res.tiers = sorted({m.tier for m in res.matched}, key=lambda t: TIER_RANK[t])
     return res
 
 
+# --------------------------------------------------------------------------- coverage
+
+
+_CONFIG_EVENTS = {"AddedOwner": ("owners_add", "owners_swap"), "RemovedOwner": ("owners_remove", "owners_swap"),
+                  "ChangedThreshold": ("threshold",)}
+
+
+def _human(base: int, decimals: int | None) -> str:
+    if decimals is None:
+        return f"{base} base units"
+    return f"{Decimal(base).scaleb(-decimals).normalize():f}"
+
+
+def _coverage(observed: CanonEffects, r: Resolver) -> list[Unexplained]:
+    """What the bundle shows happened to the Safe that the narration does not account for."""
+    out: list[Unexplained] = []
+    bundle, safe = r.bundle, r.safe
+    for b in bundle.balance_diff:
+        if to_checksum_address(b.holder) != safe or b.delta >= 0:
+            continue
+        asset = "ETH" if b.asset == "ETH" else to_checksum_address(b.asset)
+        net = 0
+        for m in observed.movements:
+            if m.cited_ok and m.asset.address == asset and m.amount_base is not None:
+                net += {"out": -m.amount_base, "in": m.amount_base}.get(m.direction, 0)
+        if net != b.delta:
+            out.append(Unexplained(
+                kind="movement", severity="notable", cites=[b.id],
+                item=f"the Safe's {b.symbol or asset} balance falls by {_human(-b.delta, b.decimals)}; the listed "
+                     f"movements account for {_human(-net, b.decimals)}",
+                reason="the narration leaves part of this balance change out"))
+    for e in bundle.events:
+        values = [a.value for a in e.args or []]
+        if e.name == "Approval" and len(values) >= 2 and _is_addr(values[0]) and to_checksum_address(values[0]) == safe:
+            token, spender = to_checksum_address(e.address), to_checksum_address(values[1]) if _is_addr(values[1]) else None
+            if not any(p.cited_ok and p.asset.address == token and p.spender.address == spender
+                       for p in observed.permissions):
+                out.append(Unexplained(
+                    kind="permission", severity="notable", cites=[e.id],
+                    item=f"the Safe granted an allowance on {r.display(token)} to {r.display(spender or '?')} "
+                         f"({e.id}) that the narration does not list",
+                    reason="the narration leaves out an allowance the Safe granted"))
+        if e.name in _CONFIG_EVENTS and to_checksum_address(e.address) == safe and values:
+            value = to_checksum_address(values[0]) if _is_addr(values[0]) else str(values[0])
+            fields = _CONFIG_EVENTS[e.name]
+            if not any(c.cited_ok and c.field in fields and (c.new or "").lower() == value.lower()
+                       for c in observed.configs):
+                out.append(Unexplained(
+                    kind="config", severity="critical", cites=[e.id],
+                    item=f"the Safe announced {e.name} {r.display(value) if value.startswith('0x') else value} "
+                         f"({e.id}) and the narration does not list it",
+                    reason="the narration leaves out a change to the Safe's owners or threshold"))
+    return out
+
+
+def _is_addr(value: object) -> bool:
+    return isinstance(value, str) and value.startswith("0x") and len(value) == 42
+
+
 def _is_internal(obs: CanonMovement, expected: CanonEffects, callees, r: Resolver) -> bool:
     """Bookkeeping between contracts inside a licensed call, and nothing more. Refused when:
-    - the asset is one the words expect the Safe to *receive* (a swap's output delivered to a
-      third party is a diversion, not plumbing), or
+    - the asset is one the words expect the Safe to *receive* and it goes anywhere but a contract
+      the words license (a swap's output delivered to a third party is a diversion, not plumbing;
+      WETH unwrapping the output into the router the words name is plumbing, and the router's
+      delivery to the Safe is still checked against the words), or
     - the recipient has no code (a plain address inside a protocol call is someone's wallet)."""
     if not any(r.inside_call_to(obs.cites, p.address) for p in callees):
         return False
     expected_in = {m.asset.address for m in expected.movements if m.direction == "in" and m.asset.resolved}
     expected_in_labels = {m.asset.label.lower() for m in expected.movements if m.direction == "in"}
-    if obs.asset.address in expected_in or obs.asset.label.lower() in expected_in_labels:
+    licensed = {p.address for p in callees}
+    if (obs.asset.address in expected_in or obs.asset.label.lower() in expected_in_labels) \
+            and obs.to_party.address not in licensed:
         return False
     to = obs.to_party.address
     if to is None:

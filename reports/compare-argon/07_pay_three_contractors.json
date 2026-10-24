@@ -1,0 +1,513 @@
+{
+  "id": "07_pay_three_contractors",
+  "description": "Pay three contractors their October invoices: Alice 1,200 USDC, Bob 3,400 USDC, Chen 800 USDC",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (3 matched; tiers used: exact).",
+    "decision": "MATCH",
+    "reasons": [
+      "movement: 1,200 USDC Safe -> Alice [exact]",
+      "movement: 3,400 USDC Safe -> Bob [exact]",
+      "movement: 800 USDC Safe -> Chen [exact]"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "1,200 USDC Safe -> Alice",
+          "observed": "1,200 USDC Safe -> Alice",
+          "tier": "exact",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "3,400 USDC Safe -> Bob",
+          "observed": "3,400 USDC Safe -> Bob",
+          "tier": "exact",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "800 USDC Safe -> Chen",
+          "observed": "800 USDC Safe -> Chen",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "Safe increments its transaction nonce from 1 to 2 and records successful execution of the MultiSendCallOnly v1.4.1 batch."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Alice",
+          "address": "0x0f7Fec2abfb38b2dbE7db5c42dDf737fE4d83793",
+          "via": "address"
+        },
+        "amount_base": 1200000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1200 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Bob",
+          "address": "0x3016eed29f9F2352B2B67E570b2D1e25A2b6B79D",
+          "via": "address"
+        },
+        "amount_base": 3400000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "3400 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Chen",
+          "address": "0x0e3cF211A59882A219cF6a9E35A7023c92b9341D",
+          "via": "address"
+        },
+        "amount_base": 800000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "800 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Alice",
+          "address": "0x0f7Fec2abfb38b2dbE7db5c42dDf737fE4d83793",
+          "via": "address_book"
+        },
+        "amount_base": 1200000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1,200 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Alice 1,200 USDC"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Bob",
+          "address": "0x3016eed29f9F2352B2B67E570b2D1e25A2b6B79D",
+          "via": "address_book"
+        },
+        "amount_base": 3400000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "3,400 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Bob 3,400 USDC"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Chen",
+          "address": "0x0e3cF211A59882A219cF6a9E35A7023c92b9341D",
+          "via": "address_book"
+        },
+        "amount_base": 800000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "800 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Chen 800 USDC"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Alice",
+          "address": "0x0f7Fec2abfb38b2dbE7db5c42dDf737fE4d83793",
+          "via": "address_book"
+        },
+        "amount_base": 1200000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1,200 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s3",
+          "b1",
+          "b3",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Bob",
+          "address": "0x3016eed29f9F2352B2B67E570b2D1e25A2b6B79D",
+          "via": "address_book"
+        },
+        "amount_base": 3400000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "3,400 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Chen",
+          "address": "0x0e3cF211A59882A219cF6a9E35A7023c92b9341D",
+          "via": "address_book"
+        },
+        "amount_base": 800000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "800 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "c10",
+          "s1",
+          "s2",
+          "b0",
+          "b3",
+          "e3"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "Safe transfers 1,200 USDC to Alice.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s3",
+          "b1",
+          "b3",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe transfers 3,400 USDC to Bob.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e2"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe transfers 800 USDC to Chen.",
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "c10",
+          "s1",
+          "s2",
+          "b0",
+          "b3",
+          "e3"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe increments its transaction nonce from 1 to 2 and records successful execution of the MultiSendCallOnly v1.4.1 batch.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "s4",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: Safe increments its transaction nonce from 1 to 2 and records successful execution of the MultiSendCallOnly v1.4.1 batch.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x5bcf29bfef0dcb17a5453431471323e7f78039db2a8b8d8a2e69daf68ec2680e",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x0c30c3092677c7833af9faca7b37e4ef354ec3bd0b5d54f0bb40003dcde353f9",
+        "label": "USDC.balanceOf[0x3016…B79D]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x00000000000000000000000000000000000000000000000000000000caa7e200"
+      },
+      {
+        "id": "s1",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x2af6e45109ed6c3f87addc9868ad92048225ec319f059ae1d594169e71fbbeb6",
+        "label": "USDC.balanceOf[0xDFEC…aE47]",
+        "before": "0x00000000000000000000000000000000000000000000000000000002540be400",
+        "after": "0x00000000000000000000000000000000000000000000000000000001122e6e00"
+      },
+      {
+        "id": "s2",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x6ce9ae6bae2dc690bf03d81ad1ddaeff8acccc43f04e033e78493a09d0c6c178",
+        "label": "USDC.balanceOf[0x0e3c…341D]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000000000000000000000000000000000002faf0800"
+      },
+      {
+        "id": "s3",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x95a09609ccb30d7d3c65e9c423fb48ea8bb3bffd722b20e69f0ce0233827fd0a",
+        "label": "USDC.balanceOf[0x0f7F…3793]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x0000000000000000000000000000000000000000000000000000000047868c00"
+      },
+      {
+        "id": "s4",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

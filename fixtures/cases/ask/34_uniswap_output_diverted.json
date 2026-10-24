@@ -1,0 +1,64 @@
+{
+  "id": "34_uniswap_output_diverted",
+  "description": "Buy 1,000 USDC on Uniswap, spending at most 1 ETH",
+  "safe": {
+    "address": "0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE",
+    "note": "placeholder; replace with the Safe deployed on the fork",
+    "version": "1.4.1",
+    "owners": 3,
+    "threshold": 2
+  },
+  "address_book": {
+    "Uniswap": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WETH": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  },
+  "safe_tx": {
+    "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "value": "1000000000000000000",
+    "data": "0xfb3bdb41000000000000000000000000000000000000000000000000000000003b9aca0000000000000000000000000000000000000000000000000000000000000000800000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3000000000000000000000000000000000000000000000000000000006b49d2000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "operation": 0
+  },
+  "calls": [
+    {
+      "operation": 0,
+      "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "to_name": "Uniswap V2 Router",
+      "value_wei": "1000000000000000000",
+      "function": "swapETHForExactTokens(uint256,address[],address,uint256)",
+      "args": [
+        "1000000000",
+        [
+          "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+        ],
+        "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+        "1800000000"
+      ],
+      "data": "0xfb3bdb41000000000000000000000000000000000000000000000000000000003b9aca0000000000000000000000000000000000000000000000000000000000000000800000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3000000000000000000000000000000000000000000000000000000006b49d2000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    }
+  ],
+  "intent": {
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "at most 1 ETH",
+        "from_name": "Safe",
+        "to_name": "Uniswap"
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "1,000 USDC",
+        "from_name": "Uniswap",
+        "to_name": "Safe"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "expect_question": false,
+    "note": "The words put the USDC in the Safe. The calldata's recipient argument is Ravi."
+  },
+  "expected_verdict": "ASK",
+  "note": "Contradiction: the words state one thing and the bytes do another of the same kind. ASK by decision of 24 October 2026: REJECT is kept for the floor and for critical effects; both refuse the stamp."
+}

@@ -1,32 +1,26 @@
 {
   "model": "gemini-3.8-flash",
   "thinking": "low",
-  "interaction_id": "v1_ChdJNGJjYXRteUxPN2x4TjhQbll2ZDRRURIXSTRiY2F0bXlMTzdseE44UG5ZdmQ0UVE",
-  "latency_ms": 7475,
+  "interaction_id": "v1_ChdGLWZjYXZQQUlKZVFrZFVQOFkyRW1RVRIXRi1mY2F2UEFJSmVRa2RVUDhZMkVtUVU",
+  "latency_ms": 8312,
   "narration": {
-    "reasoning": "The rehearsal executes a Safe multisig transaction via MultiSendCallOnly (v1.4.1), which performs three distinct transfers of USDC: 1,200 USDC to Alice, 3,400 USDC to Bob, and 800 USDC to Chen. Total USDC transferred from the Safe is 5,400 USDC. The Safe's nonce increments from 1 to 2.",
+    "reasoning": "The transaction executes a Safe multisend call (via MultiSendCallOnly v1.4.1) which performs three ERC-20 transfers of USDC: 1,200 USDC to Alice, 3,400 USDC to Bob, and 800 USDC to Chen. The Safe's USDC balance decreases by 5,400 USDC in total, and its nonce increments from 1 to 2.",
     "effects": [
       {
-        "sentence": "The Safe increments its transaction nonce from 1 to 2.",
+        "sentence": "The Safe's transaction nonce is incremented from 1 to 2.",
         "severity": "info",
         "cites": [
+          "c0",
           "c1",
           "s4",
           "e0"
         ]
       },
       {
-        "sentence": "The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions.",
-        "severity": "info",
-        "cites": [
-          "c1",
-          "c4"
-        ]
-      },
-      {
         "sentence": "The Safe transfers 1,200 USDC to Alice.",
         "severity": "notable",
         "cites": [
+          "c4",
           "c5",
           "c6",
           "s1",
@@ -40,6 +34,7 @@
         "sentence": "The Safe transfers 3,400 USDC to Bob.",
         "severity": "notable",
         "cites": [
+          "c4",
           "c7",
           "c8",
           "s0",
@@ -53,6 +48,7 @@
         "sentence": "The Safe transfers 800 USDC to Chen.",
         "severity": "notable",
         "cites": [
+          "c4",
           "c9",
           "c10",
           "s1",

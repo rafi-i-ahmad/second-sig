@@ -9,7 +9,12 @@ Guarantees:
 - Timeouts and API errors surface as ``ModelUnavailable``.
 - Every call, success or failure, appends one line to ``logs/calls.jsonl``:
   timestamp, model, thinking level, sha256 of system+user, interaction id, parsed
-  output or error, latency in ms. The raw prompt and the API key are never logged.
+  output or error, latency in ms, token usage and an estimated cost in USD. The raw
+  prompt and the API key are never logged.
+- Spend cap: with ``GEMINI_SPEND_CAP_USD`` set, a call is refused (``ModelUnavailable``)
+  once the estimated spend logged since ``GEMINI_SPEND_SINCE`` (ISO time; unset means the
+  whole log) reaches the cap. Estimates use ``PRICES``, which are assumptions: check them
+  against AI Studio's spend page. ``scripts/spend.py`` prints the running total.
 - No tools are offered to the model here. Read-only tool loops, when added, run in
   separate calls (see CLAUDE.md, Gemini notes).
 
@@ -48,6 +53,15 @@ LOG_PATH = REPO_ROOT / "logs" / "calls.jsonl"
 
 DEFAULT_TIMEOUT_S = 120.0
 _VALIDATION_RETRIES = 1
+
+# USD per million tokens (input, output). Assumed, not from an official page: Argon's
+# introductory price (doubles after 30 November 2026); Flash from the 3.5 / 3.6 Flash list
+# prices. Thought tokens are billed as output. Unknown models get the dearest guess.
+PRICES: dict[str, tuple[float, float]] = {
+    "gemini-3.8-flash": (1.50, 9.00),
+    "gemini-4-argon": (2.00, 10.00),
+}
+_UNKNOWN_PRICE = (4.00, 20.00)
 
 
 class ModelUnavailable(Exception):
@@ -191,11 +205,12 @@ def _log(
     prompt_sha256: str,
     interaction_id: str | None,
     latency_ms: int,
-    status: Literal["ok", "form_error", "unavailable"],
+    status: Literal["ok", "form_error", "unavailable", "rate_limited"],
     output: dict[str, Any] | None = None,
     error: Any = None,
     attempt: int = 0,
     streamed: bool = False,
+    usage: dict[str, int] | None = None,
 ) -> None:
     line = {
         "ts": datetime.now(timezone.utc).isoformat(),
@@ -209,10 +224,71 @@ def _log(
         "latency_ms": latency_ms,
         "output": output,
         "error": error,
+        "usage": usage,
+        "est_usd": estimate_usd(model, usage) if usage else None,
     }
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     with LOG_PATH.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(line, default=str) + "\n")
+
+
+# --------------------------------------------------------------------------- spend
+
+
+def _usage(interaction: Any) -> dict[str, int] | None:
+    """Token counts from ``interaction.usage``, or None if the response carries none."""
+    u = _get(interaction, "usage")
+    if u is None:
+        return None
+    fields = {"input": "total_input_tokens", "output": "total_output_tokens",
+              "thought": "total_thought_tokens", "cached": "total_cached_tokens"}
+    return {k: int(_get(u, f) or 0) for k, f in fields.items()}
+
+
+def estimate_usd(model: str, usage: dict[str, int]) -> float:
+    """Input at the input price, output and thought tokens at the output price. Cached input is
+    not discounted, so the estimate errs high."""
+    p_in, p_out = PRICES.get(model, _UNKNOWN_PRICE)
+    return round((usage.get("input", 0) * p_in + (usage.get("output", 0) + usage.get("thought", 0)) * p_out) / 1e6, 6)
+
+
+def _parse_ts(text: str) -> datetime:
+    ts = datetime.fromisoformat(text.strip())
+    return ts if ts.tzinfo else ts.replace(tzinfo=timezone.utc)
+
+
+def spent_since(since: str | None = None, path: Path | None = None) -> float:
+    """Estimated USD logged in ``logs/calls.jsonl`` at or after ``since`` (ISO time; None: all)."""
+    path = path or LOG_PATH
+    if not path.exists():
+        return 0.0
+    start = _parse_ts(since) if since else None
+    total = 0.0
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        try:
+            line = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if not line.get("est_usd"):
+            continue
+        if start is not None and _parse_ts(line["ts"]) < start:
+            continue
+        total += float(line["est_usd"])
+    return total
+
+
+def _check_spend_cap(model: str, thinking: str, prompt_sha: str) -> None:
+    """Refuse the call once the logged spend reaches GEMINI_SPEND_CAP_USD. Callers turn the
+    ModelUnavailable into ASK, as for any other outage."""
+    cap = os.environ.get("GEMINI_SPEND_CAP_USD")
+    if not cap:
+        return
+    spent = spent_since(os.environ.get("GEMINI_SPEND_SINCE") or None)
+    if spent >= float(cap):
+        msg = f"spend cap reached: ${spent:.2f} of ${float(cap):.2f} since {os.environ.get('GEMINI_SPEND_SINCE') or 'the start of the log'}"
+        _log(model=model, thinking=thinking, prompt_sha256=prompt_sha, interaction_id=None, latency_ms=0,
+             status="unavailable", error=msg)
+        raise ModelUnavailable(msg)
 
 
 # --------------------------------------------------------------------------- output
@@ -273,6 +349,7 @@ def _create_with_backoff(
 ) -> Any:
     """``interactions.create`` with a short wait and retry on 429. Any other API failure, or a
     429 that outlasts the retries, is ModelUnavailable: the caller turns that into ASK."""
+    _check_spend_cap(model, thinking, prompt_sha)
     waits = 0
     while True:
         t0 = time.perf_counter()
@@ -320,6 +397,7 @@ def complete(
 
         latency = _ms(t0)
         interaction_id = _get(interaction, "id") or ""
+        usage = _usage(interaction)
         try:
             parsed = schema.model_validate_json(_output_text(interaction))
         except ValidationError as exc:
@@ -327,7 +405,7 @@ def complete(
             _log(
                 model=model, thinking=thinking, prompt_sha256=prompt_sha,
                 interaction_id=interaction_id, latency_ms=latency, status="form_error",
-                error=errors, attempt=attempt,
+                error=errors, attempt=attempt, usage=usage,
             )
             if attempt < _VALIDATION_RETRIES:
                 prompt = _retry_prompt(user, errors)
@@ -340,7 +418,7 @@ def complete(
         _log(
             model=model, thinking=thinking, prompt_sha256=prompt_sha,
             interaction_id=interaction_id, latency_ms=latency, status="ok",
-            output=parsed.model_dump(mode="json"), attempt=attempt,
+            output=parsed.model_dump(mode="json"), attempt=attempt, usage=usage,
         )
         return parsed, interaction_id
 
@@ -362,6 +440,7 @@ def stream(
     client = get_client()
     prompt_sha = _prompt_hash(system, user)
     kwargs = _request_kwargs(model, system, user, schema, thinking, stream=True)
+    _check_spend_cap(model, thinking, prompt_sha)
 
     text_parts: list[str] = []
     interaction_id: str | None = None
@@ -409,6 +488,7 @@ def stream(
 
     latency = _ms(t0)
     full_text = "".join(text_parts) or (_output_text(completed) if completed is not None else "")
+    usage = _usage(completed) if completed is not None else None
     try:
         parsed = schema.model_validate_json(full_text)
     except ValidationError as exc:
@@ -416,7 +496,7 @@ def stream(
         _log(
             model=model, thinking=thinking, prompt_sha256=prompt_sha,
             interaction_id=interaction_id, latency_ms=latency, status="form_error",
-            error=errors, streamed=True,
+            error=errors, streamed=True, usage=usage,
         )
         raise ModelFormError(
             f"streamed output failed validation (interaction {interaction_id}): {errors}"
@@ -425,7 +505,7 @@ def stream(
     _log(
         model=model, thinking=thinking, prompt_sha256=prompt_sha,
         interaction_id=interaction_id, latency_ms=latency, status="ok",
-        output=parsed.model_dump(mode="json"), streamed=True,
+        output=parsed.model_dump(mode="json"), streamed=True, usage=usage,
     )
     yield StreamEvent(kind="done", result=parsed, interaction_id=interaction_id)
 

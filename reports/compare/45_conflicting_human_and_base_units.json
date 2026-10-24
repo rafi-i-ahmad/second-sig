@@ -1,0 +1,250 @@
+{
+  "id": "45_conflicting_human_and_base_units",
+  "description": "Pay Dana 1 USDC for the invoice (1,000,000,000 base units).",
+  "expected_verdict": "ASK",
+  "verdict": {
+    "reasoning": "Everything matched, but reading the description raised a question the signers must settle before anything is approved.",
+    "decision": "ASK",
+    "reasons": [
+      "the description raises a question"
+    ],
+    "floor_hits": [],
+    "question": "The description specifies '1 USDC' but also lists '(1,000,000,000 base units)', which equals 1,000 USDC. Which amount is intended?",
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "1 USDC Safe -> Dana",
+          "observed": "1 USDC Safe -> Dana",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's nonce increased from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": [
+        "The description specifies '1 USDC' but also lists '(1,000,000,000 base units)', which equals 1,000 USDC. Which amount is intended?"
+      ],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address"
+        },
+        "amount_base": 1000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC transfer(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address_book"
+        },
+        "amount_base": 1000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Pay Dana 1 USDC for the invoice (1,000,000,000 base units)"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [
+      "The description specifies '1 USDC' but also lists '(1,000,000,000 base units)', which equals 1,000 USDC. Which amount is intended?"
+    ],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Dana",
+          "address": "0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315",
+          "via": "address_book"
+        },
+        "amount_base": 1000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "b0",
+          "b1",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe transferred 1 USDC to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's nonce increased from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: The Safe's nonce increased from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x9d7acbf890e87eff4ede40337d255c6a46b8b9ff1affa8b00c118aa77a495ce6",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x2af6e45109ed6c3f87addc9868ad92048225ec319f059ae1d594169e71fbbeb6",
+        "label": "USDC.balanceOf[0xDFEC…aE47]",
+        "before": "0x00000000000000000000000000000000000000000000000000000002540be400",
+        "after": "0x0000000000000000000000000000000000000000000000000000000253fca1c0"
+      },
+      {
+        "id": "s1",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x6efc0df7a31c38d6b6b1a62d7e250d0fefce5752542a43a1d9a17a9f61532a5c",
+        "label": "USDC.balanceOf[0x4716…d315]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x00000000000000000000000000000000000000000000000000000000000f4240"
+      },
+      {
+        "id": "s2",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

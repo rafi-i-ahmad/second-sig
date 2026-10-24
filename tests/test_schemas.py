@@ -76,3 +76,15 @@ def test_verdict_decision_enum() -> None:
     v = Verdict(reasoning="delegatecall to an unverified contract", decision=Decision.REJECT)
     assert v.decision == "REJECT"
     assert list(Verdict.model_fields)[0] == "reasoning"
+
+
+@pytest.mark.parametrize("reply", ["erc20_approval", "approval", "ERC20", "approve", None])
+def test_permission_kind_reads_any_reply_as_the_one_legal_value(reply) -> None:
+    """`kind` has one legal value; a model that writes anything else costs no schema retry."""
+    from judge.schemas import ObservedPermissionChange, PermissionChange
+
+    fwd = PermissionChange(kind=reply, asset="USDC", owner_name="Safe", spender_name="Uniswap router",
+                           amount_human="1,000 USDC", cites="Approve the Uniswap router")
+    obs = ObservedPermissionChange(kind=reply, asset="USDC", owner_name="Safe", spender_name="Uniswap router",
+                                   amount_human="1,000 USDC", cites=["e1"])
+    assert fwd.kind == obs.kind == "erc20_approval"

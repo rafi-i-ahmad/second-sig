@@ -1,0 +1,50 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChRidWZjYXVpa0tvU1VrZFVQNXI1MBIUYnVmY2F1aWtLb1NVa2RVUDVyNTA",
+  "latency_ms": 8093,
+  "narration": {
+    "reasoning": "The transaction executes an ERC-20 transfer of 2,500 USDC from the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47) to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277 via a call to the USDC contract. The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe transferred 2,500 USDC to 0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "e1",
+          "s0",
+          "s1",
+          "b0",
+          "b1"
+        ]
+      },
+      {
+        "sentence": "The Safe's transaction nonce increased from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "0x97f8fD4720c6b29a0664cf3A8b3550bd1171c277",
+        "cites": [
+          "b0",
+          "b1",
+          "e1",
+          "c4"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}
