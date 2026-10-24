@@ -53,7 +53,10 @@ Ready when it prints `Listening on 127.0.0.1:8545`. The scripts read `ANVIL_RPC`
 | Threshold | 2 of 3 |
 | Salt nonce | 20251023 |
 | Funding | 1,000 ETH via `anvil_setBalance`, topped up whenever it drops below that |
-| Guard | none yet |
+| Guard | `SecondSigGuard` at `0x7ee55531aacf54195D872EbBD1e19a1c725DD8A5`, set with `--guard` (see below) |
+| Judge | `0x0C7B56D75DCA0c4D7258fBEe0d0E9fa8E74B5298` (`JUDGE_ADDRESS` in `.env`; key in `JUDGE_PRIVATE_KEY`) |
+| judgeVersion | `keccak256("second-sig/v1")` = `0xcfcf56cea6319c219b578886973494ce72c5fcc289fa275fbf44fff029f9f534` |
+| Override delay / max stamp age | 50 blocks / 100 blocks |
 
 The address is deterministic: the factory uses CREATE2 over the setup calldata and the salt, so
 every fresh fork puts the Safe at the same address as long as owners, threshold, fallback handler
@@ -65,6 +68,22 @@ Rebuild or check the Safe:
 ```sh
 uv run python contracts/setup.py
 ```
+
+Install the guard (deploys `SecondSigGuard` through the mainnet CREATE2 deployer, then
+`execTransaction(setGuard)` signed by owners 0 and 1). Needs `forge build` first. Idempotent:
+
+```sh
+(cd contracts && forge build) && uv run python contracts/setup.py --guard
+```
+
+The guard address is fixed by the CREATE2 salt and the constructor arguments (Safe, judge,
+judgeVersion, override delay), so it is the same on every fresh fork unless one of those changes.
+It sits in the stamp's EIP-712 domain, so `judge/stamp.py` must use this address and judgeVersion.
+
+**Once the guard is set, nothing executes without a stamp**, including `judge/run_fixture.py`: it
+reverts with `SecondSig__NoStamp(safeTxHash)` (selector `0x66d21dae`). Run fixtures on a fork
+without `--guard`, or zero the guard slot first as the rehearsal does:
+`anvil_setStorageAt(safe, 0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8, 0)`.
 
 The fixtures still carry the placeholder `0x5AFE…5AFE`; `judge/run_fixture.py` substitutes the real
 address at run time, so the fixture files do not change when the fork is rebuilt.
