@@ -36,7 +36,8 @@ judge/
   jobs/               layer 3: forward.py (works); backward, leftovers, probe, escalate (stubs)
   checker.py          layer 4  (stub)
   verdict.py          layer 5: decision table  (stub)
-  stamp.py            EIP-712 signing with the judge key  (stub)
+  stamp.py            EIP-712 signing with the judge key: make_stamp(bundle), sign(), digest(),
+                      attest(). The only module that reads JUDGE_PRIVATE_KEY
   stages/
     sources.py        Etherscan verified source + ABI, cached in fixtures/sources/, proxies followed
     judge.py          the naive one-call baseline (see below the invariants). Eval only
@@ -59,7 +60,8 @@ fixtures/
 eval/
   run.py              the eval table  (stub)
   naive_baseline.md   naive-judge results and the auditor-miss analysis
-tests/                pytest: schemas, model adapter, evidence, floor rules, forward cases (live)
+tests/                pytest: schemas, model adapter, evidence, floor rules, stamp, forward cases
+                      (live). Markers: `live` needs --live + GEMINI_API_KEY; `fork` needs --fork + anvil
 scripts/              smoke_gemini.py, forward_transfer.py: one-off checks
 logs/                 calls.jsonl, verdicts.jsonl (gitignored; used by --replay)
 ```
@@ -72,6 +74,7 @@ Working now:
 uv sync
 uv run pytest                                   # offline tests; live ones skip
 uv run pytest tests/test_forward_cases.py --live -s   # calls Gemini; needs GEMINI_API_KEY
+uv run pytest tests/test_stamp.py --fork -s            # stamp, attest, execute case 01 through the guard on anvil
 uv run python fixtures/build.py                 # regenerate fixture JSON
 cd contracts && ~/.foundry/bin/forge build && ~/.foundry/bin/forge test -vv
 
@@ -89,7 +92,7 @@ Fixtures carry the Safe placeholder `0x5AFE…5AFE`. `run_fixture.py` and `fork.
 
 Read and write text files with `encoding="utf-8"`. The default encoding on Windows is not UTF-8, and the fixtures contain non-ASCII characters such as `…`.
 
-Secrets live in `.env` only: `GEMINI_API_KEY`, `MAINNET_RPC`, `SEPOLIA_RPC`, `ETHERSCAN_API_KEY`, `SAFE_API_KEY`, `JUDGE_PRIVATE_KEY`, test owner keys. Never print, log or commit any of them.
+Secrets live in `.env` only: `GEMINI_API_KEY`, `MAINNET_RPC`, `SEPOLIA_RPC`, `ETHERSCAN_API_KEY`, `SAFE_API_KEY`, `JUDGE_PRIVATE_KEY` (with its public `JUDGE_ADDRESS`), test owner keys. Never print, log or commit any of them.
 
 ## Invariants: never break these
 
@@ -116,7 +119,7 @@ domain: { name: "SecondSig", version: "1", chainId, verifyingContract: <guard ad
 Stamp:  { bytes32 safeTxHash, uint64 forkBlock, bytes32 judgeVersion }
 ```
 
-`attest(stamp, sig)` is callable by anyone; the guard recovers the signer and compares it with the judge address. Stamps older than `MAX_STAMP_AGE` blocks are rejected, and so are low-s-violating (malleable) signatures. `judgeVersion` is the bytes32 `keccak256("second-sig/v1")` (`contracts/setup.py` `JUDGE_VERSION`). `verifyingContract` is the guard's CREATE2 address in `NOTES.md`. `judge/stamp.py` must sign with exactly these values.
+`attest(stamp, sig)` is callable by anyone; the guard recovers the signer and compares it with the judge address. Stamps older than `MAX_STAMP_AGE` blocks are rejected, and so are low-s-violating (malleable) signatures. `judgeVersion` is the bytes32 `keccak256("second-sig/v1")` (`contracts/setup.py` `JUDGE_VERSION`). `verifyingContract` is the guard's address, which depends on the judge address and so differs per machine until we share one key (`NOTES.md`, "Judge key"). Never hard-code it: get it from `ensure_guard(w3, safe).address` and pass it to `judge/stamp.py`. The stamp round trip is proven on the fork by `tests/test_stamp.py --fork`.
 
 ## Safe gotchas
 

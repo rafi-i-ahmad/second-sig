@@ -20,7 +20,7 @@ Operational facts for the fork and the test Safe. Updated 24 October 2026.
 | Chain | Ethereum mainnet, chain id 1 |
 | Fork block | 21,895,238 (the Bybit attack block) |
 | RPC in use | `https://eth.drpc.org` (public, no key, serves archive state at this block) |
-| `MAINNET_RPC` in `.env` | empty as of 23 October; set it to an Alchemy or Infura URL before the demo |
+| `MAINNET_RPC` in `.env` | set on Rafi's machine as of 24 October; the anvil below was still started on dRPC |
 | anvil | Foundry 1.8.6, installed at `~/.foundry/bin` (not on PATH) |
 
 dRPC's public endpoint worked for a single-case rehearsal. It may rate-limit a fork under demo load,
@@ -58,8 +58,8 @@ Ready when it prints `Listening on 127.0.0.1:8545`. The scripts read `ANVIL_RPC`
 | Threshold | 2 of 3 |
 | Salt nonce | 20251023 |
 | Funding | 1,000 ETH via `anvil_setBalance`, topped up whenever it drops below that |
-| Guard | `SecondSigGuard` at `0x7ee55531aacf54195D872EbBD1e19a1c725DD8A5`, set with `--guard` (see below) |
-| Judge | `0x0C7B56D75DCA0c4D7258fBEe0d0E9fa8E74B5298` (`JUDGE_ADDRESS` in `.env`; key in `JUDGE_PRIVATE_KEY`) |
+| Guard | `SecondSigGuard`, set with `--guard` (see below). **Per machine**: its CREATE2 address depends on the judge address. Daniel: `0x7ee55531aacf54195D872EbBD1e19a1c725DD8A5`. Rafi: `0xf4932401784c5D8435890C226729a87B6464BBC0` |
+| Judge | **Per machine**, see "Judge key" below. Daniel: `0x0C7B56D75DCA0c4D7258fBEe0d0E9fa8E74B5298`. Rafi: `0x7bAc29915313CC27a39163fD82595C6A355b40B9` |
 | judgeVersion | `keccak256("second-sig/v1")` = `0xcfcf56cea6319c219b578886973494ce72c5fcc289fa275fbf44fff029f9f534` |
 | Override delay / max stamp age | 50 blocks / 100 blocks |
 
@@ -83,7 +83,23 @@ Install the guard (deploys `SecondSigGuard` through the mainnet CREATE2 deployer
 
 The guard address is fixed by the CREATE2 salt and the constructor arguments (Safe, judge,
 judgeVersion, override delay), so it is the same on every fresh fork unless one of those changes.
-It sits in the stamp's EIP-712 domain, so `judge/stamp.py` must use this address and judgeVersion.
+The judge address is one of them, so **each developer's guard lands at a different address** until
+we share one judge key for the demo. Nothing should hard-code the guard address: `judge/stamp.py`
+takes it as an argument, and `contracts.setup.ensure_guard(w3, safe)` returns the live contract.
+`setGuard` spends Safe nonce 0, so the first fixture run after `--guard` is at nonce 1.
+
+## Judge key
+
+`JUDGE_PRIVATE_KEY` and `JUDGE_ADDRESS` live in `.env` only (gitignored). Each of us generated our
+own on 24 October; before the demo, pick one key, put it in both `.env` files and restart the fork,
+or the guard addresses above stay different. Generate a fresh one with:
+
+```sh
+uv run python -c "from eth_account import Account; a = Account.create(); print(f'JUDGE_PRIVATE_KEY={a.key.hex()}\nJUDGE_ADDRESS={a.address}')" >> .env
+```
+
+`judge/stamp.py` is the only code that reads the key. It refuses to sign if the key does not
+derive to `JUDGE_ADDRESS`, so a stamp can never be signed for a guard built around another key.
 
 **Once the guard is set, nothing executes without a stamp**, including `judge/run_fixture.py`: it
 reverts with `SecondSig__NoStamp(safeTxHash)` (selector `0x66d21dae`). Run fixtures on a fork
@@ -140,8 +156,32 @@ On the fork, through the real Safe with two owner signatures:
 
 Rehearsed with `judge.evidence.fork` (24 October, Daniel): 01, Bybit, Aave and auditor, bundles in
 `fixtures/bundles/`. Floor hits: Bybit trips rules 1, 2 and 3; the other three trip none. Not yet
-rehearsed: cases 02 to 10. The guard is set on the fork, but no stamped transaction has been
-executed through it yet (only in the Foundry tests); `judge/stamp.py` is still a stub.
+rehearsed: cases 02 to 10.
+
+### Stamp round trip through the guard (24 October, Rafi)
+
+`uv run pytest tests/test_stamp.py --fork -s` runs case 01 the way the full system will, on Rafi's
+fork with the guard set (`judge/stamp.py` signs, code only; the "verdict" is assumed MATCH because
+the bundle has no floor hits and the judge is not wired yet):
+
+| Step | What happened |
+| --- | --- |
+| Rehearse | `fork.build_bundle` on a snapshot: `ExecutionSuccess`, no floor hits, `safeTxHash 0x19ae…5c3f`, fork block 21,895,241. The guard slot was zeroed only inside the snapshot; afterwards the guard was still set |
+| Owners sign, no stamp | `execTransaction` with owners 0 and 1 reverts at the guard with `SecondSig__NoStamp(0x19ae…5c3f)` |
+| Stamp | `stamp.make_stamp(bundle)` → `{safeTxHash, forkBlock 21895241, judgeVersion keccak("second-sig/v1")}`; `stamp.sign` with the judge key. Python's digest equals `guard.stampDigest()` on-chain, byte for byte |
+| Attest | Submitted by owner 2 (anyone may) in block 21,895,242; `stamps[hash] == 21895241`; `Attested` emitted |
+| Execute | Same calldata, same two owner signatures, block 21,895,243: `ExecutionSuccess`, 5 ETH to the ops wallet, nonce 1 → 2 |
+| Replay | Same bytes at nonce 2: `SecondSig__NoStamp` again. A stamp is for one hash, and the hash includes the nonce |
+
+The test takes an `evm_snapshot` after `ensure_guard` and reverts to it, so it leaves the fork
+with the guard set and nothing else changed. Everything that executes through the Safe from then
+on needs a stamp; `judge/run_fixture.py` will revert. Offline, `tests/test_stamp.py` also checks
+that changing any of chain id, guard address, hash, fork block or judgeVersion breaks the
+signature, and that eth_account's EIP-712 encoding matches the hand-built digest.
+
+Signature facts the guard relies on and eth_account satisfies: 65 bytes `r ‖ s ‖ v`, `v` in {27, 28},
+low `s` (the guard rejects `s > n/2`). `MAX_STAMP_AGE` is 100 blocks from `forkBlock`, so a stamp
+signed on a stale rehearsal (or a `forkBlock` in the future) is refused at `attest`.
 
 Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
 01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss
