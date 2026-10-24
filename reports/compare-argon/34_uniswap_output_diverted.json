@@ -1,0 +1,927 @@
+{
+  "id": "34_uniswap_output_diverted",
+  "description": "Buy 1,000 USDC on Uniswap, spending at most 1 ETH",
+  "expected_verdict": "ASK",
+  "verdict": {
+    "reasoning": "The trace shows 2 effects the description does not mention:\n- 1,000 USDC 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3 (evidence c9, c10, s0, s1, b2, b3, e5)\n- 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3. (evidence c8, c9, c10, s0, s1, b2, b3, e4, e5)",
+    "decision": "ASK",
+    "reasons": [
+      "unexplained: 1,000 USDC 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+    ],
+    "floor_hits": [],
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? 1,000 USDC 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3; 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "at most 1 ETH Safe -> Uniswap",
+          "observed": "0.354583927628692837 ETH Safe -> WETH",
+          "tier": "counterparty_via_callee",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "(inside a call the words license)",
+          "observed": "0.354583927628692837 WETH Uniswap -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "tier": "internal_to_callee",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [
+        {
+          "kind": "movement",
+          "item": "1,000 USDC 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "severity": "notable",
+          "cites": [
+            "c9",
+            "c10",
+            "s0",
+            "s1",
+            "b2",
+            "b3",
+            "e5"
+          ],
+          "reason": "no expected movement matches (asset, route, amount)"
+        },
+        {
+          "kind": "effect",
+          "item": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+          "severity": "notable",
+          "cites": [
+            "c8",
+            "c9",
+            "c10",
+            "s0",
+            "s1",
+            "b2",
+            "b3",
+            "e4",
+            "e5"
+          ],
+          "reason": "no matched item shares its evidence"
+        }
+      ],
+      "expected_unobserved": [
+        "movement 1,000 USDC Uniswap -> Safe"
+      ],
+      "info_effects": [
+        "internal movement 0.354583927628692837 WETH Uniswap -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc updates its reserve and cumulative price storage slots and emits a Sync event.",
+        "Safe increments its transaction nonce from 1 to 2 and records successful execution."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "counterparty_via_callee",
+        "internal_to_callee"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH (ETH…)",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Uniswap",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address"
+        },
+        "amount_base": 354583927628692837,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.354583927628692837 ETH (ETH…)",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "b1",
+          "from bundle balance_diff"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": [
+      "protocol call Uniswap V2 Router.swapETHForExactTokens(uint256,address[],address,uint256): asset flows taken from the fork's balance changes"
+    ]
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Uniswap",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address_book"
+        },
+        "amount_base": null,
+        "amount_max_base": 1000000000000000000,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "at most 1 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "spending at most 1 ETH"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Uniswap",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address_book"
+        },
+        "to_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "amount_base": 1000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1,000 USDC",
+        "direction": "in",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Buy 1,000 USDC on Uniswap"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book"
+        },
+        "amount_base": 354583927628692837,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.354583927628692837 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c6",
+          "c14",
+          "b0",
+          "b1",
+          "e1",
+          "e6"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "WETH",
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "via": "address_book",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Uniswap",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address_book"
+        },
+        "to_party": {
+          "label": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "via": "address"
+        },
+        "amount_base": 354583927628692837,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "0.354583927628692837 WETH",
+        "direction": "third_party",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "s5",
+          "b4",
+          "e2"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "via": "address"
+        },
+        "to_party": {
+          "label": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address"
+        },
+        "amount_base": 1000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "1,000 USDC",
+        "direction": "third_party",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "c10",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e5"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "Safe sends 1 ETH to Uniswap, which wraps 0.354583927628692837 ETH into WETH and refunds 0.645416072371307163 ETH to Safe, for a net outflow of 0.354583927628692837 ETH from Safe to WETH.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c6",
+          "c14",
+          "c15",
+          "b0",
+          "b1",
+          "e1",
+          "e6"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Uniswap transfers 0.354583927628692837 WETH to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "s5",
+          "b4",
+          "e2"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+        "severity": "notable",
+        "cites": [
+          "c8",
+          "c9",
+          "c10",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e4",
+          "e5"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc updates its reserve and cumulative price storage slots and emits a Sync event.",
+        "severity": "info",
+        "cites": [
+          "c8",
+          "s2",
+          "s3",
+          "s4",
+          "e3"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe increments its transaction nonce from 1 to 2 and records successful execution.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "s6",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [
+      "movement 1,000 USDC Uniswap -> Safe"
+    ],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [notable]: 1,000 USDC 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "observed, unexplained [notable]: 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+      "attribution": "real_finding (same evidence as the item above)"
+    },
+    {
+      "item": "expected, not observed: movement 1,000 USDC Uniswap -> Safe",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "matched by counterparty_via_callee: 0.354583927628692837 ETH Safe -> WETH",
+      "attribution": "tolerance_rule"
+    },
+    {
+      "item": "matched by internal_to_callee: 0.354583927628692837 WETH Uniswap -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+      "attribution": "tolerance_rule"
+    },
+    {
+      "item": "forward vs truth (extra): movement 1,000 USDC Uniswap -> Safe",
+      "attribution": "real_finding"
+    },
+    {
+      "item": "info: internal movement 0.354583927628692837 WETH Uniswap -> 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+      "attribution": "bookkeeping"
+    },
+    {
+      "item": "info: 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc updates its reserve and cumulative price storage slots and emits a Sync event.",
+      "attribution": "bookkeeping"
+    },
+    {
+      "item": "info: Safe increments its transaction nonce from 1 to 2 and records successful execution.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "1,000 USDC 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc -> 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+      "kind": "movement",
+      "severity": "notable",
+      "reason": "no expected movement matches (asset, route, amount)",
+      "evidence": [
+        {
+          "id": "c9",
+          "parent": "c8",
+          "depth": 4,
+          "kind": "CALL",
+          "from_address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "to_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3000000000000000000000000000000000000000000000000000000003b9aca00",
+          "selector": "0xa9059cbb",
+          "function": "transfer(address,uint256)",
+          "args": [
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c10",
+          "parent": "c9",
+          "depth": 5,
+          "kind": "DELEGATECALL",
+          "from_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "to_address": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3000000000000000000000000000000000000000000000000000000003b9aca00",
+          "selector": "0xa9059cbb",
+          "function": "transfer(address,uint256)",
+          "args": [
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s0",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x096dd619cd2c4170b38907621d8867e5cbd5a41ec8e9f09b8df03981132df3de",
+          "label": "USDC.balanceOf[0x2C81…53D3]",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "0x000000000000000000000000000000000000000000000000000000003b9aca00",
+          "writers": [
+            {
+              "id": "c9",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c10",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c12",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "balanceOf(address)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "s1",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x28c0947f463362aab09a2d7896ccc847fb7e52633a16b978fb2caf3db1a9b8f8",
+          "label": "USDC.balanceOf[0xB4e1…C9Dc]",
+          "before": "0x000000000000000000000000000000000000000000000000000013f2591d5c3a",
+          "after": "0x000000000000000000000000000000000000000000000000000013f21d82923a",
+          "writers": [
+            {
+              "id": "c9",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c10",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c12",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "balanceOf(address)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "b2",
+          "holder": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "asset": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6,
+          "before": 0,
+          "after": 1000000000,
+          "delta": 1000000000
+        },
+        {
+          "id": "b3",
+          "holder": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "asset": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6,
+          "before": 21931598109754,
+          "after": 21930598109754,
+          "delta": -1000000000
+        },
+        {
+          "id": "e5",
+          "call_id": "c10",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "name": "Transfer",
+          "args": [
+            {
+              "name": "from",
+              "type": "address",
+              "value": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000000"
+            }
+          ],
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000b4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+            "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000003b9aca00"
+        }
+      ]
+    },
+    {
+      "item": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transfers 1,000 USDC to 0x2C81904f370e7f6490aEa328CA847AEFdc3853D3.",
+      "kind": "effect",
+      "severity": "notable",
+      "reason": "no matched item shares its evidence",
+      "evidence": [
+        {
+          "id": "c8",
+          "parent": "c4",
+          "depth": 3,
+          "kind": "CALL",
+          "from_address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "to_address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "storage_context": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "value": 0,
+          "input": "0x022c0d9f000000000000000000000000000000000000000000000000000000003b9aca0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d300000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000",
+          "selector": "0x022c0d9f",
+          "function": "swap(uint256,uint256,address,bytes)",
+          "args": [
+            {
+              "name": "amount0Out",
+              "type": "uint256",
+              "value": "1000000000"
+            },
+            {
+              "name": "amount1Out",
+              "type": "uint256",
+              "value": "0"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "data",
+              "type": "bytes",
+              "value": "0x"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c9",
+          "parent": "c8",
+          "depth": 4,
+          "kind": "CALL",
+          "from_address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "to_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3000000000000000000000000000000000000000000000000000000003b9aca00",
+          "selector": "0xa9059cbb",
+          "function": "transfer(address,uint256)",
+          "args": [
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "c10",
+          "parent": "c9",
+          "depth": 5,
+          "kind": "DELEGATECALL",
+          "from_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "to_address": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+          "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "value": 0,
+          "input": "0xa9059cbb0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3000000000000000000000000000000000000000000000000000000003b9aca00",
+          "selector": "0xa9059cbb",
+          "function": "transfer(address,uint256)",
+          "args": [
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000000"
+            }
+          ],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s0",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x096dd619cd2c4170b38907621d8867e5cbd5a41ec8e9f09b8df03981132df3de",
+          "label": "USDC.balanceOf[0x2C81…53D3]",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "0x000000000000000000000000000000000000000000000000000000003b9aca00",
+          "writers": [
+            {
+              "id": "c9",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c10",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c12",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "balanceOf(address)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "s1",
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "slot": "0x28c0947f463362aab09a2d7896ccc847fb7e52633a16b978fb2caf3db1a9b8f8",
+          "label": "USDC.balanceOf[0xB4e1…C9Dc]",
+          "before": "0x000000000000000000000000000000000000000000000000000013f2591d5c3a",
+          "after": "0x000000000000000000000000000000000000000000000000000013f21d82923a",
+          "writers": [
+            {
+              "id": "c9",
+              "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c10",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "transfer(address,uint256)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "id": "c12",
+              "to": "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
+              "function": "balanceOf(address)",
+              "storage_context": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            }
+          ]
+        },
+        {
+          "id": "b2",
+          "holder": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "asset": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6,
+          "before": 0,
+          "after": 1000000000,
+          "delta": 1000000000
+        },
+        {
+          "id": "b3",
+          "holder": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "asset": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6,
+          "before": 21931598109754,
+          "after": 21930598109754,
+          "delta": -1000000000
+        },
+        {
+          "id": "e4",
+          "call_id": "c8",
+          "address": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          "topic0": "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
+          "name": "Swap",
+          "args": [
+            {
+              "name": "sender",
+              "type": "address",
+              "value": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+            },
+            {
+              "name": "amount0In",
+              "type": "uint256",
+              "value": "0"
+            },
+            {
+              "name": "amount1In",
+              "type": "uint256",
+              "value": "354583927628692837"
+            },
+            {
+              "name": "amount0Out",
+              "type": "uint256",
+              "value": "1000000000"
+            },
+            {
+              "name": "amount1Out",
+              "type": "uint256",
+              "value": "0"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            }
+          ],
+          "topics": [
+            "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
+            "0x0000000000000000000000007a250d5630b4cf539739df2c5dacb4c659f2488d",
+            "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004ebbc34195efd65000000000000000000000000000000000000000000000000000000003b9aca000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "e5",
+          "call_id": "c10",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "name": "Transfer",
+          "args": [
+            {
+              "name": "from",
+              "type": "address",
+              "value": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "value": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "value": "1000000000"
+            }
+          ],
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000b4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+            "0x0000000000000000000000002c81904f370e7f6490aea328ca847aefdc3853d3"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000003b9aca00"
+        }
+      ]
+    }
+  ],
+  "bundle": {
+    "safe_tx_hash": "0x8b296a6af123ae966eccfa35afcc18734ed59ffe9a411a5bedfd3f58adb603bc",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x096dd619cd2c4170b38907621d8867e5cbd5a41ec8e9f09b8df03981132df3de",
+        "label": "USDC.balanceOf[0x2C81…53D3]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000000000000000000000000000000000003b9aca00"
+      },
+      {
+        "id": "s1",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x28c0947f463362aab09a2d7896ccc847fb7e52633a16b978fb2caf3db1a9b8f8",
+        "label": "USDC.balanceOf[0xB4e1…C9Dc]",
+        "before": "0x000000000000000000000000000000000000000000000000000013f2591d5c3a",
+        "after": "0x000000000000000000000000000000000000000000000000000013f21d82923a"
+      },
+      {
+        "id": "s2",
+        "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000008",
+        "label": "UniswapV2Pair(USDC/WETH).reserves (reserve0, reserve1, blockTimestampLast)",
+        "before": "0x67b889f70000000001a449398006fcbdca6b000000000000000013f2591d5c3a",
+        "after": "0x67b943830000000001a44e253c3b161cc7d0000000000000000013f21d82923a"
+      },
+      {
+        "id": "s3",
+        "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "label": "UniswapV2Pair(USDC/WETH).price0CumulativeLast",
+        "before": "0x0000000000000000000001bcff5d51626bbac3212f1e0c569428e43325bd2ed8",
+        "after": "0x0000000000000000000001bd0ea2e15c7b23c36986afff1daeeeac612fd33678"
+      },
+      {
+        "id": "s4",
+        "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "slot": "0x000000000000000000000000000000000000000000000000000000000000000a",
+        "label": "UniswapV2Pair(USDC/WETH).price1CumulativeLast",
+        "before": "0x000000000000000000000000000000000000530ebc192fc1b74983845eb95a5e",
+        "after": "0x00000000000000000000000000000000000053178a6fcf64c153e9e5edf7225e"
+      },
+      {
+        "id": "s5",
+        "contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "slot": "0xb374801ace2c02f5db0425ab5920a2b7ed1d5a00abbcd395fda7530ba1d666c0",
+        "label": "WETH.balanceOf[0xB4e1…C9Dc]",
+        "before": "0x0000000000000000000000000000000000000000000001a449398006fcbdca6b",
+        "after": "0x0000000000000000000000000000000000000000000001a44e253c3b161cc7d0"
+      },
+      {
+        "id": "s6",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

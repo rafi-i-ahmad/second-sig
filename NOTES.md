@@ -37,22 +37,26 @@ All 33 cases replay to their expected verdict. The older items (source reader, r
 re-recording forward forms, prompts, the honesty note) are done; the temperature pin was dropped,
 because the API documents temperature as deprecated and determinism comes from `--replay`.
 
-1. **Bounded ASK loop:** gap ids on residuals; an amendment counts only if it closes an asked gap;
+1. **Decide on Aave's collateral flag.** Should "deposit into Aave" license the collateral flag Aave sets
+   automatically, or should the signer always see it? Flash calls it bookkeeping; Argon calls it notable, which turns
+   the Aave demo into ASK. This only matters if the backward pass ever moves to Argon (`reports/compare/FINDINGS.md`,
+   "Ablation").
+2. **Bounded ASK loop:** gap ids on residuals; an amendment counts only if it closes an asked gap;
    resolved gaps are never re-asked; two rounds, then REJECT "unresolved after two clarifications".
    Cases 39, 49 and 51 are its tests. Today each scripted answer leaves its case at ASK, as expected,
    but the loop has no bound.
-2. **Eval extras, not run:**
+3. **Eval extras, not run:**
    - the naive one-call baseline on the injection cases 37–43 (about $2–3; it has only run on 01,
      auditor and Bybit);
    - stability resampling (about $1.50);
    - `eval/run.py` is still a stub. The table is `reports/compare/FINDINGS.md`.
-3. **Two benign protocol cases** (Compound v3 supply, Uniswap V3 exactInputSingle), so the source
+4. **Two benign protocol cases** (Compound v3 supply, Uniswap V3 exactInputSingle), so the source
    reader runs on more than Aave.
-4. **`truth.py`** nets the Safe's balance for protocol calls, so case 43's correct gross narration
+5. **`truth.py`** nets the Safe's balance for protocol calls, so case 43's correct gross narration
    grades as a wrong amount. Reports only.
-5. **Pitch:** quote the measured numbers in `demo-and-pitch.md`: 98,038 tokens and 89 s for Aave's
-   source read; about 3.5 cents per live judgement; 33 of 33 cases; no MATCH on a case that should be
-   refused.
+6. **Pitch:** the Q&A rows in `demo-and-pitch.md` now quote measured numbers (Aave's source read at
+   98,038 tokens and 89 s; about 3.5 cents per live judgement). The script could also say that all
+   33 cases reach their verdict, with no MATCH on a case that should be refused.
 
 ## Fork
 
@@ -330,6 +334,9 @@ introductory $2 / $10 per million tokens; Flash at most $1.50 / $9), so check th
 | Forward, round 2, after the prompt and fixture fixes | 33 | 30 of 30 meet the intent; the demos land MATCH, ASK and REJECT |
 | Escalation, 37–51 (`ask_questions.py`, recorded questions replayed) | 15 | every text names the gap; no injected text reaches the signers |
 | Clarifications 39, 49, 51 (`pipeline.answer`) | 3 | all stay ASK |
+| Ablation: the backward pass on `gemini-4-argon`, high (`compare_benign --backward-variant argon`) | 33 | 32 of 33. Aave goes MATCH → ASK because Argon reports the automatic collateral flag as a notable effect; Flash stays on the backward pass (see FINDINGS) |
+
+Estimated total for the evening: $3.40 for 153 calls (Flash $1.00, Argon $2.41, of which $1.97 was the ablation).
 
 Fork, on the running anvil after `secondsig reset`:
 - `pytest --fork`: the stamp round trip, and Aave MATCH → stamp → attest → `ExecutionSuccess`.

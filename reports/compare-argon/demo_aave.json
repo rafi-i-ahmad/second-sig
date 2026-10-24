@@ -1,0 +1,696 @@
+{
+  "id": "demo_aave",
+  "description": "Deposit 10,000 USDC into Aave v3",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "The trace shows 1 effect the description does not mention:\n- Aave v3 Pool enables USDC as collateral for Safe. (evidence c9, s0, e3)",
+    "decision": "ASK",
+    "reasons": [
+      "unexplained: Aave v3 Pool enables USDC as collateral for Safe."
+    ],
+    "floor_hits": [],
+    "question": "The transaction also does the following, which the description does not mention. Is that intended? Aave v3 Pool enables USDC as collateral for Safe.",
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "10,000 USDC Safe -> Aave v3 Pool",
+          "observed": "10,000 USDC Safe -> aUSDC",
+          "tier": "counterparty_via_callee",
+          "notes": []
+        },
+        {
+          "kind": "movement",
+          "expected": "10,000 aUSDC Aave v3 Pool -> Safe",
+          "observed": "10,000 aUSDC zero address -> Safe",
+          "tier": "counterparty_via_callee",
+          "notes": []
+        },
+        {
+          "kind": "permission",
+          "expected": "allowance USDC Safe -> Aave v3 Pool: 10000000000",
+          "observed": "allowance USDC Safe -> Aave v3 Pool: 10000000000",
+          "tier": "exact",
+          "notes": [
+            "expected item was implied by the words, not stated"
+          ]
+        }
+      ],
+      "observed_unexplained": [
+        {
+          "kind": "effect",
+          "item": "Aave v3 Pool enables USDC as collateral for Safe.",
+          "severity": "notable",
+          "cites": [
+            "c9",
+            "s0",
+            "e3"
+          ],
+          "reason": "no matched item shares its evidence"
+        }
+      ],
+      "expected_unobserved": [],
+      "info_effects": [
+        "Aave v3 Pool updates reserve interest indices, rates, and accounting for USDC, and aUSDC calls 0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb to update user action accounting.",
+        "Safe verifies signatures, increments its nonce from 1 to 2, batches the calls via MultiSendCallOnly v1.4.1, and records successful execution."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact",
+        "counterparty_via_callee"
+      ],
+      "nothing_else": true,
+      "questions": [],
+      "explained_slots": [
+        "s0 InitializableImmutableAdminUpgradeabilityProxy._usersConfig[0xDFEC…aE47]: Enables USDC (reserve ID 3) as collateral in the Safe's Aave user configuration bitmap. (PoolStorage.sol:24, DataTypes.sol:111)",
+        "s1 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+1: Updates the liquidityIndex and currentLiquidityRate for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:46, DataTypes.sol:48)",
+        "s2 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+2: Updates the variableBorrowIndex and currentVariableBorrowRate for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:50, DataTypes.sol:52)",
+        "s3 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+3: Updates the lastUpdateTimestamp for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:56)",
+        "s4 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+8: Updates the accruedToTreasury balance for the USDC reserve. (PoolStorage.sol:21, DataTypes.sol:70)",
+        "s5 InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+9: Increases the virtualUnderlyingBalance of the USDC reserve by the supplied 10,000 USDC. (PoolStorage.sol:21, DataTypes.sol:76)",
+        "s6 InitializableImmutableAdminUpgradeabilityProxy._totalSupply: Increases the scaled total supply of aEthUSDC by the newly minted scaled amount. (IncentivizedERC20.sol:57)",
+        "s7 InitializableImmutableAdminUpgradeabilityProxy._userState[0xDFEC…aE47]: Records the Safe's scaled aEthUSDC balance and last liquidity index in _userState. (IncentivizedERC20.sol:52, IncentivizedERC20.sol:48, IncentivizedERC20.sol:49)"
+      ],
+      "ignored_labels": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "aUSDC",
+          "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address"
+        },
+        "to_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10000 aUSDC",
+        "direction": "in",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "b0",
+          "from bundle balance_diff"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "b2",
+          "from bundle balance_diff"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "owner": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "spender": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address"
+        },
+        "new_allowance": 10000000000,
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC approve(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": [
+      "protocol call Aave v3 Pool.supply(address,uint256,address,uint16): asset flows taken from the fork's balance changes"
+    ]
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address_book"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Deposit 10,000 USDC into Aave v3"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "asset": {
+          "label": "aUSDC",
+          "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address_book"
+        },
+        "to_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 aUSDC",
+        "direction": "in",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Deposit 10,000 USDC into Aave v3"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "owner": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "spender": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address_book"
+        },
+        "new_allowance": 10000000000,
+        "implied": true,
+        "severity": null,
+        "cites": [
+          "Deposit 10,000 USDC into Aave v3"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "aUSDC",
+          "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "via": "address_book"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 USDC",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c15",
+          "c16",
+          "s8",
+          "s9",
+          "b1",
+          "b2",
+          "e5"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "asset": {
+          "label": "aUSDC",
+          "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "from_party": {
+          "label": "zero address",
+          "address": "0x0000000000000000000000000000000000000000",
+          "via": "zero"
+        },
+        "to_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "amount_base": 10000000000,
+        "amount_max_base": null,
+        "amount_min_base": null,
+        "amount_approx": false,
+        "amount_human": "10,000 aUSDC",
+        "direction": "in",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c17",
+          "c18",
+          "s6",
+          "s7",
+          "b0",
+          "e6",
+          "e7"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address_book",
+          "decimals": 6
+        },
+        "owner": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "spender": {
+          "label": "Aave v3 Pool",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "via": "address_book"
+        },
+        "new_allowance": 10000000000,
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "Safe approves Aave v3 Pool to spend 10,000 USDC, which is then consumed during the transaction.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe supplies 10,000 USDC to Aave v3 Pool on behalf of Safe, transferring 10,000 USDC from Safe to aUSDC.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "c9",
+          "c15",
+          "c16",
+          "s8",
+          "s9",
+          "b1",
+          "b2",
+          "e4",
+          "e5"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "aUSDC mints 10,000 aUSDC to Safe as a deposit receipt.",
+        "severity": "notable",
+        "cites": [
+          "c17",
+          "c18",
+          "s6",
+          "s7",
+          "b0",
+          "e6",
+          "e7"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Aave v3 Pool enables USDC as collateral for Safe.",
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "s0",
+          "e3"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Aave v3 Pool updates reserve interest indices, rates, and accounting for USDC, and aUSDC calls 0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb to update user action accounting.",
+        "severity": "info",
+        "cites": [
+          "c10",
+          "c11",
+          "c12",
+          "c13",
+          "c14",
+          "c19",
+          "c20",
+          "s1",
+          "s2",
+          "s3",
+          "s4",
+          "s5",
+          "e2"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "Safe verifies signatures, increments its nonce from 1 to 2, batches the calls via MultiSendCallOnly v1.4.1, and records successful execution.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "s10",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "observed, unexplained [notable]: Aave v3 Pool enables USDC as collateral for Safe.",
+      "attribution": "needs_investigation"
+    },
+    {
+      "item": "matched by counterparty_via_callee: 10,000 USDC Safe -> aUSDC",
+      "attribution": "tolerance_rule"
+    },
+    {
+      "item": "matched by counterparty_via_callee: 10,000 aUSDC zero address -> Safe",
+      "attribution": "tolerance_rule"
+    },
+    {
+      "item": "info: Aave v3 Pool updates reserve interest indices, rates, and accounting for USDC, and aUSDC calls 0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb to update user action accounting.",
+      "attribution": "bookkeeping"
+    },
+    {
+      "item": "info: Safe verifies signatures, increments its nonce from 1 to 2, batches the calls via MultiSendCallOnly v1.4.1, and records successful execution.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [
+    {
+      "item": "Aave v3 Pool enables USDC as collateral for Safe.",
+      "kind": "effect",
+      "severity": "notable",
+      "reason": "no matched item shares its evidence",
+      "evidence": [
+        {
+          "id": "c9",
+          "parent": "c8",
+          "depth": 5,
+          "kind": "DELEGATECALL",
+          "from_address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "to_address": "0x2b22E425C1322fbA0DbF17bb1dA25d71811EE7ba",
+          "storage_context": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "value": 0,
+          "input": "0x1913f161000000000000000000000000000000000000000000000000000000000000003400000000000000000000000000000000000000000000000000000000000000368b77e06472d23652ce052e752c60284ffeeccbfb24647f7b94d940dd37ff8552000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000002540be400000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae470000000000000000000000000000000000000000000000000000000000000000",
+          "selector": "0x1913f161",
+          "function": null,
+          "args": [],
+          "success": true,
+          "revert_reason": null
+        },
+        {
+          "id": "s0",
+          "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "slot": "0x8b77e06472d23652ce052e752c60284ffeeccbfb24647f7b94d940dd37ff8552",
+          "label": "InitializableImmutableAdminUpgradeabilityProxy._usersConfig[0xDFEC…aE47]",
+          "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "0x0000000000000000000000000000000000000000000000000000000000000080",
+          "writers": [
+            {
+              "id": "c7",
+              "to": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+              "function": "supply(address,uint256,address,uint16)",
+              "storage_context": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+            },
+            {
+              "id": "c8",
+              "to": "0xeF434E4573b90b6ECd4a00f4888381e4D0CC5Ccd",
+              "function": "supply(address,uint256,address,uint16)",
+              "storage_context": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+            },
+            {
+              "id": "c9",
+              "to": "0x2b22E425C1322fbA0DbF17bb1dA25d71811EE7ba",
+              "function": null,
+              "storage_context": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+            }
+          ]
+        },
+        {
+          "id": "e3",
+          "call_id": "c9",
+          "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+          "topic0": "0x00058a56ea94653cdf4f152d227ace22d4c00ad99e2a43f58cb7d9e3feb295f2",
+          "name": "ReserveUsedAsCollateralEnabled",
+          "args": [
+            {
+              "name": "reserve",
+              "type": "address",
+              "value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            },
+            {
+              "name": "user",
+              "type": "address",
+              "value": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
+            }
+          ],
+          "topics": [
+            "0x00058a56ea94653cdf4f152d227ace22d4c00ad99e2a43f58cb7d9e3feb295f2",
+            "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0x000000000000000000000000dfecef26e5d211b9935cabc9fad1edb8960aae47"
+          ],
+          "data": "0x"
+        }
+      ]
+    }
+  ],
+  "bundle": {
+    "safe_tx_hash": "0x55244bf727265ca31939d8bb4657b636cbf8085a9c6fb3522fc434b2aa36ddd3",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "slot": "0x8b77e06472d23652ce052e752c60284ffeeccbfb24647f7b94d940dd37ff8552",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._usersConfig[0xDFEC…aE47]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000080"
+      },
+      {
+        "id": "s1",
+        "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf21",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+1",
+        "before": "0x00000000002269b7c55752fed64c80e500000000039f6d6c4fc72a6eb2a26e1e",
+        "after": "0x00000000002269aaf4b2cadba77a6d0800000000039f6db43c0c89930d4818f3"
+      },
+      {
+        "id": "s2",
+        "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf22",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+2",
+        "before": "0x000000000039261ddfa1abe5b8c2e8f20000000003bddbea114310b025ddcc40",
+        "after": "0x00000000003926133b946fe1de7623320000000003bddc656d7d0437faf27df8"
+      },
+      {
+        "id": "s3",
+        "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf23",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+3",
+        "before": "0x00000000000000000000030067b88a0f00000000000000000000000000000000",
+        "after": "0x00000000000000000000030067b88d9000000000000000000000000000000000"
+      },
+      {
+        "id": "s4",
+        "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf28",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+8",
+        "before": "0x000000000000000000000000000000000000000000000000000000092afc17e6",
+        "after": "0x000000000000000000000000000000000000000000000000000000093f012b2c"
+      },
+      {
+        "id": "s5",
+        "contract": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "slot": "0xed960c71bd5fa1333658850f076b35ec5565086b606556c3dd36a916b43ddf29",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._reserves[0xA0b8…eB48]+9",
+        "before": "0x000000000000000000035e0bfe63b78800000000000000000000000000000000",
+        "after": "0x000000000000000000035e0e526f9b8800000000000000000000000000000000"
+      },
+      {
+        "id": "s6",
+        "contract": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000036",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._totalSupply",
+        "before": "0x00000000000000000000000000000000000000000000000000091351808e5908",
+        "after": "0x00000000000000000000000000000000000000000000000000091353942ca80e"
+      },
+      {
+        "id": "s7",
+        "contract": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+        "slot": "0x80ec0b624341bbd162a7fd5235b912a5d63656b8cb8ec12243db3ea110f4eabf",
+        "label": "InitializableImmutableAdminUpgradeabilityProxy._userState[0xDFEC…aE47]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x00000000039f6db43c0c89930d4818f3000000000000000000000002139e4f06"
+      },
+      {
+        "id": "s8",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x2af6e45109ed6c3f87addc9868ad92048225ec319f059ae1d594169e71fbbeb6",
+        "label": "USDC.balanceOf[0xDFEC…aE47]",
+        "before": "0x00000000000000000000000000000000000000000000000000000002540be400",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "id": "s9",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x368c3f5f03e5634b3e4381c9c3caac98f4d254c7027fd14b53436c90d060fef4",
+        "label": "USDC.balanceOf[0x98C2…6F5c]",
+        "before": "0x00000000000000000000000000000000000000000000000000035e0d7828c822",
+        "after": "0x00000000000000000000000000000000000000000000000000035e0fcc34ac22"
+      },
+      {
+        "id": "s10",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

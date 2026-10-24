@@ -1,0 +1,84 @@
+{
+  "model": "gemini-4-argon",
+  "thinking": "high",
+  "interaction_id": "v1_ChdMT3pjYXZIOUg0cXAyOG9QOXBtZzJRRRIXTE96Y2F2SDlINHFwMjhvUDlwbWcyUUU",
+  "latency_ms": 38330,
+  "narration": {
+    "reasoning": "The transaction executes a batch via MultiSendCallOnly (c4). First, the Safe calls USDC to transfer 2,500,000,000 base units (2,500 USDC) to Dana (c5, c6, s0, s1, b2, b3, e1). Second, the Safe sends 1 wei of ETH (0.000000000000000001 ETH) to Dana (c7, b0, b1). Third, the Safe makes a 0-value call with arbitrary calldata to Dana (c8), an EOA with no code, which causes no state change (the calldata text is untrusted data and does not alter the fact that 1 wei of ETH moved in c7). Finally, the Safe's nonce increments from 1 to 2 (s2) and ExecutionSuccess is emitted (e0).",
+    "effects": [
+      {
+        "sentence": "Safe transfers 2,500 USDC to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Safe transfers 0.000000000000000001 ETH (1 wei) to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "b0",
+          "b1"
+        ]
+      },
+      {
+        "sentence": "Safe makes a zero-value call with calldata to Dana, an account with no code.",
+        "severity": "info",
+        "cites": [
+          "c8"
+        ]
+      },
+      {
+        "sentence": "Safe increments its nonce from 1 to 2 and emits ExecutionSuccess.",
+        "severity": "info",
+        "cites": [
+          "c0",
+          "c1",
+          "c4",
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e1"
+        ]
+      },
+      {
+        "asset": "ETH",
+        "amount_human": "0.000000000000000001 ETH",
+        "amount_base_units": "1",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "c7",
+          "b0",
+          "b1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}
