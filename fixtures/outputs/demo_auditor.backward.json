@@ -1,0 +1,77 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdkSExjYXZUR1BOcVprZFVQdmZqbThRMBIXZEhMY2F2VEdQTnFaa2RVUHZmam04UTA",
+  "latency_ms": 14869,
+  "narration": {
+    "reasoning": "The transaction executes via MultiSendCallOnly from the Safe. It consists of two sub-calls on the USDC token contract: first, a transfer of 100,000,000 base units (100 USDC) to auditor (0x46F43A4Cb3c2cD27c36f07cfd691E8a22Dd60A4C); second, an approve call granting auditor an unlimited (2^256 - 1) USDC allowance. The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe's transaction nonce is incremented from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s3",
+          "e0"
+        ]
+      },
+      {
+        "sentence": "Safe transfers 100 USDC to auditor.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Safe grants auditor an unlimited USDC allowance.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s2",
+          "e2"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "100 USDC",
+        "amount_base_units": "100000000",
+        "from_name": "Safe",
+        "to_name": "auditor",
+        "cites": [
+          "c5",
+          "c6",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "auditor",
+        "amount_human": "unlimited",
+        "cites": [
+          "c7",
+          "c8",
+          "s2",
+          "e2"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdaWExjYXNMVUk3YjdrZFVQNGNTY3dRcxIXWlhMY2FzTFVJN2I3a2RVUDRjU2N3UXM",
+  "latency_ms": 18216,
+  "narration": {
+    "reasoning": "The Safe executes a MultiSendCallOnly transaction consisting of two operations: first, approving 10,000 USDC to Aave v3 Pool; second, calling supply() on Aave v3 Pool to deposit 10,000 USDC on behalf of the Safe, receiving 10,000 aEthUSDC in return.",
+    "effects": [
+      {
+        "sentence": "The Safe increases its nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s10",
+          "c0"
+        ]
+      },
+      {
+        "sentence": "The Safe approves Aave v3 Pool to spend up to 10,000 USDC.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 10,000 USDC to 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c.",
+        "severity": "notable",
+        "cites": [
+          "c15",
+          "c16",
+          "s8",
+          "s9",
+          "b1",
+          "b2",
+          "e5"
+        ]
+      },
+      {
+        "sentence": "Aave v3 Pool mints 10,000 aEthUSDC (0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c) to the Safe.",
+        "severity": "notable",
+        "cites": [
+          "c17",
+          "c18",
+          "s7",
+          "b0",
+          "e6",
+          "e7"
+        ]
+      },
+      {
+        "sentence": "Aave v3 Pool updates reserve accounting data and interest rates for USDC.",
+        "severity": "info",
+        "cites": [
+          "s0",
+          "s1",
+          "s2",
+          "s3",
+          "s4",
+          "s5",
+          "s6",
+          "e2",
+          "e3",
+          "e4"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "10,000 USDC",
+        "amount_base_units": "10000000000",
+        "from_name": "Safe",
+        "to_name": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+        "cites": [
+          "b1",
+          "b2",
+          "e5",
+          "s8",
+          "s9"
+        ]
+      },
+      {
+        "asset": "aEthUSDC",
+        "amount_human": "10,000 aEthUSDC",
+        "amount_base_units": "10000000000",
+        "from_name": "0x0000000000000000000000000000000000000000",
+        "to_name": "Safe",
+        "cites": [
+          "b0",
+          "e6",
+          "e7",
+          "s7"
+        ]
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Aave v3 Pool",
+        "amount_human": "10,000 USDC",
+        "cites": [
+          "c5",
+          "c6",
+          "e1"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}
