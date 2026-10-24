@@ -40,7 +40,7 @@ from judge import pipeline
 from judge.run_fixture import ensure_usdc
 from judge.schemas import Decision, EvidenceBundle
 from web import sepolia
-from web.display import JOBS, Job, _amount, _short, relay, show_backward, show_forward, show_verdict
+from web.display import JOBS, Job, _amount, _short, book_names, relay, show_backward, show_forward, show_verdict
 
 STATIC = Path(__file__).resolve().parent / "static"
 REPLAY_PACE_S = 0.7
@@ -226,11 +226,9 @@ def state() -> dict[str, Any]:
 
 def _book_name(book: dict[str, str], address: str) -> str:
     """Address-book name if the owners know this address, else the short address. Never the fixture's
-    own label: the page must not say what the judge has not found yet."""
-    for name, a in book.items():
-        if a.lower() == address.lower():
-            return name
-    return _short(to_checksum_address(address))
+    own label: the page must not say what the judge has not found yet. A label the judge ignores (not
+    a plain name) is not shown as a name either."""
+    return book_names(book).get(address.lower()) or _short(to_checksum_address(address))
 
 
 @app.get("/api/scenarios")
@@ -312,6 +310,8 @@ def execute(scenario: str) -> dict[str, Any]:
     if res is None:
         raise HTTPException(409, "judge the scenario first")
     with demo.chain_lock:
+        # A replayed MATCH assumes the recorded 10,000 USDC; without it the guard passes and the Safe reverts (GS013)
+        ensure_usdc(demo.w3, demo.safe.address)
         out = pipeline.execute(res, demo.w3, demo.safe, OWNERS[0].address)
     signers = f"{THRESHOLD} of {len(OWNERS)} owners had signed"
     if out["executed"]:

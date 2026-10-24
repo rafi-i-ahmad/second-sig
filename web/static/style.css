@@ -155,6 +155,11 @@ pre.raw {
 .note.clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .section-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin-top: 8px; }
 .source { font-size: 12.5px; color: var(--text-2); padding: 2px 0; }
+.warn { font-size: 12.5px; color: var(--text-2); padding: 6px 0; overflow-wrap: anywhere; }
+.calls { font-size: 11.5px; color: var(--text-3); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-family: var(--mono); }
+.hint { font-size: 12.5px; color: var(--text-2); padding: 10px 20px 4px; }
+.hint summary { cursor: pointer; color: var(--text-3); font-weight: 600; }
+.hint ul { margin: 6px 0 0; padding-left: 18px; }
 
 .stamp { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0 0; font-size: 12.5px; padding-top: 12px; border-top: 1px solid var(--border); }
 .stamp:empty { display: none; }

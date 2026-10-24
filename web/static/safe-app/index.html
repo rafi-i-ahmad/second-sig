@@ -33,6 +33,16 @@
     <section class="panel queue">
       <header class="card-head"><h2 id="queue-title">Queue</h2><span class="tag" id="queue-meta"></span></header>
       <div id="queue" class="queue-body"><div class="empty">—</div></div>
+      <details class="hint" id="hint">
+        <summary>Writing the note</summary>
+        <ul>
+          <li>Give every payment and allowance an amount, or a bound: "up to", "at least", "about".</li>
+          <li>Name each recipient and token from the address book, or write the 0x address. ETH needs no entry. A new wallet goes into the book first.</li>
+          <li>Adding an owner without a threshold means the threshold stays as it is.</li>
+          <li>"Approve the invoice" means sign-off, not a token allowance.</li>
+        </ul>
+        <div id="hint-book" class="footer-note"></div>
+      </details>
     </section>
 
     <section class="panel proposal hidden" id="proposal">
