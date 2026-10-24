@@ -119,7 +119,7 @@ domain: { name: "SecondSig", version: "1", chainId, verifyingContract: <guard ad
 Stamp:  { bytes32 safeTxHash, uint64 forkBlock, bytes32 judgeVersion }
 ```
 
-`attest(stamp, sig)` is callable by anyone; the guard recovers the signer and compares it with the judge address. Stamps older than `MAX_STAMP_AGE` blocks are rejected, and so are low-s-violating (malleable) signatures. `judgeVersion` is the bytes32 `keccak256("second-sig/v1")` (`contracts/setup.py` `JUDGE_VERSION`). `verifyingContract` is the guard's address, which depends on the judge address and so differs per machine until we share one key (`NOTES.md`, "Judge key"). Never hard-code it: get it from `ensure_guard(w3, safe).address` and pass it to `judge/stamp.py`. The stamp round trip is proven on the fork by `tests/test_stamp.py --fork`.
+`attest(stamp, sig)` is callable by anyone; the guard recovers the signer and compares it with the judge address. Stamps older than `MAX_STAMP_AGE` blocks are rejected, and so are low-s-violating (malleable) signatures. `judgeVersion` is the bytes32 `keccak256("second-sig/v1")` (`contracts/setup.py` `JUDGE_VERSION`). `verifyingContract` is the guard's address. One judge key is shared for the demo; its public address and the resulting guard address are `SHARED_JUDGE_ADDRESS` and `SHARED_GUARD_ADDRESS` in `contracts/setup.py`. The private key is passed between us privately and lives in `.env` only (`NOTES.md`, "Judge key"). In code, get the guard from `ensure_guard(w3, safe)` and pass its address to `judge/stamp.py` rather than repeating the constant. The stamp round trip is proven on the fork by `tests/test_stamp.py --fork`.
 
 ## Safe gotchas
 

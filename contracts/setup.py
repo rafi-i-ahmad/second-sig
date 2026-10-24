@@ -56,6 +56,15 @@ JUDGE_VERSION_LABEL = os.environ.get("JUDGE_VERSION", "second-sig/v1")
 JUDGE_VERSION = keccak(text=JUDGE_VERSION_LABEL)  # bytes32; judge/stamp.py must sign the same value
 OVERRIDE_DELAY = 50  # blocks; the guard rejects 0
 
+# The one judge the demo uses (24 October). Its public address is below; the private key is in
+# each developer's .env as JUDGE_PRIVATE_KEY, shared privately, never committed. With this judge,
+# the guard's CREATE2 address is SHARED_GUARD_ADDRESS on every fresh fork, as long as the compiled
+# bytecode, the salt and the other constructor arguments stay the same. JUDGE_ADDRESS in .env
+# overrides the judge for local experiments; the guard then lands somewhere else and ensure_guard
+# says so.
+SHARED_JUDGE_ADDRESS = to_checksum_address("0x7bAc29915313CC27a39163fD82595C6A355b40B9")
+SHARED_GUARD_ADDRESS = to_checksum_address("0xf4932401784c5D8435890C226729a87B6464BBC0")
+
 THRESHOLD = 2
 SALT_NONCE = 20251023
 FUND_WEI = 1000 * 10**18
@@ -189,14 +198,13 @@ def sign_safe_tx(safe_tx_hash: bytes, signers: list[Account] | None = None) -> b
 
 
 def judge_address() -> str:
-    """The judge's public address, from JUDGE_ADDRESS in .env. The key itself is never read here."""
+    """The judge's public address: JUDGE_ADDRESS from .env if set, else the shared judge.
+    The key itself is never read here."""
     from dotenv import load_dotenv
 
     load_dotenv(pathlib.Path(__file__).resolve().parent.parent / ".env")
     addr = os.environ.get("JUDGE_ADDRESS", "")
-    if not addr:
-        raise SystemExit("JUDGE_ADDRESS is not set in .env")
-    return to_checksum_address(addr)
+    return to_checksum_address(addr) if addr else SHARED_JUDGE_ADDRESS
 
 
 def guard_initcode(w3: Web3, safe_addr: str, judge: str) -> tuple[bytes, list]:
@@ -221,6 +229,10 @@ def ensure_guard(w3: Web3, safe: Contract) -> Contract:
     initcode, abi = guard_initcode(w3, safe.address, judge)
     raw = keccak(b"\xff" + bytes.fromhex(CREATE2_DEPLOYER[2:]) + GUARD_SALT + keccak(initcode))
     guard_addr = to_checksum_address(raw[12:])
+    if guard_addr != SHARED_GUARD_ADDRESS:
+        why = "JUDGE_ADDRESS in .env is not the shared judge" if judge != SHARED_JUDGE_ADDRESS else (
+            "the guard bytecode or constructor arguments changed; update SHARED_GUARD_ADDRESS")
+        print(f"warning: this guard is at {guard_addr}, not the shared {SHARED_GUARD_ADDRESS}: {why}", file=sys.stderr)
 
     if w3.eth.get_code(guard_addr):
         action = "found"

@@ -26,7 +26,7 @@ from eth_utils import keccak, to_checksum_address
 from web3 import Web3
 from web3.contract import Contract
 
-from contracts.setup import JUDGE_VERSION
+from contracts.setup import JUDGE_VERSION, SHARED_JUDGE_ADDRESS
 from judge.schemas import EvidenceBundle, Stamp
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -60,15 +60,18 @@ def judge_version_hex() -> str:
 
 
 def judge_account() -> Account:
-    """The judge key from .env. Raises if it is unset or disagrees with JUDGE_ADDRESS."""
+    """The judge key from .env. Raises if it is unset or does not derive to the judge the guard
+    was built for: JUDGE_ADDRESS if .env sets one, else the shared judge."""
     load_dotenv(REPO_ROOT / ".env")
     raw = os.environ.get("JUDGE_PRIVATE_KEY", "")
     if not raw:
         raise JudgeKeyError("JUDGE_PRIVATE_KEY is not set in .env")
     acct = Account.from_key(raw)
-    expected = os.environ.get("JUDGE_ADDRESS", "")
-    if expected and to_checksum_address(expected) != acct.address:
-        raise JudgeKeyError("JUDGE_PRIVATE_KEY does not match JUDGE_ADDRESS in .env")
+    override = os.environ.get("JUDGE_ADDRESS", "")
+    expected = to_checksum_address(override) if override else SHARED_JUDGE_ADDRESS
+    if acct.address != expected:
+        which = "JUDGE_ADDRESS in .env" if override else "the shared judge (contracts.setup.SHARED_JUDGE_ADDRESS)"
+        raise JudgeKeyError(f"JUDGE_PRIVATE_KEY does not derive to {which}")
     return acct
 
 
