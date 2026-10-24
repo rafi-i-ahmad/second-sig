@@ -12,6 +12,8 @@ Operational facts for the fork and the test Safe. Updated 24 October 2026.
   `c*`/`s*`/`b*`/`e*` and `bundle.entry(id)` for `checker.py`. New supporting models: `SafeTx`,
   `DecodedArg`, `Call`, `SlotWrite`, `BalanceChange`, `Event`, `Source`, `FloorRule`, `FloorHit`.
   `Stamp` unchanged; its `judgeVersion` is the bytes32 hex of `keccak256("second-sig/v1")`.
+- 24 October, Rafi: `Verdict` gains `floor_hits: list[FloorHit] = []`, so the UI can show which hard
+  rules forced a REJECT. `EvidenceBundle` and `Stamp` unchanged.
 
 ## Fork
 
@@ -154,9 +156,37 @@ On the fork, through the real Safe with two owner signatures:
 | --- | --- |
 | 01 "Send 5 ETH to the ops wallet" | `ExecutionSuccess`, 5 ETH moved, nonce 0 to 1; call tree is proxy, delegatecall to singleton, two ecrecover staticcalls, one CALL with 5 ETH and empty data. Rerun after the refactor at nonce 1, same result. |
 
-Rehearsed with `judge.evidence.fork` (24 October, Daniel): 01, Bybit, Aave and auditor, bundles in
-`fixtures/bundles/`. Floor hits: Bybit trips rules 1, 2 and 3; the other three trip none. Not yet
-rehearsed: cases 02 to 10.
+Rehearsed with `judge.evidence.fork`, bundles in `fixtures/bundles/`: 01, Bybit, Aave and auditor
+(Daniel), then cases 02 to 10 (Rafi), all on 24 October. All 13 cases.
+
+### Hard floor false-positive check (24 October, Rafi)
+
+Every benign case rehearsed on the fork with the guard set (the rehearsal zeroes the guard inside
+its snapshot). The question was whether `rules.py` rejects anything honest. It does not:
+
+| Case | Why it could have tripped | Result |
+| --- | --- | --- |
+| 01 send 5 ETH, 02 pay Dana USDC, 08 refund Sam, 09 vague 1 ETH | recipients are EOAs with no source | no hits: rule 3 skips addresses with no code |
+| 03 ETH + USDC batch, 07 three contractors | delegatecall to MultiSendCallOnly 1.4.1 | no hits: `0x9641…02e2` is on the allowlist |
+| 04 add owner Priya | Safe self-call, writes `Safe.owners[…]` and `Safe.ownerCount` | no hits: owners (slot 2) and ownerCount (slot 3) are not protected; only singleton, guard, fallback handler and modules (slot 1) are |
+| 05 raise threshold to 3 | Safe self-call, writes `Safe.threshold` | no hits |
+| 06 finite approve to Uniswap | ERC-20 approve | no hits: approvals are the model's question, not a floor rule |
+| 10 approve + swapExactTokensForETH | touches UniswapV2Router02, the USDC/WETH pair, WETH9 | no hits: all verified on Etherscan (cached in `fixtures/sources/`) |
+| Aave deposit, auditor payment | batches, 11 unlabelled Aave slot writes, unlimited approve | no hits |
+| Bybit | | rules 1, 2 and 3 |
+
+Two conservative behaviours worth knowing: our own Safe proxy shows `verified=False` because
+Etherscan has never seen a fork-only address, and rule 3 skips the Safe itself for that reason.
+A *recipient* that is a contract with no verified source (another Safe proxy that Etherscan has
+not matched, a fresh wallet contract) would trip rule 3 and be rejected; that is intended, but it
+is the one place an honest payment could be refused. `tests/test_verdict.py` pins all twelve
+benign cases as "never REJECT".
+
+`judge/verdict.py` is the decision table (layer 5): floor hit → REJECT with a signer-facing
+paragraph per rule (`FLOOR_EXPLANATIONS`) plus what the rehearsal showed and the evidence ids;
+failed rehearsal → ASK; no checked model form → ASK; otherwise the form's decision. It recomputes
+the floor from the evidence rather than trusting `bundle.floor_hits`. Try it:
+`uv run python -m judge.verdict fixtures/bundles/demo_bybit.bundle.json`.
 
 ### Stamp round trip through the guard (24 October, Rafi)
 

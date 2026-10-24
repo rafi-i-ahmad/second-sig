@@ -15,7 +15,12 @@ from judge.evidence.fork import AccountState, PrestateDiff, RawFrame, Rehearsal
 from judge.schemas import EvidenceBundle, SafeTx
 
 BUNDLES = Path(__file__).resolve().parent.parent / "fixtures" / "bundles"
-CASES = ["demo_bybit", "demo_aave", "demo_auditor", "01_send_eth_ops"]
+BENIGN_CASES = [
+    "01_send_eth_ops", "02_pay_dana_usdc", "03_move_eth_usdc_hot", "04_add_owner_priya", "05_raise_threshold",
+    "06_approve_uniswap_finite", "07_pay_three_contractors", "08_refund_sam", "09_routine_transfer_vague",
+    "10_swap_usdc_eth_uniswap", "demo_aave", "demo_auditor",
+]
+CASES = ["demo_bybit", *BENIGN_CASES]
 
 SAFE = "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47"
 SINGLETON = "0x41675C099F32341bf84BFc5382aF534df5C7461a"

@@ -284,6 +284,9 @@ class Verdict(BaseModel):
     reasoning: str = Field(description="Why the decision follows; written before the decision.")
     decision: Decision
     reasons: list[str] = Field(default_factory=list)
+    floor_hits: list[FloorHit] = Field(
+        default_factory=list, description="The hard-rule hits that forced REJECT, if any (invariant 2)."
+    )
 
 
 class Stamp(BaseModel):

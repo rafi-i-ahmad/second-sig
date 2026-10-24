@@ -35,7 +35,9 @@ judge/
   model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call
   jobs/               layer 3: forward.py (works); backward, leftovers, probe, escalate (stubs)
   checker.py          layer 4  (stub)
-  verdict.py          layer 5: decision table  (stub)
+  verdict.py          layer 5: decide(bundle, model_form) -> Verdict. Floor hit -> REJECT (recomputes the
+                      floor, never trusts bundle.floor_hits); failed rehearsal or no form -> ASK; else the
+                      form's decision. FLOOR_EXPLANATIONS holds the signer-facing paragraph per rule
   stamp.py            EIP-712 signing with the judge key: make_stamp(bundle), sign(), digest(),
                       attest(). The only module that reads JUDGE_PRIVATE_KEY
   stages/
@@ -55,7 +57,8 @@ fixtures/
   outputs/            model outputs: <id>.forward.json, <id>.naive.json
   sources/            Etherscan cache, one file per address
   traces/             callTracer + prestate diff + ERC-20 balances, from run_fixture --save-trace
-  bundles/            <id>.bundle.json (EvidenceBundle) + <id>.rehearsal.json (raw traces), from fork.py
+  bundles/            <id>.bundle.json (EvidenceBundle) + <id>.rehearsal.json (raw traces), from fork.py.
+                      All 13 cases (01-10 and the three demos) as of 24 October
   examples/           bybit.bundle.json, the hand-checked example the schema tests validate
 eval/
   run.py              the eval table  (stub)
@@ -82,6 +85,7 @@ cd contracts && ~/.foundry/bin/forge build && ~/.foundry/bin/forge test -vv
 ~/.foundry/bin/anvil --fork-url $MAINNET_RPC --fork-block-number 21895238 --steps-tracing --port 8545
 uv run python contracts/setup.py [--guard]      # deploy or find the test Safe; --guard also sets the guard
 uv run python -m judge.evidence.fork <case.json> [--out fixtures/bundles]   # rehearse, write the bundle
+uv run python -m judge.verdict fixtures/bundles/<id>.bundle.json           # decision table on a saved bundle
 uv run python -m judge.run_fixture fixtures/cases/01_send_eth_ops.json [--save-trace]
 uv run python -m judge.stages.judge <case.json>... [--dump-prompt out.txt --no-call]
 ```
