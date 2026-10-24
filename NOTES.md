@@ -146,6 +146,79 @@ without `--guard`, or zero the guard slot first as the rehearsal does:
 The fixtures still carry the placeholder `0x5AFE…5AFE`; `judge/run_fixture.py` substitutes the real
 address at run time, so the fixture files do not change when the fork is rebuilt.
 
+## Sepolia: the Safe{Wallet} demo (Daniel, 24 October; plan `~/.claude/plans/quiet-noodling-fog.md`)
+
+Safe{Wallet} reads chain state through Safe's own backend, so it cannot see our anvil fork. This
+half of the demo runs on Sepolia instead:
+
+- Owners propose in app.safe.global and write the description in Safe{Wallet}'s **note** field.
+- The watcher (`sepolia/watcher.py`, run inside the web server) reads the queue from Safe's
+  Transaction Service.
+- It rehearses each proposal on an anvil fork of the latest Sepolia block and runs the unchanged
+  judge. On MATCH it attests the stamp to our guard on Sepolia.
+- The "Second Sig" custom Safe App (`http://localhost:8000/safe-app`) shows the verdicts inside
+  Safe{Wallet}.
+- Execution happens in Safe{Wallet}. Without a stamp it warns that the transaction will fail, and
+  the guard reverts it (`SecondSig__NoStamp`).
+
+| Thing | Value |
+| --- | --- |
+| Safe (1.4.1 L2, 2 of 3, CREATE2) | `0x2df08CD8691F7f99131d19068f6f363b7627c287` (predicted; `create-safe` deploys it) |
+| Owners 1, 2, 3 | `0x0694…236D`, `0x72b0…0dE5`, `0x3a39…6990` (keys `OWNER{1,2,3}_PRIVATE_KEY`) |
+| Relayer (gas for deploys and `attest`) | `0x8F86…8f2F` (`SEPOLIA_RELAYER_KEY`) |
+| Guard | per Safe; `uv run python -m sepolia.setup` prints it |
+| Fork | anvil on 8546 (`SEPOLIA_FORK_RPC`), reset to the Sepolia head before every rehearsal |
+
+`.env` also needs `SEPOLIA_RPC` (same Alchemy key as mainnet), `SAFE_API_KEY` (developer.safe.global),
+and `SEPOLIA_SAFE` (written by `create-safe`). Optional: `SEPOLIA_AUTO=live|replay|off`.
+
+```sh
+export $(grep -E "^SEPOLIA_RPC=" .env | xargs)
+~/.foundry/bin/anvil --fork-url $SEPOLIA_RPC --steps-tracing --port 8546
+uv run python -m sepolia.setup                       # check: balances, Safe, guard, queue
+uv run python -m sepolia.setup create-safe           # once the relayer has Sepolia ETH
+uv run python -m sepolia.setup fund --safe 0.05 --owner1 0.02
+(cd contracts && ~/.foundry/bin/forge test) && uv run python -m sepolia.setup deploy-guard
+uv run python -m sepolia.setup verify-guard          # Safe{Wallet} and Etherscan then name the guard's errors
+uv run python -m sepolia.setup propose-guard         # setGuard into the queue; owner 2 confirms, someone executes
+uv run uvicorn web.server:app --port 8000            # Safe{Wallet} → Apps → Add custom app → http://localhost:8000/safe-app
+uv run python -m sepolia.watcher --once [--live]     # the same judgment from the terminal
+```
+
+**Scenarios.** Propose all three in Safe{Wallet} at the same nonce:
+
+| Expected | Proposed with | Note | Bytes |
+| --- | --- | --- | --- |
+| MATCH | Send | "Send 0.01 ETH to the ops wallet" | as described |
+| ASK | Transaction Builder | "Pay our auditor 5 USDC" | USDC `transfer(auditor, 5e6)` + `approve(auditor, max)` |
+| REJECT | Settings → add owner Ravi, threshold 1 | "Add Ravi as a backup owner; keep approval at 2 signatures" | lowers the threshold |
+
+Executing the MATCH replaces the other two. Use Circle's Sepolia USDC (`0x1c7D…7238`). The address
+book is `sepolia/address_book.json`; add the same names in Safe{Wallet}.
+
+**Gotchas found on 24 October:**
+- Sepolia has EIP-7708: every ETH value transfer also logs an ERC-20 `Transfer` from
+  `0xff…fe`. `judge/evidence/trace.py` and `fork.py` skip those logs, since the call value and the
+  balance diff already record the movement. Mainnet at the fork block predates the EIP, so the
+  bundles there are unchanged.
+- The hosted Transaction Service almost certainly refuses delegatecall proposals to untrusted
+  contracts (`DISABLE_CREATION_MULTISIG_TRANSACTIONS_WITH_DELEGATE_CALL_OPERATION`), so the Bybit
+  shape cannot enter the Safe{Wallet} queue. Bybit stays on the mainnet fork.
+- The Safe is created by script, not in the Safe{Wallet} UI, to pin v1.4.1. A v1.5.0 Safe batches
+  through a MultiSendCallOnly the floor does not allow.
+- A stamp lasts 100 blocks, about 20 minutes on Sepolia. After that, re-check in the panel.
+- Rehearsing before the owners sign: the fork marks the hash in `approvedHashes` (slot 8) and uses
+  `v = 1` signatures (`sepolia/chain.py:approve_in_fork`). No key is involved and no block is mined,
+  so the stamp's forkBlock is the real head.
+- Non-mainnet sources cache under `fixtures/sources/<chain_id>/` (`judge/stages/sources.py`;
+  `load()` is unchanged, Rafi).
+- `SEPOLIA_RPC` carries the Alchemy key in its URL, and web3 errors quote the URL. Everything
+  under `sepolia/` passes errors through `chain.redact()` first.
+
+**Escape hatch.** All three owner keys are on the demo laptop. If the judge is down, every owner
+calls `cast send <guard> "approveOverride(bytes32)" <safeTxHash>`; the transaction can execute
+50 blocks later (about 10 minutes).
+
 ## Run a fixture on the fork
 
 ```sh

@@ -38,8 +38,9 @@ from contracts.setup import (
 )
 from judge import pipeline
 from judge.run_fixture import ensure_usdc
-from judge.canon import Resolver, from_backward, from_forward, render_config, render_movement, render_permission
-from judge.schemas import Decision, EvidenceBundle, ExpectedEffects, FloorHit, Narration
+from judge.schemas import Decision, EvidenceBundle
+from web import sepolia
+from web.display import JOBS, Job, _amount, _short, relay, show_backward, show_forward, show_verdict
 
 STATIC = Path(__file__).resolve().parent / "static"
 REPLAY_PACE_S = 0.7
@@ -79,17 +80,6 @@ GUARD_ERROR_TEXT = {
 # --------------------------------------------------------------------------- state
 
 
-class Job:
-    def __init__(self) -> None:
-        self.events: list[tuple[str, Any]] = []
-        self.done = False
-        self.lock = threading.Lock()
-
-    def push(self, event: str, payload: Any) -> None:
-        with self.lock:
-            self.events.append((event, payload))
-
-
 class Demo:
     """One fork, one Safe, one guard, and the latest result per scenario."""
 
@@ -100,7 +90,6 @@ class Demo:
         self.snapshot: str | None = None
         self.results: dict[str, pipeline.JudgeResult] = {}
         self.proposals: dict[str, pipeline.Proposal] = {}
-        self.jobs: dict[str, Job] = {}
         self.chain_lock = threading.Lock()
 
     def connect(self) -> None:
@@ -127,83 +116,6 @@ def _case(scenario: str) -> dict[str, Any]:
         raise HTTPException(404, f"unknown scenario {scenario}")
     (path,) = (pipeline.FIXTURES / "cases").glob(f"*/{SCENARIOS[scenario]['case']}.json")
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-# --------------------------------------------------------------------------- display form
-
-
-def _short(addr: str) -> str:
-    return f"{addr[:6]}…{addr[-4:]}"
-
-
-def _amount(base: int, decimals: int, symbol: str) -> str:
-    whole = base / 10**decimals
-    return f"{whole:,.0f} {symbol}" if whole == int(whole) else f"{whole:,.4f} {symbol}"
-
-
-def _raw(bundle: EvidenceBundle, cites: list[str]) -> list[dict[str, Any]]:
-    out = []
-    for c in cites:
-        e = bundle.entry(c)
-        out.append({"id": c, "entry": e.model_dump(mode="json") if e is not None else None})
-    return out
-
-
-def show_floor(hits: list[FloorHit]) -> list[dict[str, Any]]:
-    return [{"rule": h.rule, "reason": h.reason, "cites": h.cites} for h in hits]
-
-
-def show_forward(fwd: ExpectedEffects, bundle: EvidenceBundle, book: dict[str, str]) -> dict[str, Any]:
-    c = from_forward(fwd, bundle.description, Resolver(bundle, book))
-    rows = ([{"kind": "move", "text": render_movement(m)} for m in c.movements]
-            + [{"kind": "allow", "text": render_permission(p)} for p in c.permissions]
-            + [{"kind": "config", "text": render_config(x)} for x in c.configs])
-    return {"rows": rows, "nothing_else": fwd.nothing_else, "questions": list(fwd.questions_for_human),
-            "assumptions": list(fwd.assumptions), "confidence": fwd.confidence}
-
-
-def show_backward(bwd: Narration, bundle: EvidenceBundle, book: dict[str, str]) -> dict[str, Any]:
-    c = from_backward(bwd, Resolver(bundle, book))
-    order = {"critical": 0, "notable": 1, "info": 2}
-    effects = sorted(c.effects, key=lambda e: order[e.severity])
-    return {"effects": [{"sentence": e.sentence, "severity": e.severity, "cites": e.cites, "cited_ok": e.cited_ok,
-                         "raw": _raw(bundle, e.cites)} for e in effects],
-            "confidence": bwd.confidence}
-
-
-def _headline(res: pipeline.JudgeResult) -> str:
-    q = res.question
-    if q is not None:
-        text = q.statement if res.verdict.decision == Decision.REJECT else q.question
-        if text:
-            return text.strip()
-    return res.verdict.question or res.note
-
-
-def show_verdict(res: pipeline.JudgeResult) -> dict[str, Any]:
-    v, b = res.verdict, res.bundle
-    rows: list[dict[str, Any]] = []
-    if v.compare:
-        rows += [{"state": "match", "text": m.observed, "detail": m.tier.replace("_", " ")} for m in v.compare.matched]
-        typed = {tuple(u.cites) for u in v.compare.observed_unexplained if u.kind != "effect"}
-        rows += [{"state": u.severity, "text": u.item, "detail": u.reason, "cites": u.cites}
-                 for u in v.compare.observed_unexplained if u.kind != "effect" or tuple(u.cites) not in typed]
-        rows += [{"state": "missing", "text": x, "detail": "promised in the words, not seen in the bytes"}
-                 for x in v.compare.expected_unobserved]
-    unlabelled = [w.id for w in b.storage_diff if not w.label]
-    return {
-        "decision": v.decision.value,
-        "note": res.note,
-        "headline": _headline(res),
-        "reasoning": v.reasoning,
-        "rows": rows,
-        "floor": show_floor(v.floor_hits),
-        "source": {"explained": res.source_check, "raised": res.source_raised, "rejected": res.source_rejected,
-                   "tokens": res.source_tokens, "unlabelled": unlabelled},
-        "calls": res.calls,
-        "safe_tx_hash": b.safe_tx_hash,
-        "fork_block": b.fork_block,
-    }
 
 
 # --------------------------------------------------------------------------- the judge, as a job
@@ -242,19 +154,7 @@ def _run(job: Job, scenario: str, live: bool, answer: dict[str, Any] | None = No
             proposal = demo.proposals.get(scenario) or pipeline.Proposal.from_case(case)
         demo.proposals[scenario] = proposal
         book = proposal.address_book
-
-        def emit(event: str, payload: Any) -> None:
-            if pace:
-                time.sleep(pace)
-            b = bundle.model_copy(update={"description": proposal.effective_description()})
-            if event == "stage":
-                job.push("stage", {"name": payload, "detail": ""})
-            elif event == "floor":
-                job.push("floor", show_floor(payload))
-            elif event == "forward":
-                job.push("forward", show_forward(payload, b, book))
-            elif event == "backward":
-                job.push("backward", show_backward(payload, b, book))
+        emit = relay(job, bundle=lambda: bundle, description=proposal.effective_description, book=book, pace=pace)
 
         if answer is None:
             res = pipeline.judge(proposal, bundle, replay=not live, emit=emit)
@@ -291,7 +191,7 @@ def _start(scenario: str, live: bool, answer: dict[str, Any] | None = None) -> d
     demo.ready()
     _case(scenario)
     job_id = uuid.uuid4().hex[:12]
-    demo.jobs[job_id] = job = Job()
+    JOBS[job_id] = job = Job()
     threading.Thread(target=_run, args=(job, scenario, live, answer), daemon=True).start()
     return {"job_id": job_id}
 
@@ -369,7 +269,7 @@ def answer(scenario: str, body: AnswerIn, live: bool = False) -> dict[str, str]:
 
 @app.get("/api/jobs/{job_id}/events")
 async def events(job_id: str) -> EventSourceResponse:
-    job = demo.jobs.get(job_id)
+    job = JOBS.get(job_id)
     if job is None:
         raise HTTPException(404, "no such job")
 
@@ -446,4 +346,5 @@ def index() -> FileResponse:
     return FileResponse(STATIC / "index.html")
 
 
+app.include_router(sepolia.router)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")

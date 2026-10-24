@@ -68,13 +68,20 @@ def _fetch(address: str, chain_id: int) -> dict[str, Any]:
     raise AssertionError("unreachable")
 
 
+def _cache_path(address: str, chain_id: int) -> Path:
+    """Mainnet at the top level, as always; any other chain in its own folder, so an address that
+    exists on two chains never borrows the other chain's verification."""
+    folder = CACHE_DIR if chain_id == 1 else CACHE_DIR / str(chain_id)
+    return folder / f"{address.lower()}.json"
+
+
 def _cached(address: str, chain_id: int) -> dict[str, Any]:
-    path = CACHE_DIR / f"{address.lower()}.json"
+    path = _cache_path(address, chain_id)
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     raw = _fetch(address, chain_id)
     raw["fetched_at"] = datetime.now(timezone.utc).isoformat()
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(raw, indent=1) + "\n", encoding="utf-8", newline="\n")
     return raw
 

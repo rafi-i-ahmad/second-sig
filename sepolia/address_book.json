@@ -1,0 +1,9 @@
+{
+  "_note": "Names the Sepolia demo Safe's owners know. Same people as the fork fixtures; add the same names in Safe{Wallet}'s address book.",
+  "ops wallet": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+  "auditor": "0x46F43A4Cb3c2cD27c36f07cfd691E8a22Dd60A4C",
+  "Ravi": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+  "warm wallet": "0x5EdeB15618d4A94EBFC4DfEBBe49748982731B07",
+  "USDC": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+  "MultiSendCallOnly v1.4.1": "0x9641d764fc13c8B624c04430C7356C1C7C8102e2"
+}

@@ -160,6 +160,8 @@ def _token_balances(w3: Web3, frame: RawFrame, block: int) -> list[TokenBalance]
     pairs: set[tuple[str, str]] = set()
     for f in _walk(frame):
         for log in f.logs:
+            if log.address.lower() == trace.ETH_TRANSFER_LOG_ADDRESS:
+                continue  # EIP-7708 ETH-transfer log, not a token
             if len(log.topics) == 3 and log.topics[0] == TRANSFER_TOPIC:
                 token = to_checksum_address(log.address)
                 pairs |= {(token, to_checksum_address("0x" + t[-40:])) for t in log.topics[1:]}

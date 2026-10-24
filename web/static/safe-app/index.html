@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second Sig</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="app">
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand"><span class="logo">S</span>Second Sig</div>
+      <span class="env-pill">Sepolia</span>
+      <span class="muted" id="head">—</span>
+      <div class="nav-spacer"></div>
+      <label class="switch" title="Off: recorded model outputs for this proposal, if any; otherwise the models run">
+        <input type="checkbox" id="live" checked><span class="track"></span><span id="mode-label">Live</span>
+      </label>
+      <a class="btn" id="open-wallet" href="#" target="_blank" rel="noopener noreferrer">Safe{Wallet} ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary">
+      <div class="stat"><div class="stat-label">ETH</div><div class="stat-value" id="bal-eth">—</div></div>
+      <div class="stat"><div class="stat-label">USDC</div><div class="stat-value" id="bal-usdc">—</div></div>
+      <div class="stat stat-wide">
+        <div class="stat-label" id="safe-label">Safe</div>
+        <div class="stat-meta"><span id="safe-addr" class="mono">—</span><span class="pill neutral" id="guard-pill">…</span></div>
+      </div>
+    </section>
+
+    <section class="panel queue">
+      <header class="card-head"><h2 id="queue-title">Queue</h2><span class="tag" id="queue-meta"></span></header>
+      <div id="queue" class="queue-body"><div class="empty">—</div></div>
+    </section>
+
+    <section class="panel proposal hidden" id="proposal">
+      <div class="proposal-main">
+        <div class="eyebrow" id="proposal-eyebrow">Proposal</div>
+        <div class="eyebrow muted">Safe{Wallet} note · untrusted</div>
+        <div class="description" id="description">—</div>
+      </div>
+      <dl class="proposal-meta">
+        <dt>Calls</dt><dd class="mono" id="bytes-summary">—</dd>
+        <dt>Confirmations</dt><dd id="confirmations">—</dd>
+        <dt>Safe{Wallet}</dt><dd id="tx-link">—</dd>
+      </dl>
+      <button class="btn primary" id="judge">Re-check</button>
+    </section>
+
+    <div class="stepper hidden" id="stepper"></div>
+
+    <section class="cards hidden" id="cards">
+      <article class="panel card">
+        <header class="card-head"><h2>Stated intent</h2></header>
+        <div class="card-body" id="told"><div class="empty">—</div></div>
+      </article>
+
+      <article class="panel card">
+        <header class="card-head"><h2>Simulated effects</h2></header>
+        <div class="card-body" id="does"><div class="empty">—</div></div>
+        <div class="floor" id="floor"></div>
+      </article>
+
+      <article class="panel card">
+        <header class="card-head"><h2>Decision</h2><span class="tag" id="mode-tag"></span></header>
+        <div class="card-body" id="verdict"><div class="empty">—</div></div>
+        <dl class="stamp" id="stamp"></dl>
+        <div id="answer-box" class="answer hidden">
+          <div class="answer-row">
+            <select id="answer-owner"></select>
+            <input id="answer-text" type="text" placeholder="Reply to the question, as an owner">
+            <button class="btn" id="answer-send">Send</button>
+          </div>
+        </div>
+        <div class="result" id="result"></div>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="/static/safe-app/safe-app.js"></script>
+</body>
+</html>

@@ -1,38 +1,14 @@
-// Second Sig demo page. Renders what the server sends; computes nothing.
+// Second Sig demo page (mainnet fork). Renders what the server sends; computes nothing.
 // Every string from the server may carry attacker-authored text, so it goes in via textContent only.
 
-const $ = (id) => document.getElementById(id);
-
-function el(tag, attrs = {}, ...children) {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (k === "class") n.className = v;
-    else if (k === "onclick") n.onclick = v;
-    else n.setAttribute(k, v);
-  }
-  for (const c of children.flat()) {
-    if (c == null || c === false) continue;
-    n.append(c instanceof Node ? c : document.createTextNode(String(c)));
-  }
-  return n;
-}
-
-const short = (a) => (a && a.length > 12 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a || "");
-const tidy = (t) => String(t).replace(/0x[0-9a-fA-F]{40}\b/g, (a) => short(a)).replaceAll(" -> ", " → ");
-const dot = (cls) => el("span", { class: `dot ${cls}` });
-const skeleton = () => [el("div", { class: "skeleton" }), el("div", { class: "skeleton" }), el("div", { class: "skeleton" })];
-const PILL = { MATCH: "success", ASK: "warning", REJECT: "danger" };
-const KIND = { move: "Transfer", allow: "Approval", config: "Config" };
-const LABEL = { MATCH: "Match", ASK: "Needs answer", REJECT: "Rejected" };
-function fill(node, ...children) {
-  node.replaceChildren(...children.flat().filter((c) => c != null));
-  node.classList.remove("fade"); void node.offsetWidth; node.classList.add("fade");
-}
+import {
+  $, el, short, skeleton, fill, resetStepper, renderStepper, onStage, listen,
+  renderFloor, renderForward, renderBackward, renderVerdict, renderStamp, showError,
+} from "./render.js";
 
 let scenarios = [];
 let current = null;
 let state = null;
-let source = null;
 let busy = false;
 
 // --------------------------------------------------------------------------- summary
@@ -99,39 +75,12 @@ function clearCards() {
   renderStepper(null);
 }
 
-// --------------------------------------------------------------------------- stepper
-
-const STEPS = [
-  ["rehearsing", "Simulation"], ["floor", "Policy"], ["forward", "Intent"], ["backward", "Effects"],
-  ["source", "Source check"], ["verdict", "Decision"], ["stamping", "Stamp"],
-];
-let reached = -1;
-let mode = null;
-
-function renderStepper(active, finished = false) {
-  const parts = [];
-  STEPS.forEach(([key, label], i) => {
-    let cls = "step";
-    if (i < reached || (finished && i === reached)) cls += " done";
-    else if (i === reached && active) cls += " active";
-    if (i > 0) parts.push(el("span", { class: "step-line" }));
-    parts.push(el("span", { class: cls }, el("span", { class: "ring" }), label));
-  });
-  $("stepper").replaceChildren(...parts);
-}
-
-function onStage(name) {
-  if (name === "done") { renderStepper(null, true); return; }
-  const i = STEPS.findIndex(([k]) => k === name);
-  if (i >= 0) { reached = i; renderStepper(name); }
-}
-
 // --------------------------------------------------------------------------- the stream
 
 function startJob(url, body) {
   if (busy) return;
   busy = true;
-  reached = -1; mode = null;
+  resetStepper();
   const live = $("live").checked;
   $("judge").disabled = true;
   $("execute").disabled = true;
@@ -149,124 +98,32 @@ function startJob(url, body) {
       if (!r.ok) throw new Error((await r.json()).detail || r.statusText);
       return r.json();
     })
-    .then(({ job_id }) => listen(job_id))
+    .then(({ job_id }) => listen(job_id, {
+      mode: () => renderStepper(null),
+      stage: (s) => onStage(s.name),
+      floor: renderFloor,
+      forward: renderForward,
+      backward: renderBackward,
+      amendments: renderAmendments,
+      verdict: renderVerdict,
+      stamp: renderStamp,
+      error: (e) => showError(e, replay),
+      end: () => { busy = false; $("judge").disabled = false; loadState(); },
+    }))
     .catch((e) => { busy = false; $("judge").disabled = false; showError({ message: e.message }); });
 }
 
-function listen(jobId) {
-  if (source) source.close();
-  source = new EventSource(`/api/jobs/${jobId}/events`);
-  const on = (name, fn) => source.addEventListener(name, (ev) => fn(JSON.parse(ev.data)));
-  on("mode", (m) => { mode = m; renderStepper(null); });
-  on("stage", (s) => onStage(s.name));
-  on("floor", renderFloor);
-  on("forward", renderForward);
-  on("backward", renderBackward);
-  on("amendments", renderAmendments);
-  on("verdict", renderVerdict);
-  on("stamp", renderStamp);
-  on("error", showError);
-  on("end", () => {
-    source.close(); source = null; busy = false;
-    $("judge").disabled = false;
-    loadState();
-  });
-}
-
 // --------------------------------------------------------------------------- cards
-
-function renderFloor(hits) {
-  if (!hits.length) {
-    $("floor").replaceChildren(el("div", { class: "ok" }, el("span", { class: "pill success" }, "Policy passed")));
-    return;
-  }
-  $("floor").replaceChildren(
-    el("div", { class: "floor-title" }, el("span", { class: "pill danger" }, `${hits.length} policy violations`)),
-    ...hits.map((h) => el("div", { class: "hit" }, tidy(h.reason))),
-  );
-  fill($("told"), el("div", { class: "empty" }, "—"));
-  fill($("does"), el("div", { class: "empty" }, "—"));
-}
-
-function renderForward(f) {
-  const rows = f.rows.length
-    ? f.rows.map((r) => el("div", { class: "row" }, el("span", { class: "kind" }, KIND[r.kind] || r.kind), el("span", { class: "text" }, tidy(r.text))))
-    : [el("div", { class: "empty" }, "No effects")];
-  const extra = [];
-  for (const q of f.questions) extra.push(el("div", { class: "footer-note" }, q));
-  fill($("told"), rows, extra);
-}
-
-function renderBackward(b) {
-  const rows = b.effects.map((e) => {
-    const raw = el("pre", { class: "raw hidden" }, JSON.stringify(e.raw, null, 2));
-    const toggle = el("button", { class: "raw-toggle", onclick: () => raw.classList.toggle("hidden") }, "Details");
-    return el("div", {},
-      el("div", { class: "row" }, dot(e.severity),
-        el("span", { class: "text" }, e.severity === "critical" ? el("span", { class: "pill danger" }, "Critical") : null,
-          e.severity === "critical" ? " " : null, tidy(e.sentence)),
-        toggle),
-      raw);
-  });
-  fill($("does"), rows);
-}
 
 function renderAmendments(list) {
   $("description").replaceChildren(current.description,
     ...list.map((a) => el("div", { class: "amend" }, `Owner ${short(a.owner)}: ${a.text}`)));
 }
 
-function renderVerdict(v) {
-  const note = el("div", { class: "note clamp" }, tidy(v.headline));
-  const more = el("button", { class: "link", onclick: () => { note.classList.toggle("clamp"); more.textContent = note.classList.contains("clamp") ? "Show more" : "Show less"; } }, "Show more");
-  const parts = [
-    el("div", { class: "verdict-head" }, el("span", { class: `pill ${PILL[v.decision]} verdict-pill` }, LABEL[v.decision])),
-    note,
-  ];
-  parts.push(more);
-  if (v.rows.length) {
-    parts.push(el("div", { class: "section-label" }, "Reconciliation"));
-    for (const r of v.rows) {
-      parts.push(el("div", { class: "row", title: r.detail }, dot(r.state),
-        el("span", { class: "text" }, tidy(r.text))));
-    }
-  }
-  const s = v.source;
-  if (s.explained.length) {
-    parts.push(el("div", { class: "source" }, `${s.explained.length} state changes verified against source`));
-  }
-  if (s.unlabelled.length && v.decision !== "REJECT") {
-    parts.push(el("div", { class: "source" }, `${s.unlabelled.length} unverified state changes`));
-  }
-  fill($("verdict"), parts);
-  if (note.scrollHeight <= note.clientHeight) more.remove();
-  $("stamp").replaceChildren();
-  $("execute").disabled = false;
-  if (v.decision === "ASK") $("answer-box").classList.remove("hidden");
-}
-
-function renderStamp(s) {
-  $("stamp").replaceChildren(
-    el("dt", {}, "Stamp"), el("dd", {}, el("span", { class: "pill success" }, "Signed"), ` by ${short(s.judge)}`),
-    el("dt", {}, "Fork block"), el("dd", {}, s.fork_block.toLocaleString()),
-    el("dt", {}, "Attestation"), el("dd", { title: s.attest_tx }, `${short(s.attest_tx)} · block ${s.attest_block.toLocaleString()}`),
-  );
-}
-
-function showError(e) {
-  const parts = [
-    el("div", { class: "verdict-head" }, el("span", { class: "pill danger verdict-pill" }, "Unavailable")),
-    el("div", { class: "note" }, e.message),
-  ];
-  if (e.replay_available) {
-    parts.push(el("button", { class: "link", onclick: () => { $("live").checked = false; judge(); } }, "Replay from log"));
-  }
-  fill($("verdict"), parts);
-}
-
 // --------------------------------------------------------------------------- actions
 
 function judge() { startJob(`/api/judge/${current.id}`); }
+function replay() { $("live").checked = false; judge(); }
 
 async function execute() {
   $("execute").disabled = true;
