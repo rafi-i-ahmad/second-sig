@@ -80,5 +80,6 @@
     "nothing_else": true,
     "expect_question": false,
     "note": "amount_human None means the sentence fixes no ETH amount; the swap returns whatever the market gives above the minimum in the calldata."
-  }
+  },
+  "expected_verdict": "MATCH"
 }

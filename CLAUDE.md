@@ -52,15 +52,16 @@ cli/
 sepolia/              watcher.py, attacker.py  (stubs)
 fixtures/
   build.py            generates every case JSON; edit the Python, not the JSON
-  cases/              ten ordinary proposals, the forward-pass test set. Never a demo scenario
-  bybit/ aave/ auditor/   the three demo scenarios (case.json, with expected_verdict)
-  mismatch/           31-35: description contradicts the bytes, expected REJECT; floor-clean, so the model's job
   README.md           what every folder here is for; read it before adding a fixture
-  transfer/           first forward-pass dry run
-  tornado/ injection/ not built yet
+  cases/              every proposal, one folder per expected verdict, every file has expected_verdict
+    match/            honest and precise (01-08, 10)
+    ask/              too vague to act on (09)
+    reject/           description contradicts the bytes (31-35); floor-clean, so the model's job
+    demo/             demo_bybit (REJECT), demo_aave (MATCH), demo_auditor (ASK). Forward-pass tests and
+                      few-shot examples never read this folder (invariant 8)
   outputs/            model outputs: <id>.forward.json, <id>.naive.json
   sources/            Etherscan cache, one file per address
-  traces/             callTracer + prestate diff + ERC-20 balances, from run_fixture --save-trace
+  traces/             older raw traces from run_fixture --save-trace; only the naive baseline still reads them
   bundles/            <id>.bundle.json (EvidenceBundle) + <id>.rehearsal.json (raw traces), from fork.py.
                       All 18 cases (01-10, the three demos, mismatch 31-35) as of 24 October
   examples/           bybit.bundle.json, the hand-checked example the schema tests validate

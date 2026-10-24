@@ -21,8 +21,8 @@ What it never sees from the fixture: ``calls`` (hand-written names such as "atta
 contract"), ``intent``, ``note``, ``expected_verdict``.
 
 Usage:
-    uv run python -m judge.stages.judge fixtures/bybit/case.json --dump-prompt out.txt --no-call
-    uv run python -m judge.stages.judge fixtures/cases/01_send_eth_ops.json fixtures/auditor/case.json
+    uv run python -m judge.stages.judge fixtures/cases/demo/demo_bybit.json --dump-prompt out.txt --no-call
+    uv run python -m judge.stages.judge fixtures/cases/match/01_send_eth_ops.json fixtures/cases/demo/demo_auditor.json
 """
 
 from __future__ import annotations

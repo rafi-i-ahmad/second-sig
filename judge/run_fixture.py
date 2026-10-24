@@ -1,8 +1,8 @@
 """Execute one fixture case through the test Safe on the anvil fork and show what happened.
 
 Usage:
-    uv run python -m judge.run_fixture fixtures/cases/01_send_eth_ops.json
-    uv run python -m judge.run_fixture fixtures/bybit/case.json --save-trace
+    uv run python -m judge.run_fixture fixtures/cases/match/01_send_eth_ops.json
+    uv run python -m judge.run_fixture fixtures/cases/demo/demo_bybit.json --save-trace
 
 Needs anvil forking mainnet on http://127.0.0.1:8545 (see NOTES.md). Deploys the test Safe
 if it is missing (contracts/setup.py), substitutes the Safe's real address for the fixture

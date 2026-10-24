@@ -114,7 +114,7 @@ address at run time, so the fixture files do not change when the fork is rebuilt
 ## Run a fixture on the fork
 
 ```sh
-uv run python -m judge.run_fixture fixtures/cases/01_send_eth_ops.json
+uv run python -m judge.run_fixture fixtures/cases/match/01_send_eth_ops.json
 ```
 
 Prints the receipt, `ExecutionSuccess` or `ExecutionFailure`, ETH balance changes for every
@@ -137,7 +137,8 @@ uv run python contracts/setup.py
 ```
 
 Verified sources from Etherscan are cached in `fixtures/sources/<address>.json`
-(`judge/stages/sources.py`). Model outputs go in `fixtures/outputs/`; `fixtures/cases/` holds cases only.
+(`judge/stages/sources.py`). Model outputs go in `fixtures/outputs/`; `fixtures/cases/` holds cases only,
+one folder per expected verdict (`match/`, `ask/`, `reject/`) plus `demo/`. See `fixtures/README.md`.
 
 ## Runs so far
 
@@ -174,7 +175,7 @@ its snapshot). The question was whether `rules.py` rejects anything honest. It d
 | 10 approve + swapExactTokensForETH | touches UniswapV2Router02, the USDC/WETH pair, WETH9 | no hits: all verified on Etherscan (cached in `fixtures/sources/`) |
 | Aave deposit, auditor payment | batches, 11 unlabelled Aave slot writes, unlimited approve | no hits |
 | Bybit | | rules 1, 2 and 3 |
-| 31–35 `fixtures/mismatch/` (description contradicts the bytes; expected REJECT) | approve to an EOA; a payment to a non-address-book EOA; a swap delivered to an EOA; threshold lowered by a Safe self-call | no hits on any, as designed: none of these is an attack *shape*, each is an honest-looking transaction with a lying description. The REJECT has to come from the model. If we want the floor to catch 31 and 33, the spec's "approve or setApprovalForAll to an EOA" rule would, and no benign case approves an EOA |
+| 31–35 `fixtures/cases/reject/` (description contradicts the bytes; expected REJECT) | approve to an EOA; a payment to a non-address-book EOA; a swap delivered to an EOA; threshold lowered by a Safe self-call | no hits on any, as designed: none of these is an attack *shape*, each is an honest-looking transaction with a lying description. The REJECT has to come from the model. If we want the floor to catch 31 and 33, the spec's "approve or setApprovalForAll to an EOA" rule would, and no benign case approves an EOA |
 
 What the bundles show for the mismatch cases, which is what the backward pass will have to say
 out loud: 31 `USDC.allowances[Safe][Ravi]` goes to `uint256 max`; 32 the 2,500 USDC land at

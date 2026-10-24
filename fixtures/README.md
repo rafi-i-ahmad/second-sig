@@ -16,19 +16,21 @@ humans, and the `intent` ground truth (movements, permission changes, Safe confi
 `nothing_else`, `expect_question`). The Safe address in every file is the placeholder
 `0x5AFE…5AFE`; the tooling substitutes the real fork Safe at run time.
 
-| Folder | What is in it | Expected verdict | Who reads it |
-| --- | --- | --- | --- |
-| `cases/` | Ten ordinary, honest proposals (`01`–`10`): transfers, batches, owner and threshold changes, a finite approval, a swap. The forward-pass test set | none recorded on purpose; case 09 expects a question | `tests/test_forward_cases.py`, `judge.evidence.fork` |
-| `bybit/` | The Bybit attack shape: delegatecall to the attackers' contract, rewrites the Safe's master copy | REJECT (hard floor) | demo scenario 1 |
-| `aave/` | An honest Aave v3 deposit batch: approve then supply | MATCH | demo scenario 2 |
-| `auditor/` | True but incomplete: pay 100 USDC, plus an unmentioned unlimited approval | ASK | demo scenario 3 |
-| `mismatch/` | The description contradicts the bytes (`31`–`35`): "revoke" that grants, a payment to the wrong wallet, "pay" that only approves, a swap whose output goes elsewhere, "keep threshold at 2" that drops it to 1. No floor rule fires on any of them; the model has to see the gap | REJECT | eval, `tests/test_verdict.py` |
-| `injection/` | Descriptions that try to talk the model into approving | not built yet | |
-| `tornado/` | A sanctioned destination | not built yet | |
+Every case lives under `cases/`, in a folder named after its expected verdict (the classifier's
+three answers) or `demo`. Every file carries `expected_verdict`, and a test checks it matches
+the folder.
 
-The demo scenarios and mismatch cases never go in `cases/`, so forward-pass tests and few-shot
-examples cannot read them. `tests/test_forward_cases.py` enforces this: nothing in `cases/` may
-carry an `expected_verdict`.
+| Folder | What is in it | Who reads it |
+| --- | --- | --- |
+| `cases/match/` | Nine honest, precise proposals (`01`–`08`, `10`): transfers, batches, owner and threshold changes, a finite approval, a swap. The words say exactly what the bytes do | forward-pass tests, eval |
+| `cases/ask/` | `09` "Routine transfer": too vague to fix the asset, amount or recipient, so the right answer is a question | forward-pass tests, eval |
+| `cases/reject/` | The description contradicts the bytes (`31`–`35`): "revoke" that grants, a payment to the wrong wallet, "pay" that only approves, a swap whose output goes elsewhere, "keep threshold at 2" that drops it to 1. No floor rule fires on any of them; the model has to see the gap | forward-pass tests (the words still describe an honest transaction), `tests/test_verdict.py`, eval |
+| `cases/demo/` | The three demo scenarios: `demo_bybit` (REJECT, by the hard floor), `demo_aave` (MATCH), `demo_auditor` (ASK: true but incomplete) | the demo and the eval only |
+
+Forward-pass tests and few-shot examples never read `cases/demo/` (CLAUDE.md invariant 8);
+`tests/test_forward_cases.py` reads `match/`, `ask/` and `reject/` and fails if a `demo_*` id
+appears there. Injection cases (descriptions that try to talk the model round) and a sanctioned
+destination case are still to be written; they go in `reject/` or `ask/` like any other case.
 
 ## Evidence: what the fork said
 
@@ -36,8 +38,7 @@ carry an `expected_verdict`.
 | --- | --- | --- |
 | `bundles/` | One `<id>.bundle.json` (the `EvidenceBundle`: decoded call tree, labelled storage writes, balance changes, events, sources, floor hits) and one `<id>.rehearsal.json` (the raw traces it was built from) per case. All 18 cases as of 24 October | `uv run python -m judge.evidence.fork <case.json>` on anvil |
 | `examples/` | `bybit.bundle.json`, a hand-checked example bundle the schema tests validate against | by hand |
-| `traces/` | Older raw traces from `judge.run_fixture --save-trace` (three cases). Superseded by `bundles/`; kept for reference | `uv run python -m judge.run_fixture <case.json> --save-trace` |
-| `transfer/` | The very first forward-pass dry run: a fork context and a recorded Argon output. Historical | by hand, 22 October |
+| `traces/` | Older raw traces from `judge.run_fixture --save-trace` (three cases). Superseded by `bundles/`, but the naive baseline (`judge/stages/judge.py`) still reads this format; delete once it reads bundles | `uv run python -m judge.run_fixture <case.json> --save-trace` |
 
 ## Caches: so nothing needs the network
 

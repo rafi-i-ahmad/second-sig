@@ -7,15 +7,15 @@ The forward pass only ever sees ``description`` and ``address_book``; ``safe_tx`
 
 Run:  uv run python fixtures/build.py
 
-Writes one JSON file per case:
-  fixtures/cases/<id>.json          ten ordinary cases (the forward-pass test set)
-  fixtures/bybit/case.json          demo scenario, expected REJECT
-  fixtures/aave/case.json           demo scenario, expected MATCH
-  fixtures/auditor/case.json        demo scenario, expected ASK
-  fixtures/mismatch/<id>.json       description contradicts the bytes, expected REJECT
+Writes one JSON file per case under fixtures/cases/<folder>/<id>.json, where the folder is
+the expected verdict in lower case, or "demo" for the three demo scenarios:
+  cases/match/    honest proposals whose words say exactly what the bytes do (01-08, 10)
+  cases/ask/      too vague to act on without a question (09)
+  cases/reject/   the description contradicts the bytes (31-35)
+  cases/demo/     demo_bybit (REJECT), demo_aave (MATCH), demo_auditor (ASK)
 
-The demo scenarios never go in fixtures/cases/, so forward-pass tests and any few-shot
-examples cannot read them (CLAUDE.md invariant 8).
+The demo scenarios sit in their own folder so forward-pass tests and any few-shot examples
+never read them (CLAUDE.md invariant 8).
 
 Plain-language glossary, one sentence each:
   calldata     the bytes a contract receives; the first 4 bytes pick the function, the
@@ -40,6 +40,12 @@ from eth_utils import keccak, to_checksum_address
 
 ROOT = Path(__file__).resolve().parent
 CASES_DIR = ROOT / "cases"
+
+
+def case_path(c: dict[str, Any]) -> Path:
+    """cases/<expected verdict, lower case>/<id>.json; the demos get cases/demo/."""
+    folder = "demo" if c["id"].startswith("demo_") else c["expected_verdict"].lower()
+    return CASES_DIR / folder / f"{c['id']}.json"
 
 # ---------------------------------------------------------------------------
 # Real mainnet contracts. All exist at the fork block (21,895,238 or later).
@@ -415,13 +421,11 @@ CASES: list[dict[str, Any]] = [
 
 
 # ---------------------------------------------------------------------------
-# The three demo scenarios. Kept out of fixtures/cases/ on purpose.
+# The three demo scenarios. Written to cases/demo/, which the forward-pass tests never read.
 # ---------------------------------------------------------------------------
-DEMOS: list[tuple[Path, dict[str, Any]]] = [
+DEMOS: list[dict[str, Any]] = [
     # Bybit shape: DELEGATECALL (operation 1) to the attackers' contract. Its transfer()
     # writes storage slot 0, and because it runs as the Safe, that is the Safe's master copy.
-    (
-        ROOT / "bybit" / "case.json",
         case(
             "demo_bybit",
             "Transfer 500 ETH to the warm wallet",
@@ -440,10 +444,7 @@ DEMOS: list[tuple[Path, dict[str, Any]]] = [
             expected_verdict="REJECT",
             note="The bytes do not do what the sentence says. The delegatecall trips hard-floor rules 1, 2 and 3 before any model runs. Real attack: mainnet block 21,895,238.",
         ),
-    ),
     # Honest DeFi: approve the Pool, then supply. The Safe ends up holding aUSDC.
-    (
-        ROOT / "aave" / "case.json",
         case(
             "demo_aave",
             "Deposit 10,000 USDC into Aave v3",
@@ -468,10 +469,7 @@ DEMOS: list[tuple[Path, dict[str, Any]]] = [
             ),
             expected_verdict="MATCH",
         ),
-    ),
     # True but incomplete: the payment is real, but an unlimited approval rides along.
-    (
-        ROOT / "auditor" / "case.json",
         case(
             "demo_auditor",
             "Pay our auditor 100 USDC",
@@ -486,16 +484,13 @@ DEMOS: list[tuple[Path, dict[str, Any]]] = [
             ),
             expected_verdict="ASK",
         ),
-    ),
 ]
 
 # ---------------------------------------------------------------------------
-# Mismatch cases: the description says one thing, the bytes do another. Expected REJECT.
-# Not in fixtures/cases/ (that set has no expected verdicts) and not demos. No floor rule
-# catches these: the floor only knows attack shapes, so the model has to see the gap.
+# Mismatch cases: the description says one thing, the bytes do another. Expected REJECT,
+# so they land in cases/reject/. No floor rule catches these: the floor only knows attack
+# shapes, so the model has to see the gap.
 # ---------------------------------------------------------------------------
-MISMATCH_DIR = ROOT / "mismatch"
-
 MISMATCH: list[dict[str, Any]] = [
     # "Revoke" means approve(Ravi, 0). The bytes approve the maximum instead: the words
     # describe the opposite of what happens. Ravi is a plain address, so nothing can pull the
@@ -589,15 +584,14 @@ def write(path: Path, data: dict[str, Any]) -> None:
 
 
 def main() -> None:
+    # The ordinary cases are honest by construction: MATCH, unless the intent says the words
+    # are too thin to act on, in which case the right answer is a question (ASK).
     for c in CASES:
-        write(CASES_DIR / f"{c['id']}.json", c)
-        print(f"wrote cases/{c['id']}.json  ({len(c['calls'])} call(s), op={c['safe_tx']['operation']})")
-    for path, c in DEMOS:
+        c.setdefault("expected_verdict", "ASK" if c["intent"].get("expect_question") else "MATCH")
+    for c in [*CASES, *DEMOS, *MISMATCH]:
+        path = case_path(c)
         write(path, c)
-        print(f"wrote {path.relative_to(ROOT).as_posix()}  expected {c['expected_verdict']}")
-    for c in MISMATCH:
-        write(MISMATCH_DIR / f"{c['id']}.json", c)
-        print(f"wrote mismatch/{c['id']}.json  expected {c['expected_verdict']}")
+        print(f"wrote {path.relative_to(ROOT).as_posix():45s} {len(c['calls'])} call(s), op={c['safe_tx']['operation']}")
 
 
 if __name__ == "__main__":

@@ -45,5 +45,6 @@
     "safe_config_changes": [],
     "nothing_else": true,
     "expect_question": false
-  }
+  },
+  "expected_verdict": "MATCH"
 }

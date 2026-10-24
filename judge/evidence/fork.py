@@ -5,8 +5,8 @@ block the rehearsal; run the real execTransaction with the owners' signatures fr
 relayer; trace it (callTracer with logs, prestateTracer in diff mode); read token balances and
 code while the state still exists; evm_revert. The fork is left exactly as it was.
 
-    uv run python -m judge.evidence.fork fixtures/bybit/case.json
-    uv run python -m judge.evidence.fork fixtures/cases/01_send_eth_ops.json --out fixtures/bundles
+    uv run python -m judge.evidence.fork fixtures/cases/demo/demo_bybit.json
+    uv run python -m judge.evidence.fork fixtures/cases/match/01_send_eth_ops.json --out fixtures/bundles
 
 The CLI signs with the test owners (anvil's public keys) and writes <out>/<case id>.bundle.json,
 plus <case id>.rehearsal.json, the raw traces the bundle was built from.

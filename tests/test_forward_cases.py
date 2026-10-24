@@ -1,10 +1,12 @@
-"""Live forward-pass test over fixtures/cases/.
+"""Live forward-pass test over fixtures/cases/{match,ask,reject}/.
 
 For every case, run judge/jobs/forward.py on the description and address book alone,
 then compare the form with the case's ``intent``: same multiset of movements, same
 permission and config changes, ``nothing_else`` agreeing, and a question where the
-intent expects one. Each model output is saved as ``fixtures/outputs/<id>.forward.json``;
-fixtures/cases/ holds cases only.
+intent expects one. The reject cases belong here too: their words describe an honest
+transaction, so the forward pass should read them like one. The demos in cases/demo/ are
+never read (CLAUDE.md invariant 8). Each model output is saved as
+``fixtures/outputs/<id>.forward.json``.
 
 Run:  uv run pytest tests/test_forward_cases.py --live -s
 """
@@ -24,7 +26,8 @@ from judge.schemas import ExpectedEffects
 FIXTURES = Path(__file__).resolve().parent.parent / "fixtures"
 CASES_DIR = FIXTURES / "cases"
 OUTPUTS_DIR = FIXTURES / "outputs"
-CASE_FILES = sorted(CASES_DIR.glob("*.json"))
+FORWARD_FOLDERS = ("match", "ask", "reject")  # never "demo"
+CASE_FILES = sorted(p for folder in FORWARD_FOLDERS for p in (CASES_DIR / folder).glob("*.json"))
 MODEL = "gemini-3.8-flash"
 THINKING = "low"
 
@@ -111,11 +114,13 @@ def compare(form: ExpectedEffects, intent: dict[str, Any]) -> list[str]:
 
 
 def test_cases_exist_and_never_include_demos() -> None:
-    assert len(CASE_FILES) == 10
+    assert len(CASE_FILES) == 15
     for path in CASE_FILES:
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert "expected_verdict" not in data, f"{path.name} looks like a demo scenario"
+        assert not data["id"].startswith("demo_"), f"{path} is a demo scenario; those stay in cases/demo/"
+        assert data["expected_verdict"].lower() == path.parent.name, f"{path} is in the wrong folder"
         assert set(data["intent"]) >= {"movements", "permission_changes", "safe_config_changes", "nothing_else"}
+    assert sorted((CASES_DIR / "demo").glob("*.json")), "cases/demo/ should hold the three demo scenarios"
 
 
 def test_compare_helper_wildcard_amount() -> None:

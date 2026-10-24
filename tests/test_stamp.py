@@ -20,7 +20,7 @@ from judge import stamp as st
 from judge.schemas import Stamp
 
 REPO = Path(__file__).resolve().parent.parent
-CASE_01 = REPO / "fixtures" / "cases" / "01_send_eth_ops.json"
+CASE_01 = REPO / "fixtures" / "cases" / "match" / "01_send_eth_ops.json"
 
 GUARD = "0x7ee55531aacf54195D872EbBD1e19a1c725DD8A5"
 NO_STAMP_SELECTOR = "66d21dae"  # SecondSig__NoStamp(bytes32)

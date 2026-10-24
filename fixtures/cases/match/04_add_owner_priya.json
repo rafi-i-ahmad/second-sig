@@ -44,5 +44,6 @@
     "nothing_else": true,
     "expect_question": false,
     "note": "Threshold is unchanged at 2; a forward pass that flags the threshold as unstated is acceptable."
-  }
+  },
+  "expected_verdict": "MATCH"
 }
