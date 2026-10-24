@@ -7,10 +7,18 @@ model, no key. The order is fixed and nothing later in the table can soften an e
    from the bundle's evidence here, so a stale or edited ``floor_hits`` list cannot hide a hit.
 2. The rehearsal did not succeed (ExecutionFailure or revert): ASK. Nothing happened, so there
    is nothing to approve, and a transaction that fails today may succeed under other state.
-3. No checked model form: ASK. The judge has not run, timed out or returned an invalid form;
-   every failure ends in ASK, never MATCH.
-4. Otherwise the model's decision. A model form can only hold the verdict at MATCH, ASK or
-   REJECT; the rows above have already taken REJECT and ASK out of its hands where they apply.
+3. A missing or invalid form (forward or backward): ASK. Every failure ends in ASK, never MATCH.
+4. The comparison (compare.reconcile) of what the words promised with what the bytes did:
+   - an observed effect nothing expected explains, severity critical: REJECT
+   - an observed effect nothing expected explains, severity notable: ASK
+   - an expected effect the trace does not show: ASK
+   - the words leave room for more (nothing_else is false): ASK, with the forward pass's question
+   - otherwise MATCH
+   Items matched only by a weaker tier (party or asset the address book lacks) count as
+   explained here and are flagged in the CompareResult for the report.
+
+``decide(bundle, model=...)`` is kept for the one-call judge form (eval only): its decision
+stands only after rows 1 to 3.
 
     uv run python -m judge.verdict fixtures/bundles/demo_bybit.bundle.json
 """
@@ -20,8 +28,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from judge import canon, compare
+from judge.canon import Resolver
 from judge.evidence import rules
-from judge.schemas import Decision, EvidenceBundle, FloorHit, FloorRule, Verdict
+from judge.schemas import (
+    CompareResult, Decision, EvidenceBundle, ExpectedEffects, FloorHit, FloorRule, Narration, Verdict,
+)
 
 # One paragraph per rule, for the signer who has to understand the rejection. Written by us, not
 # by a model, so it can be shown without spotlighting. Keep it to what the rule actually proves.
@@ -77,45 +89,88 @@ def floor_verdict(hits: list[FloorHit]) -> Verdict:
     )
 
 
-def decide(bundle: EvidenceBundle, model: Verdict | None = None) -> Verdict:
-    """The decision table. ``model`` is the checked judge form, or None if the judge did not run."""
+def _ask(reasoning: str, reason: str, question: str | None = None, cmp: CompareResult | None = None) -> Verdict:
+    return Verdict(reasoning=reasoning, decision=Decision.ASK, reasons=[reason], question=question, compare=cmp)
+
+
+def from_compare(cmp: CompareResult) -> Verdict:
+    """Rows 4 of the table, from a finished reconciliation."""
+    critical = [u for u in cmp.observed_unexplained if u.severity == "critical"]
+    notable = [u for u in cmp.observed_unexplained if u.severity != "critical"]
+    if critical:
+        lines = [f"{len(critical)} critical effect{'s' if len(critical) != 1 else ''} in the trace that nothing in the "
+                 "description accounts for:"]
+        lines += [f"- {u.item} (evidence {', '.join(u.cites)}; {u.reason})" for u in critical]
+        return Verdict(reasoning="\n".join(lines), decision=Decision.REJECT,
+                       reasons=[f"unexplained critical: {u.item}" for u in critical], compare=cmp)
+    if notable:
+        lines = [f"The trace shows {len(notable)} effect{'s' if len(notable) != 1 else ''} the description does not "
+                 "mention:"]
+        lines += [f"- {u.item} (evidence {', '.join(u.cites)})" for u in notable]
+        q = "The transaction also does the following, which the description does not mention. Is that intended? " + \
+            "; ".join(u.item for u in notable)
+        return _ask("\n".join(lines), f"unexplained: {notable[0].item}", q, cmp)
+    if cmp.expected_unobserved:
+        lines = ["The description promises effects the rehearsal did not show:"]
+        lines += [f"- {x}" for x in cmp.expected_unobserved]
+        q = "The description says this should happen but the transaction does not do it: " + \
+            "; ".join(cmp.expected_unobserved) + ". Is the description right?"
+        return _ask("\n".join(lines), f"expected but not observed: {cmp.expected_unobserved[0]}", q, cmp)
+    if cmp.nothing_else is False:
+        q = cmp.questions[0] if cmp.questions else "The description leaves open what the transaction may do."
+        return _ask("The description does not pin the transaction down: the forward pass could not rule out other "
+                    "effects.", "description leaves room", q, cmp)
+    tiers = ", ".join(cmp.tiers) if cmp.tiers else "exact"
+    return Verdict(
+        reasoning=f"Every effect in the trace is accounted for by the description, and everything the description "
+                  f"promises is in the trace ({len(cmp.matched)} matched; tiers used: {tiers}).",
+        decision=Decision.MATCH, reasons=[f"{m.kind}: {m.observed} [{m.tier}]" for m in cmp.matched], compare=cmp,
+    )
+
+
+def decide(
+    bundle: EvidenceBundle,
+    model: Verdict | None = None,
+    *,
+    expected: ExpectedEffects | None = None,
+    observed: Narration | None = None,
+    address_book: dict[str, str] | None = None,
+) -> Verdict:
+    """The decision table. Pass ``expected`` + ``observed`` (+ the address book) for the real
+    pipeline, or ``model`` for the one-call judge form. Neither present: ASK."""
     hits = rules.evaluate(bundle)
     if hits:
         return floor_verdict(hits)
 
     if not bundle.execution_success:
-        return Verdict(
-            reasoning=(
-                "The rehearsal did not succeed: the Safe reported ExecutionFailure or the call "
-                "reverted, so the transaction did nothing on the fork. There is nothing to approve, "
-                "and a transaction that fails under today's state may do something else later."
-            ),
-            decision=Decision.ASK,
-            reasons=["rehearsal did not succeed"],
-        )
+        return _ask(
+            "The rehearsal did not succeed: the Safe reported ExecutionFailure or the call reverted, so the "
+            "transaction did nothing on the fork. There is nothing to approve, and a transaction that fails under "
+            "today's state may do something else later.", "rehearsal did not succeed")
+
+    if expected is not None or observed is not None:
+        if expected is None or observed is None:
+            missing = "forward" if expected is None else "backward"
+            return _ask(f"No hard rule was hit, but the {missing} pass produced no checked form (it did not run, "
+                        "timed out, or its output failed validation). Without both forms nothing can be approved.",
+                        f"no checked {missing} form")
+        r = Resolver(bundle, address_book or {})
+        cmp = compare.reconcile(canon.from_forward(expected, bundle.description, r), canon.from_backward(observed, r), r)
+        return from_compare(cmp)
 
     if model is None:
-        return Verdict(
-            reasoning=(
-                "No hard rule was hit, but the judge has not produced a checked form (it did not "
-                "run, timed out, or its output failed validation). Without one, nothing can be "
-                "approved: every failure ends in ASK."
-            ),
-            decision=Decision.ASK,
-            reasons=["no checked model form"],
-        )
+        return _ask(
+            "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its "
+            "output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+            "no checked model form")
 
-    return Verdict(
-        reasoning=model.reasoning,
-        decision=model.decision,
-        reasons=list(model.reasons),
-        floor_hits=[],
-    )
+    return Verdict(reasoning=model.reasoning, decision=model.decision, reasons=list(model.reasons), floor_hits=[])
 
 
 def render(v: Verdict) -> str:
-    lines = [f"{v.decision.value}", ""]
-    lines.append(v.reasoning)
+    lines = [f"{v.decision.value}", "", v.reasoning]
+    if v.question:
+        lines += ["", f"Question for the signers: {v.question}"]
     return "\n".join(lines)
 
 

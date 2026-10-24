@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_Chdfb1hjYXFtbEM3R0N2ZElQd182ZXdBSRIXX29YY2FxbWxDN0dDdmRJUHdfNmV3QUk",
+  "latency_ms": 7127,
+  "expected_effects": {
+    "reasoning": "The proposal description clearly states a transfer of 500 ETH from the Safe to 'warm wallet', which is mapped in the address book. No other actions, permissions, or Safe configuration changes are mentioned.",
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "500 ETH",
+        "from_name": "Safe",
+        "to_name": "warm wallet",
+        "cites": "Transfer 500 ETH to the warm wallet"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

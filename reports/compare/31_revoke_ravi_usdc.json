@@ -1,0 +1,82 @@
+{
+  "id": "31_revoke_ravi_usdc",
+  "description": "Revoke Ravi's USDC allowance",
+  "expected_verdict": "REJECT",
+  "verdict": {
+    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "decision": "ASK",
+    "reasons": [
+      "no checked model form"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": null
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [],
+    "permissions": [
+      {
+        "asset": {
+          "label": "USDC",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "via": "address",
+          "decimals": 6
+        },
+        "owner": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "spender": {
+          "label": "Ravi",
+          "address": "0x2C81904f370e7f6490aEa328CA847AEFdc3853D3",
+          "via": "address"
+        },
+        "new_allowance": "unlimited",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:USDC approve(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": null,
+  "backward": null,
+  "forward_vs_truth": null,
+  "backward_vs_truth": null,
+  "attribution": [],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x86d78fde7e09f938ebb2bca03511e43b2cf4a6e8f4a0bde8ecbe45f92b30b7ec",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x775a8989dc47f629b145f7378d3145eb690ce716903bc51289f46bd1d0567927",
+        "label": "USDC.allowance[0xDFEC…aE47][0x2C81…53D3]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      },
+      {
+        "id": "s1",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

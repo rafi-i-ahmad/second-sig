@@ -1,0 +1,216 @@
+{
+  "id": "01_send_eth_ops",
+  "description": "Send 5 ETH to the ops wallet",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (1 matched; tiers used: exact).",
+    "decision": "MATCH",
+    "reasons": [
+      "movement: 5 ETH Safe -> ops wallet [exact]"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "5 ETH Safe -> ops wallet",
+          "observed": "5 ETH Safe -> ops wallet",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's nonce increments from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "ops wallet",
+          "address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "via": "address"
+        },
+        "amount_base": 5000000000000000000,
+        "amount_human": "5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:ops wallet (plain ETH transfer, empty calldata)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "ops wallet",
+          "address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "via": "address_book"
+        },
+        "amount_base": 5000000000000000000,
+        "amount_human": "5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Send 5 ETH to the ops wallet"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "ops wallet",
+          "address": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+          "via": "address_book"
+        },
+        "amount_base": 5000000000000000000,
+        "amount_human": "5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe transfers 5 ETH to ops wallet.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s0",
+          "c1",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: The Safe's nonce increments from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x19aee56367863f1b634a6d332757857125222dafb09b8a6df3e6b90144f25c3f",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

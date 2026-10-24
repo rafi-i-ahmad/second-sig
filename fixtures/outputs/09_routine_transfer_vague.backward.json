@@ -1,0 +1,45 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_Chc0NFhjYXJuakdjZk12ZElQbFlTTHVRURIXNDRYY2FybmpHY2ZNdmRJUGxZU0x1UVE",
+  "latency_ms": 8233,
+  "narration": {
+    "reasoning": "The transaction executes a standard Safe transaction (c0, c1) that sends 1 ETH (1000000000000000000 wei) from the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47) to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (c4). The Safe nonce increments from 1 to 2 (s0). The ExecutionSuccess event is emitted (e0). ETH balances reflect the transfer of 1 ETH from Safe to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31 (b0, b1).",
+    "effects": [
+      {
+        "sentence": "The Safe transferred 1 ETH to 0xE1D9a0eADCb8082d7989D7304061c017bE296C31.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ]
+      },
+      {
+        "sentence": "The Safe's nonce incremented from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s0",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "ETH",
+        "amount_human": "1 ETH",
+        "amount_base_units": "1000000000000000000",
+        "from_name": "Safe",
+        "to_name": "0xE1D9a0eADCb8082d7989D7304061c017bE296C31",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

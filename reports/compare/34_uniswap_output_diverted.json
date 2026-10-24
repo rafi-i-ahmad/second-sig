@@ -1,0 +1,126 @@
+{
+  "id": "34_uniswap_output_diverted",
+  "description": "Buy 1,000 USDC on Uniswap, spending at most 1 ETH",
+  "expected_verdict": "REJECT",
+  "verdict": {
+    "reasoning": "No hard rule was hit, but the judge has not produced a checked form (it did not run, timed out, or its output failed validation). Without one, nothing can be approved: every failure ends in ASK.",
+    "decision": "ASK",
+    "reasons": [
+      "no checked model form"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": null
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Uniswap",
+          "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+          "via": "address"
+        },
+        "amount_base": 1000000000000000000,
+        "amount_human": "1 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:Uniswap V2 Router swapETHForExactTokens(uint256,address[],address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": [
+      "protocol call Uniswap V2 Router.swapETHForExactTokens(uint256,address[],address,uint256): asset flows taken from the fork's balance changes"
+    ]
+  },
+  "forward": null,
+  "backward": null,
+  "forward_vs_truth": null,
+  "backward_vs_truth": null,
+  "attribution": [],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x8b296a6af123ae966eccfa35afcc18734ed59ffe9a411a5bedfd3f58adb603bc",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x096dd619cd2c4170b38907621d8867e5cbd5a41ec8e9f09b8df03981132df3de",
+        "label": "USDC.balanceOf[0x2C81…53D3]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000000000000000000000000000000000003b9aca00"
+      },
+      {
+        "id": "s1",
+        "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "slot": "0x28c0947f463362aab09a2d7896ccc847fb7e52633a16b978fb2caf3db1a9b8f8",
+        "label": "USDC.balanceOf[0xB4e1…C9Dc]",
+        "before": "0x000000000000000000000000000000000000000000000000000013f2591d5c3a",
+        "after": "0x000000000000000000000000000000000000000000000000000013f21d82923a"
+      },
+      {
+        "id": "s2",
+        "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000008",
+        "label": null,
+        "before": "0x67b889f70000000001a449398006fcbdca6b000000000000000013f2591d5c3a",
+        "after": "0x67b943830000000001a44e253c3b161cc7d0000000000000000013f21d82923a"
+      },
+      {
+        "id": "s3",
+        "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "label": null,
+        "before": "0x0000000000000000000001bcff5d51626bbac3212f1e0c569428e43325bd2ed8",
+        "after": "0x0000000000000000000001bd0ea2e15c7b23c36986afff1daeeeac612fd33678"
+      },
+      {
+        "id": "s4",
+        "contract": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "slot": "0x000000000000000000000000000000000000000000000000000000000000000a",
+        "label": null,
+        "before": "0x000000000000000000000000000000000000530ebc192fc1b74983845eb95a5e",
+        "after": "0x00000000000000000000000000000000000053178a6fcf64c153e9e5edf7225e"
+      },
+      {
+        "id": "s5",
+        "contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "slot": "0xb374801ace2c02f5db0425ab5920a2b7ed1d5a00abbcd395fda7530ba1d666c0",
+        "label": null,
+        "before": "0x0000000000000000000000000000000000000000000001a449398006fcbdca6b",
+        "after": "0x0000000000000000000000000000000000000000000001a44e253c3b161cc7d0"
+      },
+      {
+        "id": "s6",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

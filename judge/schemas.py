@@ -330,6 +330,135 @@ class HumanQuestion(BaseModel):
     """An item the judge could not resolve and must surface to a human."""
 
 
+# --------------------------------------------------------------------------- canonical form (layer 4)
+#
+# canon.py normalises ExpectedEffects (forward), Narration (backward) and the fixture ground
+# truth into these. Identity is the address: labels, chain symbols and contract names are
+# display only. compare.py reconciles two CanonEffects and verdict.py reads the result.
+
+PartyVia = Literal["safe", "address_book", "address", "zero", "sources", "unresolved"]
+AssetVia = Literal["eth", "address_book", "address", "evidence", "unresolved"]
+Direction = Literal["out", "in", "self", "third_party"]
+FormSource = Literal["forward", "backward", "truth"]
+ConfigField = Literal[
+    "owners_add", "owners_remove", "owners_swap", "threshold", "guard", "fallback_handler",
+    "module_enable", "module_disable", "singleton",
+]
+MatchTier = Literal[
+    "exact", "amount_unconstrained", "party_unresolved", "asset_unresolved", "counterparty_via_callee",
+    "inbound_from_callee", "internal_to_callee", "unmatched",
+]
+
+
+class Party(BaseModel):
+    label: str = Field(description="What the form said: an address-book name, 'Safe', or an address.")
+    address: str | None = Field(default=None, description="Checksummed; None if the label could not be resolved.")
+    via: PartyVia = "unresolved"
+
+    @property
+    def resolved(self) -> bool:
+        return self.address is not None
+
+
+class Asset(BaseModel):
+    label: str
+    address: str | None = Field(default=None, description="Token address, or 'ETH'. None if unresolved.")
+    via: AssetVia = "unresolved"
+    decimals: int | None = None
+
+    @property
+    def resolved(self) -> bool:
+        return self.address is not None
+
+
+class CanonMovement(BaseModel):
+    asset: Asset
+    from_party: Party
+    to_party: Party
+    amount_base: int | None = Field(default=None, description="Base units; None if the form fixed no amount.")
+    amount_human: str | None = None
+    direction: Direction
+    implied: bool = False
+    severity: Severity | None = None
+    cites: list[str] = Field(default_factory=list)
+    cited_ok: bool = True
+    source: FormSource
+
+
+class CanonPermission(BaseModel):
+    asset: Asset
+    owner: Party
+    spender: Party
+    new_allowance: int | Literal["unlimited", "zero"] | None = None
+    implied: bool = False
+    severity: Severity | None = None
+    cites: list[str] = Field(default_factory=list)
+    cited_ok: bool = True
+    source: FormSource
+
+
+class CanonConfig(BaseModel):
+    field: ConfigField
+    old: str | None = None
+    new: str | None = None
+    severity: Severity | None = None
+    cites: list[str] = Field(default_factory=list)
+    cited_ok: bool = True
+    source: FormSource
+
+
+class CanonEffect(BaseModel):
+    """A backward-pass sentence, kept so unexplained critical findings can still force a verdict."""
+
+    sentence: str
+    severity: Severity
+    cites: list[str]
+    cited_ok: bool = True
+
+
+class CanonEffects(BaseModel):
+    source: FormSource
+    movements: list[CanonMovement] = Field(default_factory=list)
+    permissions: list[CanonPermission] = Field(default_factory=list)
+    configs: list[CanonConfig] = Field(default_factory=list)
+    effects: list[CanonEffect] = Field(default_factory=list)
+    nothing_else: bool | None = None
+    questions: list[str] = Field(default_factory=list)
+    uncited: list[str] = Field(default_factory=list, description="Items whose evidence ids do not resolve.")
+    unsupported: list[str] = Field(default_factory=list, description="Forward items whose phrase is not in the text.")
+    notes: list[str] = Field(default_factory=list)
+
+
+class Match(BaseModel):
+    kind: Literal["movement", "permission", "config"]
+    expected: str
+    observed: str
+    tier: MatchTier
+    notes: list[str] = Field(default_factory=list)
+
+
+class Unexplained(BaseModel):
+    kind: Literal["movement", "permission", "config", "effect"]
+    item: str
+    severity: Severity
+    cites: list[str] = Field(default_factory=list)
+    reason: str
+
+
+class CompareResult(BaseModel):
+    """What compare.reconcile found. The verdict reads only this and the floor."""
+
+    matched: list[Match] = Field(default_factory=list)
+    observed_unexplained: list[Unexplained] = Field(default_factory=list)
+    expected_unobserved: list[str] = Field(default_factory=list)
+    info_effects: list[str] = Field(default_factory=list)
+    uncited: list[str] = Field(default_factory=list)
+    unsupported: list[str] = Field(default_factory=list)
+    tiers: list[MatchTier] = Field(default_factory=list)
+    nothing_else: bool | None = None
+    questions: list[str] = Field(default_factory=list)
+
+
 class Decision(str, Enum):
     MATCH = "MATCH"
     ASK = "ASK"
@@ -345,6 +474,8 @@ class Verdict(BaseModel):
     floor_hits: list[FloorHit] = Field(
         default_factory=list, description="The hard-rule hits that forced REJECT, if any (invariant 2)."
     )
+    question: str | None = Field(default=None, description="ASK only: what the signer must settle.")
+    compare: CompareResult | None = Field(default=None, description="The reconciliation, for the per-effect table.")
 
 
 class Stamp(BaseModel):

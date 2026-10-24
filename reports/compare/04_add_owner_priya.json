@@ -1,0 +1,241 @@
+{
+  "id": "04_add_owner_priya",
+  "description": "Add Priya as a signer",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (2 matched; tiers used: exact).",
+    "decision": "MATCH",
+    "reasons": [
+      "config: owners_add = 0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8 [exact]",
+      "config: threshold = 2 [exact]"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": {
+      "matched": [
+        {
+          "kind": "config",
+          "expected": "owners_add = 0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8",
+          "observed": "owners_add = 0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8",
+          "tier": "exact",
+          "notes": []
+        },
+        {
+          "kind": "config",
+          "expected": "threshold = 2",
+          "observed": "threshold = 2",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's execution nonce increments from 1 to 2."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "owners_add",
+        "old": null,
+        "new": "0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8",
+        "severity": null,
+        "cites": [
+          "call:Safe (itself) addOwnerWithThreshold(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "2",
+        "severity": null,
+        "cites": [
+          "call:Safe (itself) addOwnerWithThreshold(address,uint256)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "owners_add",
+        "old": null,
+        "new": "0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8",
+        "severity": null,
+        "cites": [
+          "Add Priya as a signer"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "2",
+        "severity": null,
+        "cites": [
+          "Add Priya as a signer"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [],
+    "permissions": [],
+    "configs": [
+      {
+        "field": "owners_add",
+        "old": null,
+        "new": "0xB55c0E1dE2aF38cF741De4b2C8D6D5bb34e9AfE8",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s2",
+          "s3",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      },
+      {
+        "field": "threshold",
+        "old": null,
+        "new": "2",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s2",
+          "s3",
+          "e1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "effects": [
+      {
+        "sentence": "Priya is added as an owner of the Safe, increasing total owners from 3 to 4 with the signing threshold set to 2.",
+        "severity": "critical",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s2",
+          "s3",
+          "e1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's execution nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s1",
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: The Safe's execution nonce increments from 1 to 2.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x699fc6f9e2f44f28f6831ecdc2c56ce0bec8733dc1731fa9c17d369e594dfcdd",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "label": "Safe.ownerCount",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000004"
+      },
+      {
+        "id": "s1",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      },
+      {
+        "id": "s2",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0",
+        "label": "Safe.owners[0x0000…0001]",
+        "before": "0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "after": "0x000000000000000000000000b55c0e1de2af38cf741de4b2c8d6d5bb34e9afe8"
+      },
+      {
+        "id": "s3",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0xfaaff639b0efbafca89b3bb639afaf1c7597cb56d65009cba8b6f60f04ed7819",
+        "label": "Safe.owners[0xB55c…AfE8]",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "after": "0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+      }
+    ]
+  }
+}

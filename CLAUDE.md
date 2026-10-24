@@ -37,10 +37,20 @@ judge/
   labeller.py         layer 2: spotlight() wraps untrusted text in per-call random tags
   model.py            Gemini Interactions adapter: complete(), stream(), count_tokens(); logs every call
   jobs/               layer 3: forward.py, backward.py (work); leftovers, probe, escalate (stubs)
-  checker.py          layer 4  (stub)
-  verdict.py          layer 5: decide(bundle, model_form) -> Verdict. Floor hit -> REJECT (recomputes the
-                      floor, never trusts bundle.floor_hits); failed rehearsal or no form -> ASK; else the
-                      form's decision. FLOOR_EXPLANATIONS holds the signer-facing paragraph per rule
+  checker.py          layer 4: citation checks. Backward ids must resolve via bundle.entry(); forward phrases
+                      must be in the description. Bad citations are marked, never dropped (fail closed)
+  canon.py            layer 4: Resolver + from_forward()/from_backward() -> CanonEffects. Identity is the
+                      address: labels via address book, assets via address book or cited evidence; chain
+                      symbols and contract names are display only
+  compare.py          layer 4: reconcile(expected, observed, resolver) -> CompareResult. Tiers: exact,
+                      amount_unconstrained, counterparty_via_callee, party/asset_unresolved,
+                      inbound_from_callee, internal_to_callee. Only notable/critical observed items count
+  truth.py            ground truth for a case from its calldata (+ the Safe's balance changes for protocol
+                      calls); grades each pass on its own. fixtures/truth/<id>.json overrides if present
+  verdict.py          layer 5: decide(bundle, expected=, observed=, address_book=) -> Verdict. Floor hit ->
+                      REJECT (floor recomputed, bundle.floor_hits never trusted); failed rehearsal or a
+                      missing form -> ASK; unexplained critical -> REJECT; unexplained notable, expected
+                      unobserved, or nothing_else false -> ASK; else MATCH. Verdict carries the CompareResult
   stamp.py            EIP-712 signing with the judge key: make_stamp(bundle), sign(), digest(),
                       attest(). The only module that reads JUDGE_PRIVATE_KEY
   stages/
@@ -71,7 +81,9 @@ eval/
   naive_baseline.md   naive-judge results and the auditor-miss analysis
 tests/                pytest: schemas, model adapter, evidence, floor rules, stamp, forward cases
                       (live), backward (input checks offline; bundles live). Markers: `live` needs --live + GEMINI_API_KEY; `fork` needs --fork + anvil
-scripts/              smoke_gemini.py, forward_transfer.py: one-off checks
+scripts/              compare_benign.py: three-way report (truth, forward, backward) per case into
+                      reports/compare/, --live fills missing forms; smoke_gemini.py, forward_transfer.py
+reports/compare/      <id>.md + <id>.json per case, summary.json, FINDINGS.md (which pass is wrong where)
 logs/                 calls.jsonl, verdicts.jsonl (gitignored; used by --replay)
 ```
 
@@ -93,6 +105,7 @@ cd contracts && ~/.foundry/bin/forge build && ~/.foundry/bin/forge test -vv
 uv run python contracts/setup.py [--guard]      # deploy or find the test Safe; --guard also sets the guard
 uv run python -m judge.evidence.fork <case.json> [--out fixtures/bundles]   # rehearse, write the bundle
 uv run python -m judge.verdict fixtures/bundles/<id>.bundle.json           # decision table on a saved bundle
+uv run python scripts/compare_benign.py [--live] [--include-reject]        # end-to-end verdicts by replay + reports
 uv run python -m judge.run_fixture fixtures/cases/01_send_eth_ops.json [--save-trace]
 uv run python -m judge.stages.judge <case.json>... [--dump-prompt out.txt --no-call]
 ```

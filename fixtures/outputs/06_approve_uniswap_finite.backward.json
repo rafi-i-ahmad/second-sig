@@ -1,0 +1,47 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdIWWJjYXBuc01JT0N2ZElQemNMeHFBVRIXSFliY2FwbnNNSU9DdmRJUHpjTHhxQVU",
+  "latency_ms": 5932,
+  "narration": {
+    "reasoning": "The Safe executes a call to the USDC contract (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) calling `approve(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 1000000000)`. This grants Uniswap router an allowance of 1,000 USDC (6 decimals). The Safe nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe approves Uniswap router to spend up to 1,000 USDC.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s1",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap router",
+        "amount_human": "1,000 USDC",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "e1"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

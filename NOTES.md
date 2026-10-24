@@ -14,6 +14,11 @@ Operational facts for the fork and the test Safe. Updated 24 October 2026.
   `Stamp` unchanged; its `judgeVersion` is the bytes32 hex of `keccak256("second-sig/v1")`.
 - 24 October, Rafi: `Verdict` gains `floor_hits: list[FloorHit] = []`, so the UI can show which hard
   rules forced a REJECT. `EvidenceBundle` and `Stamp` unchanged.
+- 24 October, Rafi (branch `compare`): additive. `Verdict` gains `question: str | None` and
+  `compare: CompareResult | None`. New canonical-form models for layer 4: `Party`, `Asset`,
+  `CanonMovement`, `CanonPermission`, `CanonConfig`, `CanonEffect`, `CanonEffects`, `Match`,
+  `Unexplained`, `CompareResult`, plus the literals `MatchTier`, `Direction`, `ConfigField`,
+  `FormSource`. `EvidenceBundle`, `Stamp`, `ExpectedEffects`, `Narration` unchanged.
 
 ## Fork
 
@@ -220,6 +225,18 @@ signature, and that eth_account's EIP-712 encoding matches the hand-built digest
 Signature facts the guard relies on and eth_account satisfies: 65 bytes `r ‖ s ‖ v`, `v` in {27, 28},
 low `s` (the guard rejects `s > n/2`). `MAX_STAMP_AGE` is 100 blocks from `forkBlock`, so a stamp
 signed on a stale rehearsal (or a `forkBlock` in the future) is refused at `attest`.
+
+### End to end by replay (24 October, Rafi, branch `compare`)
+
+`uv run python scripts/compare_benign.py` runs the whole judge on recorded forms with no model
+call: floor, then canon/compare of the forward and backward forms, then the decision table. Result
+on the 13 benign and demo cases: 01–08 and 10 MATCH, 09 ASK, Aave MATCH, auditor ASK, Bybit
+REJECT. Every expected verdict met. Reports in `reports/compare/`, findings in
+`reports/compare/FINDINGS.md`. The five reject cases have no recorded forms yet: the Gemini billing
+account hit its **monthly spending cap** (HTTP 429) on 24 October while recording them, so they
+read ASK (fail closed) until the cap is raised at ai.studio/billing and `--live --include-reject`
+is run again. Forward forms for the three demos and backward forms for 02–10 were recorded before
+the cap hit.
 
 Naive judge (`judge/stages/judge.py`, one `gemini-4-argon` call, thinking high, sees everything):
 01 MATCH, auditor REJECT (expected ASK), Bybit REJECT. Table and hypotheses for the auditor miss

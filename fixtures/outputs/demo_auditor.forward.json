@@ -1,0 +1,24 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_Chc5NFhjYXBUMUNMckR2ZElQMlp6MnlBURIXOTRYY2FwVDFDTHJEdmRJUDJaejJ5QVE",
+  "latency_ms": 6906,
+  "expected_effects": {
+    "reasoning": "The description clearly specifies paying 'auditor' an amount of 100 USDC from the Safe. Both 'auditor' and 'USDC' are present in the address book. No permissions or config changes are requested.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "100 USDC",
+        "from_name": "Safe",
+        "to_name": "auditor",
+        "cites": "Pay our auditor 100 USDC"
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

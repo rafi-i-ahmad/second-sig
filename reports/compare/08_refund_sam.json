@@ -1,0 +1,227 @@
+{
+  "id": "08_refund_sam",
+  "description": "Refund Sam the 0.5 ETH he overpaid",
+  "expected_verdict": "MATCH",
+  "verdict": {
+    "reasoning": "Every effect in the trace is accounted for by the description, and everything the description promises is in the trace (1 matched; tiers used: exact).",
+    "decision": "MATCH",
+    "reasons": [
+      "movement: 0.5 ETH Safe -> Sam [exact]"
+    ],
+    "floor_hits": [],
+    "question": null,
+    "compare": {
+      "matched": [
+        {
+          "kind": "movement",
+          "expected": "0.5 ETH Safe -> Sam",
+          "observed": "0.5 ETH Safe -> Sam",
+          "tier": "exact",
+          "notes": []
+        }
+      ],
+      "observed_unexplained": [],
+      "expected_unobserved": [],
+      "info_effects": [
+        "The Safe's nonce increments from 1 to 2.",
+        "The Safe emits an ExecutionSuccess event."
+      ],
+      "uncited": [],
+      "unsupported": [],
+      "tiers": [
+        "exact"
+      ],
+      "nothing_else": true,
+      "questions": []
+    }
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Sam",
+          "address": "0x1C733c205548a061CED714A14925E952e2E64D6E",
+          "via": "address"
+        },
+        "amount_base": 500000000000000000,
+        "amount_human": "0.5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "call:Sam (plain ETH transfer, empty calldata)"
+        ],
+        "cited_ok": true,
+        "source": "truth"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Sam",
+          "address": "0x1C733c205548a061CED714A14925E952e2E64D6E",
+          "via": "address_book"
+        },
+        "amount_base": 500000000000000000,
+        "amount_human": "0.5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Refund Sam the 0.5 ETH he overpaid"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "Sam",
+          "address": "0x1C733c205548a061CED714A14925E952e2E64D6E",
+          "via": "address_book"
+        },
+        "amount_base": 500000000000000000,
+        "amount_human": "0.5 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true,
+        "source": "backward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe transfers 0.5 ETH to Sam.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "b0",
+          "b1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's nonce increments from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s0"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe emits an ExecutionSuccess event.",
+        "severity": "info",
+        "cites": [
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "info: The Safe's nonce increments from 1 to 2.",
+      "attribution": "bookkeeping"
+    },
+    {
+      "item": "info: The Safe emits an ExecutionSuccess event.",
+      "attribution": "bookkeeping"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0x7cb758ec5592b31e0d6e27cb780a0b738fa6d864292bbdd47221e431d30b1fb7",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

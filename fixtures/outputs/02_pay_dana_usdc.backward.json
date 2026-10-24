@@ -1,0 +1,51 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdCWWJjYXRTakQ3ckR2ZElQN1p6MnlBURIXQlliY2F0U2pEN3JEdmRJUDdaejJ5QVE",
+  "latency_ms": 6107,
+  "narration": {
+    "reasoning": "The rehearsal executes Safe.execTransaction which calls USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) to transfer 2,500 USDC (2,500,000,000 base units) to Dana (0x4716b53aC6fd6AeFbb0E6a4687eAE260011bd315). The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "Transferred 2,500 USDC from Safe to Dana.",
+        "severity": "notable",
+        "cites": [
+          "c4",
+          "c5",
+          "s0",
+          "s1",
+          "b0",
+          "b1",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "Safe nonce incremented from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s2",
+          "e0"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "2,500 USDC",
+        "amount_base_units": "2500000000",
+        "from_name": "Safe",
+        "to_name": "Dana",
+        "cites": [
+          "b0",
+          "b1",
+          "e1",
+          "s0",
+          "s1"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

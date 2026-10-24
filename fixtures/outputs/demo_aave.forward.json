@@ -1,0 +1,35 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_Chc4WVhjYXRya0ZZU2Z4TjhQcElYem1BNBIXOFlYY2F0cmtGWVNmeE44UHBJWHptQTQ",
+  "latency_ms": 12680,
+  "expected_effects": {
+    "reasoning": "The description specifies depositing 10,000 USDC into Aave v3. Depositing an ERC20 token into a protocol like Aave implies an ERC-20 approval from the Safe to the Aave v3 Pool for 10,000 USDC, followed by the transfer/deposit of 10,000 USDC from the Safe to the Aave v3 Pool.",
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "10,000 USDC",
+        "from_name": "Safe",
+        "to_name": "Aave v3 Pool",
+        "cites": "Deposit 10,000 USDC into Aave v3"
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Aave v3 Pool",
+        "amount_human": "10,000 USDC",
+        "cites": "Deposit 10,000 USDC into Aave v3"
+      }
+    ],
+    "safe_config_changes": [],
+    "nothing_else": true,
+    "assumptions": [
+      "A deposit into Aave v3 requires an ERC-20 approval of 10,000 USDC to the Aave v3 Pool contract."
+    ],
+    "questions_for_human": [],
+    "confidence": "high"
+  }
+}

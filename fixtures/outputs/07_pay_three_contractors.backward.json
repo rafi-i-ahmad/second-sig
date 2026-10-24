@@ -1,0 +1,120 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdJNGJjYXRteUxPN2x4TjhQbll2ZDRRURIXSTRiY2F0bXlMTzdseE44UG5ZdmQ0UVE",
+  "latency_ms": 7475,
+  "narration": {
+    "reasoning": "The rehearsal executes a Safe multisig transaction via MultiSendCallOnly (v1.4.1), which performs three distinct transfers of USDC: 1,200 USDC to Alice, 3,400 USDC to Bob, and 800 USDC to Chen. Total USDC transferred from the Safe is 5,400 USDC. The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe increments its transaction nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "s4",
+          "e0"
+        ]
+      },
+      {
+        "sentence": "The Safe delegates calls through MultiSendCallOnly v1.4.1 to execute multiple batch transactions.",
+        "severity": "info",
+        "cites": [
+          "c1",
+          "c4"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 1,200 USDC to Alice.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s3",
+          "b1",
+          "b3",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 3,400 USDC to Bob.",
+        "severity": "notable",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e2"
+        ]
+      },
+      {
+        "sentence": "The Safe transfers 800 USDC to Chen.",
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "c10",
+          "s1",
+          "s2",
+          "b0",
+          "b3",
+          "e3"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "1,200 USDC",
+        "amount_base_units": "1200000000",
+        "from_name": "Safe",
+        "to_name": "Alice",
+        "cites": [
+          "c5",
+          "c6",
+          "s1",
+          "s3",
+          "b1",
+          "b3",
+          "e1"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "3,400 USDC",
+        "amount_base_units": "3400000000",
+        "from_name": "Safe",
+        "to_name": "Bob",
+        "cites": [
+          "c7",
+          "c8",
+          "s0",
+          "s1",
+          "b2",
+          "b3",
+          "e2"
+        ]
+      },
+      {
+        "asset": "USDC",
+        "amount_human": "800 USDC",
+        "amount_base_units": "800000000",
+        "from_name": "Safe",
+        "to_name": "Chen",
+        "cites": [
+          "c9",
+          "c10",
+          "s1",
+          "s2",
+          "b0",
+          "b3",
+          "e3"
+        ]
+      }
+    ],
+    "permission_changes": [],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}

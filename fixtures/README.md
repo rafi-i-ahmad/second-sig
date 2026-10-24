@@ -38,6 +38,7 @@ destination case are still to be written; they go in `reject/` or `ask/` like an
 | --- | --- | --- |
 | `bundles/` | One `<id>.bundle.json` (the `EvidenceBundle`: decoded call tree, labelled storage writes, balance changes, events, sources, floor hits) and one `<id>.rehearsal.json` (the raw traces it was built from) per case. All 18 cases as of 24 October | `uv run python -m judge.evidence.fork <case.json>` on anvil |
 | `examples/` | `bybit.bundle.json`, a hand-checked example bundle the schema tests validate against | by hand |
+| `truth/` | Optional hand-written ground truth, `<id>.json`, same shape as a case `intent`; overrides what `judge/truth.py` derives from the calldata. None needed so far | by hand |
 | `traces/` | Older raw traces from `judge.run_fixture --save-trace` (three cases). Superseded by `bundles/`, but the naive baseline (`judge/stages/judge.py`) still reads this format; delete once it reads bundles | `uv run python -m judge.run_fixture <case.json> --save-trace` |
 
 ## Caches: so nothing needs the network

@@ -1,0 +1,183 @@
+{
+  "id": "demo_bybit",
+  "description": "Transfer 500 ETH to the warm wallet",
+  "expected_verdict": "REJECT",
+  "verdict": {
+    "reasoning": "Rejected by the hard floor before any model ran. 3 hard rule hits (delegatecall_not_allowlisted, protected_slot_write, unverified_code). These rules have no honest counterexample, so the description is irrelevant: whatever it says, this transaction must not execute.\n\nThe transaction makes the Safe run another contract's code as if it were the Safe's own (a delegatecall), and that contract is not the standard Safe batching helper (MultiSendCallOnly). Code run this way can change anything inside the Safe, including who owns it and which contract it trusts as its master copy. This is the shape of the Bybit attack. No honest payment, deposit or swap needs it. What the rehearsal showed: The Safe delegatecalls 0x9622…7242, which is not MultiSendCallOnly: that code runs with the Safe's own storage and funds. (evidence c4).\n\nThe transaction changes one of the Safe's own settings: its master copy (the contract that holds all of its logic), its guard, its fallback handler, or its list of modules. Ordinary transactions never touch these. Changing them hands control of the Safe to whoever wrote the new value, and the owners' signatures would no longer mean anything. What the rehearsal showed: The Safe's singleton (slot 0) changes from 0x4167…461a to 0xbDd0…9516. (evidence s0).\n\nThe transaction calls a contract whose source code is not verified on Etherscan. Nobody, human or model, can read what that code does, so approving it would mean trusting it blind. Attackers deploy their contracts unverified for exactly this reason. What the rehearsal showed: 0x9622…7242 has no verified source. (evidence c4).",
+    "decision": "REJECT",
+    "reasons": [
+      "delegatecall_not_allowlisted: The Safe delegatecalls 0x9622…7242, which is not MultiSendCallOnly: that code runs with the Safe's own storage and funds.",
+      "protected_slot_write: The Safe's singleton (slot 0) changes from 0x4167…461a to 0xbDd0…9516.",
+      "unverified_code: 0x9622…7242 has no verified source."
+    ],
+    "floor_hits": [
+      {
+        "rule": "delegatecall_not_allowlisted",
+        "cites": [
+          "c4"
+        ],
+        "reason": "The Safe delegatecalls 0x9622…7242, which is not MultiSendCallOnly: that code runs with the Safe's own storage and funds."
+      },
+      {
+        "rule": "protected_slot_write",
+        "cites": [
+          "s0"
+        ],
+        "reason": "The Safe's singleton (slot 0) changes from 0x4167…461a to 0xbDd0…9516."
+      },
+      {
+        "rule": "unverified_code",
+        "cites": [
+          "c4"
+        ],
+        "reason": "0x9622…7242 has no verified source."
+      }
+    ],
+    "question": null,
+    "compare": null
+  },
+  "truth": {
+    "source": "truth",
+    "movements": [],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": [
+      "delegatecall to Bybit attackers' contract (not in the address book): no asset flow derivable from calldata"
+    ]
+  },
+  "forward": {
+    "source": "forward",
+    "movements": [
+      {
+        "asset": {
+          "label": "ETH",
+          "address": "ETH",
+          "via": "eth",
+          "decimals": 18
+        },
+        "from_party": {
+          "label": "Safe",
+          "address": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+          "via": "safe"
+        },
+        "to_party": {
+          "label": "warm wallet",
+          "address": "0x5EdeB15618d4A94EBFC4DfEBBe49748982731B07",
+          "via": "address_book"
+        },
+        "amount_base": 500000000000000000000,
+        "amount_human": "500 ETH",
+        "direction": "out",
+        "implied": false,
+        "severity": null,
+        "cites": [
+          "Transfer 500 ETH to the warm wallet"
+        ],
+        "cited_ok": true,
+        "source": "forward"
+      }
+    ],
+    "permissions": [],
+    "configs": [],
+    "effects": [],
+    "nothing_else": true,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "backward": {
+    "source": "backward",
+    "movements": [],
+    "permissions": [],
+    "configs": [],
+    "effects": [
+      {
+        "sentence": "The Safe executed a delegatecall to unverified contract 0x96221423681A6d52E184D440a8eFCEbB105C7242.",
+        "severity": "critical",
+        "cites": [
+          "c4"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's singleton implementation address was overwritten from 0x41675C099F32341bf84BFc5382aF534df5C7461a to 0xbdd077f651Ebe7f7b3cE16fE5F2B025be2969516.",
+        "severity": "critical",
+        "cites": [
+          "s0",
+          "c4"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe's transaction nonce increased from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s1"
+        ],
+        "cited_ok": true
+      },
+      {
+        "sentence": "The Safe emitted an ExecutionSuccess event.",
+        "severity": "info",
+        "cites": [
+          "e0"
+        ],
+        "cited_ok": true
+      }
+    ],
+    "nothing_else": null,
+    "questions": [],
+    "uncited": [],
+    "unsupported": [],
+    "notes": []
+  },
+  "forward_vs_truth": {
+    "missing": [],
+    "extra": [
+      "movement 500 ETH Safe -> warm wallet"
+    ],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "backward_vs_truth": {
+    "missing": [],
+    "extra": [],
+    "wrong_amount": [],
+    "wrong_party": []
+  },
+  "attribution": [
+    {
+      "item": "forward vs truth (extra): movement 500 ETH Safe -> warm wallet",
+      "attribution": "real_finding"
+    }
+  ],
+  "residuals": [],
+  "bundle": {
+    "safe_tx_hash": "0xefa7c370b3d1ecc854991e54611583f0a585475eeee568c3932abdfa1e050fcc",
+    "fork_block": 21895241,
+    "storage_diff": [
+      {
+        "id": "s0",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "Safe.singleton",
+        "before": "0x00000000000000000000000041675c099f32341bf84bfc5382af534df5c7461a",
+        "after": "0x000000000000000000000000bdd077f651ebe7f7b3ce16fe5f2b025be2969516"
+      },
+      {
+        "id": "s1",
+        "contract": "0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47",
+        "slot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "label": "Safe.nonce",
+        "before": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "after": "0x0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  }
+}

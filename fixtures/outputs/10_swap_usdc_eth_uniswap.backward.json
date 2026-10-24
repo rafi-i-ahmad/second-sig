@@ -1,0 +1,117 @@
+{
+  "model": "gemini-3.8-flash",
+  "thinking": "low",
+  "interaction_id": "v1_ChdNb2JjYXVXRkVQTG14TjhQbjVDVzhRURIXTW9iY2F1V0ZFUExteE44UG41Q1c4UVE",
+  "latency_ms": 8740,
+  "narration": {
+    "reasoning": "The transaction executes a MultiSendCallOnly call from the Safe (0xDFECEf26e5d211b9935cABC9FAD1edB8960aaE47). First, the Safe approves Uniswap router to spend 5,000 USDC. Second, the Safe calls swapExactTokensForETH on Uniswap router, swapping 5,000 USDC for approximately 1.7618 ETH (which was withdrawn from WETH and sent to the Safe). All intermediate transfers and pool sync updates occur via Uniswap V2 pair (0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc). The Safe's nonce increments from 1 to 2.",
+    "effects": [
+      {
+        "sentence": "The Safe incremented its nonce from 1 to 2.",
+        "severity": "info",
+        "cites": [
+          "s6",
+          "e0"
+        ]
+      },
+      {
+        "sentence": "The Safe approved Uniswap router to spend up to 5,000 USDC.",
+        "severity": "notable",
+        "cites": [
+          "c5",
+          "c6",
+          "e1"
+        ]
+      },
+      {
+        "sentence": "The Safe transferred 5,000 USDC to 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc.",
+        "severity": "notable",
+        "cites": [
+          "c9",
+          "c10",
+          "e2",
+          "s0",
+          "s1",
+          "b2",
+          "b3"
+        ]
+      },
+      {
+        "sentence": "Uniswap pool 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc transferred 1.761817265430573461 WETH to Uniswap router, which unwrapped it into ETH.",
+        "severity": "info",
+        "cites": [
+          "c11",
+          "c12",
+          "c16",
+          "c17",
+          "e4",
+          "e5",
+          "e6",
+          "s2",
+          "s3",
+          "s4",
+          "s5",
+          "b0",
+          "b4"
+        ]
+      },
+      {
+        "sentence": "The Safe received 1.761817265430573461 ETH from Uniswap router.",
+        "severity": "notable",
+        "cites": [
+          "c18",
+          "c19",
+          "e7",
+          "b1"
+        ]
+      }
+    ],
+    "movements": [
+      {
+        "asset": "USDC",
+        "amount_human": "5,000 USDC",
+        "amount_base_units": "5000000000",
+        "from_name": "Safe",
+        "to_name": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+        "cites": [
+          "c9",
+          "c10",
+          "e2",
+          "s0",
+          "s1",
+          "b2",
+          "b3"
+        ]
+      },
+      {
+        "asset": "ETH",
+        "amount_human": "1.761817265430573461 ETH",
+        "amount_base_units": "1761817265430573461",
+        "from_name": "Uniswap router",
+        "to_name": "Safe",
+        "cites": [
+          "c18",
+          "c19",
+          "e7",
+          "b1"
+        ]
+      }
+    ],
+    "permission_changes": [
+      {
+        "kind": "erc20_approval",
+        "asset": "USDC",
+        "owner_name": "Safe",
+        "spender_name": "Uniswap router",
+        "amount_human": "5,000 USDC",
+        "cites": [
+          "c5",
+          "c6",
+          "e1"
+        ]
+      }
+    ],
+    "safe_config_changes": [],
+    "confidence": "high"
+  }
+}
