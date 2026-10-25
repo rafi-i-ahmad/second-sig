@@ -2,7 +2,9 @@
 
 An extra signer for Safe multisigs that humans can't give. It rehearses a proposed transaction on a fork of Ethereum, compares what the bytes actually do with what the description says, and signs an EIP-712 stamp only on a match. A guard contract on the Safe refuses every transaction that has no valid stamp for its exact hash, however many owners signed it.
 
-Built in two and a half days at Encode London, October 2026, for the Gemini 4 Argon challenge and Agents That Ship. Demo video: *(link goes here before submission)*.
+Built in two and a half days at Encode London, October 2026, for the Gemini 4 Argon challenge and Agents That Ship. Demo video: https://youtu.be/MM6BSl0eh-4?is=nRnqSk60gnA9BXUc
+
+Update: We made it to the finals!! - we got to pitch, and came out in the top 10
 
 ## The problem
 
